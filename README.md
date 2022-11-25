@@ -6,9 +6,13 @@
 - Funzionalità per aiutare a concentrarsi (es. Metodo pomodoro etc).
 - Possibilità di organizzarsi con altri utenti attraverso un sistema di account.
 
-Referente: Elio Gargiulo, 869184
+## Membri:
 
-Membri: Elio Gargiulo (869184), Rigato Stefano (869441).
+- Gargiulo Elio 869184 (Referente)
+- Rigato Stefano 869441
+- Mocellin Andrea 869218
+- Lamanna Francesco 869052
+- Isavo Benavides Milla Nicolle 875386  
 
 # Link utili
 - [Firebase](https://firebase.google.com/docs/android/setup?hl=en&%3Bauthuser=1&authuser=1#kotlin+ktx_2)
