@@ -7,6 +7,7 @@
 - Possibilità di organizzarsi con altri utenti attraverso un sistema di account.
 
 Referente: Elio Gargiulo, 869184
+
 Membri: Elio Gargiulo (869184), Rigato Stefano (869441).
 
 # Link utili
