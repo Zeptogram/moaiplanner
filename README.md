@@ -24,3 +24,6 @@
 - Markdown
 - Autenticazione e salvataggio dati su firebase
 - Pomodoro
+
+# Designer
+https://app.uizard.io/prototypes/7oKjaqA637UjKgYAP7rY
