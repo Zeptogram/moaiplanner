@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "50394403115",
+    "project_id": "moai-planner",
+    "storage_bucket": "moai-planner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50394403115:android:e2e8a51b32df022448b56e",
+        "android_client_info": {
+          "package_name": "com.example.moaiplanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "50394403115-k98o4pct0grf3dveb47a4ncl4gauuifd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyqxuas7E2ZGO1msouh4qQ13tQ_vJiOwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "50394403115-k98o4pct0grf3dveb47a4ncl4gauuifd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
