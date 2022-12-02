@@ -26,3 +26,4 @@
 - Pomodoro
 
 # Template
+Prova Git da Android Studio
