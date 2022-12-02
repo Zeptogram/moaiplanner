@@ -26,4 +26,4 @@
 - Pomodoro
 
 # Designer
-https://app.uizard.io/prototypes/7oKjaqA637UjKgYAP7rY
+https://app.uizard.io/p/72cf0c99
