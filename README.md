@@ -24,6 +24,3 @@
 - Markdown
 - Autenticazione e salvataggio dati su firebase
 - Pomodoro
-
-# Template
-Prova Git da Android Studio.
