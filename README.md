@@ -26,4 +26,4 @@
 - Pomodoro
 
 # Template
-Prova Git da Android Studio
+Prova Git da Android Studio.
