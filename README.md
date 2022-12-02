@@ -24,3 +24,5 @@
 - Markdown
 - Autenticazione e salvataggio dati su firebase
 - Pomodoro
+
+# Template
