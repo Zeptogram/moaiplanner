@@ -12,7 +12,7 @@
 - Rigato Stefano 869441
 - Mocellin Andrea 869218
 - Lamanna Francesco 869052
-- Isavo Benavides Milla Nicolle 875386  
+- Benavides Milla Nicolle Isavo 875386  
 
 # Link utili
 - [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
