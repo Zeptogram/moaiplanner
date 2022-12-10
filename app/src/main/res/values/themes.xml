@@ -2,7 +2,11 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorSecondary">@color/white</item>
+        <item name="colorOnSecondary">@color/gray</item>
+        <item name="colorSecondaryVariant">@color/gray</item>
+        <item name="android:colorBackground">@color/white</item>
     </style>
 
     <style name="Theme.MoaiPlanner" parent="Base.Theme.MoaiPlanner" />

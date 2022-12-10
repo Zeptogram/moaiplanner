@@ -18,12 +18,26 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="182dp"
+        android:layout_height="55dp"
         android:text="Button"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextTextEmailAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:textColor="?attr/colorSecondaryVariant"
+        android:background="@drawable/custom_edit_text"
+        android:drawableTint="?attr/colorSecondaryVariant"
+        android:hint="email"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

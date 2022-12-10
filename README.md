@@ -27,4 +27,8 @@
 - Autenticazione e salvataggio dati su firebase
 - Pomodoro
 
+# N.B.
+In caso la build fallisca perchè non trova SDK, andare sotto Gradel Scripts -> local.properties e
+sostituire <User> con il proprio user di Windows in questa riga: (Senza <>)
 
+sdk.dir=C\:\\Users\\<User>\\AppData\\Local\\Android\\Sdk

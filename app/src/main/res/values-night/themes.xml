@@ -2,6 +2,10 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorSecondary">@color/gray</item>
+        <item name="colorOnSecondary">@color/gray</item>
+        <item name="colorSecondaryVariant">@color/light_gray</item>
+        <item name="android:colorBackground">@color/night_background</item>
     </style>
 </resources>
