@@ -7,4 +7,13 @@
     <string name="home">Home</string>
     <string name="tomato">Tomato</string>
     <string name="to_do">To Do</string>
+    <string name="amici">Amici</string>
+    <string name="notifiche">Notifiche</string>
+    <string name="sicurezza">Sicurezza</string>
+    <string name="abilita_le_notifiche">Abilita le notifiche</string>
+    <string name="email">Email</string>
+    <string name="cambia">Cambia</string>
+    <string name="password">Password</string>
+    <string name="modifica_immagine">Modifica Immagine</string>
+    <string name="log_out">Log Out</string>
 </resources>

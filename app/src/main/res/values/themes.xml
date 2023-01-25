@@ -1,14 +1,26 @@
-<resources>
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- Base application theme. -->
+<style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Customize your light theme here. -->
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryVariant">@color/primary</item>
+    <item name="colorSecondary">@color/white</item>
+    <item name="android:colorBackground">@color/white</item>
+    <item name="colorOnSecondary">#F0F0F0</item>
+    <item name="colorSecondaryVariant">#F0F0F0</item>
+    <item name="android:textColor">@color/gray</item>
+    <item name="android:textColorPrimary">@color/black</item>
+    <item name="android:textColorSecondary">@color/gray</item>
+    <item name="colorOutline">@color/gray</item>
+    <item name="colorSurfaceVariant">#F0F0F0</item>
+    <item name="colorSecondaryContainer">#F0F0F0</item>
+</style>
 
-    <style name="Theme.MoaiPlanner" parent="Base.Theme.MoaiPlanner" />
-
-
-
-
-
+<style name="Theme.MoaiPlanner" parent="Base.Theme.MoaiPlanner" />
+<style name="Theme.MoaiPlanner.NoActionBar">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+</style>
+<style name="Theme.MoaiPlanner.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+<style name="Theme.MoaiPlanner.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
