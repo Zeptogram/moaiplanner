@@ -16,4 +16,6 @@
     <string name="password">Password</string>
     <string name="modifica_immagine">Modifica Immagine</string>
     <string name="log_out">Log Out</string>
+    <string name="favourites">Favourites</string>
+    <string name="show_all">Show All</string>
 </resources>
