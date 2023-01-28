@@ -3,16 +3,11 @@ package com.example.moaiplanner.ui.main
 import RecyclerViewAdapter
 import android.os.Bundle
 import android.view.*
-import android.widget.EditText
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
-import com.example.moaiplanner.ui.utils.ItemsViewModel
-import com.example.moaiplanner.ui.view.SettingsViewModel
+import com.example.moaiplanner.util.ItemsViewModel
 
 
 class HomeFragment : Fragment() {

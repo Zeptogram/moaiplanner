@@ -1,9 +1,8 @@
-package com.example.moaiplanner.ui.utils
+package com.example.moaiplanner.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.moaiplanner.ui.repository.SettingsRepository
-import com.example.moaiplanner.ui.view.SettingsViewModel
+import com.example.moaiplanner.data.repository.settings.SettingsRepository
 
 class SettingsViewModelFactory(private val repository: SettingsRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

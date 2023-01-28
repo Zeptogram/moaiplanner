@@ -7,9 +7,9 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.moaiplanner.databinding.OptionsFragmentBinding
-import com.example.moaiplanner.ui.repository.SettingsRepository
-import com.example.moaiplanner.ui.utils.SettingsViewModelFactory
-import com.example.moaiplanner.ui.view.SettingsViewModel
+import com.example.moaiplanner.data.repository.settings.SettingsRepository
+import com.example.moaiplanner.model.SettingsViewModelFactory
+import com.example.moaiplanner.model.SettingsViewModel
 
 
 class OptionsFragment : Fragment() {

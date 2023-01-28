@@ -1,28 +1,20 @@
 package com.example.moaiplanner.ui.welcome
 
 import android.os.Bundle
-import android.util.Log
 import android.util.Patterns
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.ActionBar
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
-import com.example.moaiplanner.databinding.RegisterFragmentBinding
+import com.example.moaiplanner.databinding.SigninFragmentBinding
 
 
-class RegisterFragment : Fragment() {
+class SigninFragment : Fragment() {
 
-    lateinit var binding: RegisterFragmentBinding
+    lateinit var binding: SigninFragmentBinding
     lateinit var firebase: AuthRepository
 
-    fun newInstance(): RegisterFragment? {
-        return RegisterFragment()
+    fun newInstance(): SigninFragment? {
+        return SigninFragment()
     }
 
     override fun onCreateView(
@@ -30,7 +22,7 @@ class RegisterFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = RegisterFragmentBinding.inflate(inflater, container, false)
+        binding = SigninFragmentBinding.inflate(inflater, container, false)
 
         // Inflate il layout per il fragment
         return binding.root
@@ -39,12 +31,12 @@ class RegisterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         firebase = AuthRepository(requireActivity().application)
-        binding.buttonSignUp.setOnClickListener {
-            createAccount()
+        binding.buttonSignIn.setOnClickListener {
+            signIn()
         }
     }
 
-    fun validateData(email: String, password: String, confirmPassword: String): Boolean {
+    fun validateData(email: String, password: String): Boolean {
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.editTextEmail.error = "Email is invalid"
             return false
@@ -55,19 +47,14 @@ class RegisterFragment : Fragment() {
             return false
         }
 
-        if (!password.equals(confirmPassword)) {
-            binding.editTextConfirmPassword.error = "Password not matched"
-            return false
-        }
-
         return true
     }
 
-    fun createAccount() {
+    fun signIn() {
         val email = binding.editTextEmail.text.toString()
         val password = binding.editTextPassword.text.toString()
-        if (validateData(email, password, binding.editTextConfirmPassword.text.toString())) {
-            firebase.createAccount(email, password)
+        if (validateData(email, password)) {
+            firebase.signIn(email, password)
         }
     }
 }

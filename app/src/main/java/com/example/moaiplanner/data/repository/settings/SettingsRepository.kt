@@ -1,4 +1,4 @@
-package com.example.moaiplanner.ui.repository
+package com.example.moaiplanner.data.repository.settings
 
 import android.content.Context
 

@@ -1,9 +1,9 @@
-package com.example.moaiplanner.ui.view
+package com.example.moaiplanner.model
 
 import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.moaiplanner.ui.repository.SettingsRepository
+import com.example.moaiplanner.data.repository.settings.SettingsRepository
 
 class SettingsViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
 
