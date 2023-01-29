@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.util.Patterns
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.SigninFragmentBinding
 
@@ -55,6 +58,9 @@ class SigninFragment : Fragment() {
         val password = binding.editTextPassword.text.toString()
         if (validateData(email, password)) {
             firebase.signIn(email, password)
+            if (firebase.isUserAuthenticated()) {
+                findNavController().navigate(R.id.mainActivity)
+            }
         }
     }
 }

@@ -4,19 +4,29 @@ import RecyclerViewAdapter
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
+import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.util.ItemsViewModel
 
 
 class HomeFragment : Fragment() {
+    lateinit var firebase: AuthRepository
 
     fun newInstance(): HomeFragment? {
         return HomeFragment()
     }
 
+    override fun onStart() {
+        super.onStart()
 
+        firebase = AuthRepository(requireActivity().application)
+        if (!firebase.isUserAuthenticated()) {
+            findNavController().navigate(R.id.welcomeActivity)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,15 +34,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-
-
-
-
-
-
-
-
-    // Inflate il layout per il fragment
+        // Inflate il layout per il fragment
         return inflater.inflate(R.layout.home_fragment, container, false)
     }
 

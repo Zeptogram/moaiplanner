@@ -90,13 +90,7 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnItemSelectedListener { item ->
             when(item.itemId) {
                 R.id.note -> {
-                    navHostFragment.findNavController().navigate(R.id.registerFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-                        }, null)
+
                     true
                 }
                 R.id.calendar -> {

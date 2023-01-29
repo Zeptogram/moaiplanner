@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/welcome_nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/welcome_nav_graph"
+    app:startDestination="@id/signinFragment">
 
+    <fragment
+        android:id="@+id/signinFragment"
+        android:name="com.example.moaiplanner.ui.welcome.SigninFragment"
+        android:label="signin_fragment"
+        tools:layout="@layout/signin_fragment" >
+        <action
+            android:id="@+id/action_signinFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_signinFragment_to_mainActivity"
+            app:destination="@id/mainActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.moaiplanner.ui.welcome.RegisterFragment"
+        android:label="register_fragment"
+        tools:layout="@layout/register_fragment" >
+        <action
+            android:id="@+id/action_registerFragment_to_signinFragment"
+            app:destination="@id/signinFragment" />
+    </fragment>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.moaiplanner.ui.main.MainActivity"
+        android:label="MainActivity" />
 </navigation>

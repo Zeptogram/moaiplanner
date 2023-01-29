@@ -5,6 +5,7 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -23,8 +24,7 @@ class AuthRepository(app: Application) {
                 if (task.isSuccessful) {
                     // Sign in success
                     Log.d(TAG, "createUserWithEmail:success")
-                    val firebaseUser = firebaseAuth.currentUser
-                    firebaseUser?.sendEmailVerification()
+                    firebaseAuth.currentUser?.sendEmailVerification()
                     Toast.makeText(application, "Verification email sent", Toast.LENGTH_SHORT).show()
                     firebaseAuth.signOut()
                 } else {
@@ -42,7 +42,6 @@ class AuthRepository(app: Application) {
                     // Sign in success
                     Log.d(TAG, "signInWithEmail:success")
                     Toast.makeText(application, "Authentication successful", Toast.LENGTH_SHORT).show()
-                    val firebaseUser = firebaseAuth.currentUser
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
@@ -53,5 +52,12 @@ class AuthRepository(app: Application) {
 
     fun signOut() {
         firebaseAuth.signOut()
+        Toast.makeText(application, "Sign out successful", Toast.LENGTH_SHORT).show()
+    }
+
+    fun isUserAuthenticated(): Boolean {
+        if (firebaseAuth.currentUser != null)
+            return true
+        return false
     }
 }

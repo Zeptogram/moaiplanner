@@ -6,10 +6,14 @@ import android.view.*
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.moaiplanner.R
 import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
+import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.SettingsViewModel
+import com.example.moaiplanner.ui.welcome.SigninFragment
 
 
 class OptionsFragment : Fragment() {
@@ -17,6 +21,7 @@ class OptionsFragment : Fragment() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var binding: OptionsFragmentBinding
     private lateinit var settingsRepository: SettingsRepository
+    private lateinit var firebase: AuthRepository
 
     fun newInstance(): OptionsFragment? {
         return OptionsFragment()
@@ -25,12 +30,6 @@ class OptionsFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         settingsViewModel.onSaveInstanceState(outState)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        settingsViewModel.restoreSettings()
-
     }
 
 
@@ -48,18 +47,13 @@ class OptionsFragment : Fragment() {
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
         binding.viewModel = settingsViewModel
         return binding.root
-
-        // Inflate il layout per il fragment
-        //return inflater.inflate(R.layout.options_fragment, container, false)
-
-
-
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        firebase = AuthRepository(requireActivity().application)
+        
         // imposta valore sessione quando viene modificato
         binding.durataPomodoro.addTextChangedListener {
             //Log.d("SETTINGS", it.toString())
@@ -87,6 +81,9 @@ class OptionsFragment : Fragment() {
             }
         }
 
+        binding.buttonLogout.setOnClickListener() {
+            firebase.signOut()
+        }
     }
 
     override fun onStop() {
