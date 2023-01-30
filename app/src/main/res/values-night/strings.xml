@@ -18,4 +18,6 @@
     <string name="log_out">Log Out</string>
     <string name="favourites">Favourites</string>
     <string name="show_all">Show All</string>
+    <string name="sigin">Sign In</string>
+    <string name="signup">Sign Up</string>
 </resources>

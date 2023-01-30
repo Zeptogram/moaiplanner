@@ -1,17 +1,35 @@
 package com.example.moaiplanner.data.repository.user
 
+import android.app.Activity
 import android.app.Application
 import android.content.ContentValues.TAG
 import android.util.Log
 import android.widget.Toast
+import androidx.core.app.ActivityCompat.startActivityForResult
+import com.example.moaiplanner.R
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlin.math.sign
 
 class AuthRepository(app: Application) {
     private var application: Application
     private var firebaseAuth: FirebaseAuth
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private companion object {
+        private const val RC_SIGN_IN = 100
+        private const val TAG = "GOOGLE_SIGN_IN_TAG"
+    }
 
     init {
         this.application = app
@@ -47,6 +65,49 @@ class AuthRepository(app: Application) {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
                     Toast.makeText(application, "Authentication failed", Toast.LENGTH_SHORT).show()
                 }
+            }
+    }
+
+    fun signInGoogle(activity: Activity) {
+        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(R.string.default_web_client_id.toString())
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(activity, googleSignInOptions)
+        val intent = googleSignInClient.signInIntent
+
+        val accountTask = GoogleSignIn.getSignedInAccountFromIntent(intent)
+        try {
+            val account = accountTask.getResult(ApiException::class.java)
+            authGoogleAccount(account)
+        } catch (e: java.lang.Exception) {
+            Log.d(TAG, "Google Account Task failed")
+        }
+    }
+
+    fun authGoogleAccount(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        firebaseAuth.signInWithCredential(credential)
+            .addOnSuccessListener { authResult ->
+                // Sign in success
+                Log.d(TAG, "signInWithGoogle:success")
+                Toast.makeText(application, "Authentication with Google successful", Toast.LENGTH_SHORT).show()
+                // val firebaseUser = firebaseAuth.currentUser
+                // val uid = firebaseUser.uid
+                // val email = firebaseUser.email
+
+                if (authResult.additionalUserInfo!!.isNewUser) {
+                    Log.d(TAG, "signInWithGoogle:accountCreated")
+                    Toast.makeText(application, "Account with Google created", Toast.LENGTH_SHORT).show()
+                } else {
+                    Log.d(TAG, "signInWithGoogle:existingUserLoggedIn")
+                    Toast.makeText(application, "Signed in with Google", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.d(TAG, "signInWithGoogle:failed due to ${e.message}")
+                Toast.makeText(application, "Authentication with Google failed", Toast.LENGTH_SHORT).show()
             }
     }
 
