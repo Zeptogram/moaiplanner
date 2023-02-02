@@ -1,4 +1,4 @@
-package com.example.moaiplanner.ui.utils
+package com.example.moaiplanner.util
 
 data class ItemsViewModel(val text: String) {
 

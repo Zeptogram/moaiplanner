@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout >
-
     <data>
         <variable
             name="viewModel"
-            type="com.example.moaiplanner.ui.view.SettingsViewModel" />
+            type="com.example.moaiplanner.model.SettingsViewModel" />
     </data>
 
 <ScrollView
@@ -132,6 +131,7 @@
                 android:layout_width="match_parent"
                 android:layout_weight="5"
                 android:layout_height="wrap_content"
+                android:checked="@{viewModel.notifiche}"
                 android:minWidth="48dp"
                 android:minHeight="48dp" />
 
@@ -176,7 +176,7 @@
                 android:id="@+id/durataPomodoro"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.session.toString()}"
+                android:text="@{viewModel.session}"
                 android:ems="5"
                 android:inputType="number" />
 
@@ -211,7 +211,7 @@
                 android:id="@+id/durataPausa"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.pausa.toString()}"
+                android:text="@{viewModel.pausa}"
                 android:ems="5"
                 android:inputType="number" />
 

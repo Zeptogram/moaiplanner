@@ -4,52 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
     app:startDestination="@id/homeFragment">
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="com.example.moaiplanner.ui.main.MainActivity"
-        android:label="@string/app_name" />
     <fragment
         android:id="@+id/optionsFragment"
         android:name="com.example.moaiplanner.ui.main.OptionsFragment"
         android:label="@string/settings"
-        tools:layout="@layout/options_fragment">
-        <action
-            android:id="@+id/action_optionsFragment_to_mainActivity2"
-            app:destination="@id/mainActivity" />
-    </fragment>
+        tools:layout="@layout/options_fragment"/>
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.moaiplanner.ui.welcome.RegisterFragment"
         android:label="Test"
-        tools:layout="@layout/register_fragment" >
-        <action
-            android:id="@+id/action_registerFragment_to_mainActivity2"
-            app:destination="@id/mainActivity"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
+        tools:layout="@layout/register_fragment" />
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.moaiplanner.ui.main.HomeFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/home_fragment" >
-        <action
-            android:id="@+id/action_homeFragment_to_mainActivity"
-            app:destination="@id/mainActivity"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
+        tools:layout="@layout/home_fragment" />
     <fragment
         android:id="@+id/tomatoFragment"
         android:name="com.example.moaiplanner.ui.main.TomatoFragment"
-        android:label="tomato_fragment"
-        tools:layout="@layout/tomato_fragment" >
-        <action
-            android:id="@+id/action_tomatoFragment_to_mainActivity"
-            app:destination="@id/mainActivity" />
-    </fragment>
+        android:label="Pomodoro"
+        tools:layout="@layout/tomato_fragment" />
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="com.example.moaiplanner.ui.main.NoteFragment"
+        android:label="NoteFragment" />
 </navigation>

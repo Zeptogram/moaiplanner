@@ -1,18 +1,18 @@
 package com.example.moaiplanner.ui.main
 
 import RecyclerViewAdapter
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
-import android.widget.EditText
+import android.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
-import com.example.moaiplanner.ui.utils.ItemsViewModel
-import com.example.moaiplanner.ui.view.SettingsViewModel
+import com.example.moaiplanner.util.ItemsViewModel
+
 
 
 class HomeFragment : Fragment() {
@@ -29,6 +29,11 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        setHasOptionsMenu(true);
+
+        val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
+        toolbar?.menu?.setGroupVisible(R.id.edit, false)
+        toolbar?.menu?.setGroupVisible(R.id.sett, true)
 
 
 
@@ -36,8 +41,7 @@ class HomeFragment : Fragment() {
 
 
 
-
-    // Inflate il layout per il fragment
+        // Inflate il layout per il fragment
         return inflater.inflate(R.layout.home_fragment, container, false)
     }
 
@@ -45,6 +49,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // initializing variables of grid view with their ids.
         val recyclerview = activity?.findViewById<RecyclerView>(R.id.recyclerview)
 
@@ -70,4 +75,8 @@ class HomeFragment : Fragment() {
 
 
     }
+
+
+
+
 }

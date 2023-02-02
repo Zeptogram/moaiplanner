@@ -1,15 +1,21 @@
 package com.example.moaiplanner.ui.main
 
 
+import android.app.NotificationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.moaiplanner.R
 import com.example.moaiplanner.databinding.OptionsFragmentBinding
-import com.example.moaiplanner.ui.repository.SettingsRepository
-import com.example.moaiplanner.ui.utils.SettingsViewModelFactory
-import com.example.moaiplanner.ui.view.SettingsViewModel
+import com.example.moaiplanner.data.repository.settings.SettingsRepository
+import com.example.moaiplanner.model.SettingsViewModelFactory
+import com.example.moaiplanner.model.SettingsViewModel
 
 
 class OptionsFragment : Fragment() {
@@ -30,7 +36,6 @@ class OptionsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         settingsViewModel.restoreSettings()
-
     }
 
 
@@ -39,6 +44,9 @@ class OptionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
+        toolbar?.menu?.setGroupVisible(R.id.edit, false)
+        toolbar?.menu?.setGroupVisible(R.id.sett, false)
         settingsRepository = SettingsRepository(requireActivity())
         val factory = SettingsViewModelFactory(SettingsRepository(requireActivity()))
         settingsViewModel = ViewModelProvider(requireActivity(), factory)[SettingsViewModel::class.java]
@@ -48,6 +56,7 @@ class OptionsFragment : Fragment() {
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
         binding.viewModel = settingsViewModel
         return binding.root
+
 
         // Inflate il layout per il fragment
         //return inflater.inflate(R.layout.options_fragment, container, false)
@@ -59,6 +68,7 @@ class OptionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         // imposta valore sessione quando viene modificato
         binding.durataPomodoro.addTextChangedListener {
@@ -82,8 +92,10 @@ class OptionsFragment : Fragment() {
         }
 
         binding.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+            settingsViewModel.notifiche.value = isChecked
             if (!isChecked) {
-
+                val notificationManager = ContextCompat.getSystemService(requireActivity(), NotificationManager::class.java)
+                notificationManager?.cancelAll()
             }
         }
 
@@ -98,6 +110,7 @@ class OptionsFragment : Fragment() {
         super.onViewStateRestored(savedInstanceState)
         savedInstanceState?.let { settingsViewModel.onRestoreInstanceState(it) }
     }
+
 
 
 

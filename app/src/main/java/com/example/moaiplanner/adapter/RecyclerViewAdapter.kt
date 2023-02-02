@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
-import com.example.moaiplanner.ui.utils.ItemsViewModel
+import com.example.moaiplanner.util.ItemsViewModel
 
 class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 

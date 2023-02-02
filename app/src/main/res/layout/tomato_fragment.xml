@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,9 +10,37 @@
 
 
     <TextView
-        android:id="@+id/sessione"
+        android:id="@+id/timerLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/start"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/timerBar"
+        app:layout_constraintEnd_toEndOf="@+id/timerBar"
+        app:layout_constraintStart_toStartOf="@+id/timerBar"
+        app:layout_constraintTop_toTopOf="@+id/timerBar" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/timerBar"
+        style="@style/Widget.Material3.CircularProgressIndicator"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginTop="180dp"
+        android:max="100"
+        android:progress="0"
+        app:indicatorSize="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackThickness="10dp" />
+
+    <TextView
+        android:id="@+id/sessione"
+        android:layout_width="220dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="28dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Sessione di Lavoro"
@@ -20,11 +49,46 @@
 
     <TextView
         android:id="@+id/pausa"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="221dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="4dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Pausa"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sessione" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timerBar"
+        >
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/play_pause"
+            style="?attr/floatingActionButtonSecondaryStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="32dp"
+            app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/stop"
+            style="?attr/floatingActionButtonSecondaryStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="32dp"
+
+            app:srcCompat="@drawable/ic_baseline_stop_24"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+
+    </LinearLayout>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
