@@ -34,7 +34,8 @@
             app:cardPreventCornerOverlap="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="12dp">
 
             <ImageView
                 android:id="@+id/profilepic"
@@ -42,7 +43,8 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/app_name"
                 android:scaleType="fitXY"
-                android:src="@drawable/huge_avatar" />
+                android:src="@drawable/account"
+                />
 
             <!-- Contenuti della scheda qui -->
 

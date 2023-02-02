@@ -65,6 +65,7 @@ class OptionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // TODO: Scegliere dove mettere le richieste a Firebase/Firestore se onCreateView/onViewGreated o altro
         settingsRepository = SettingsRepository(requireActivity())
         val factory = SettingsViewModelFactory(SettingsRepository(requireActivity()))
         settingsViewModel = ViewModelProvider(requireActivity(), factory)[SettingsViewModel::class.java]
@@ -73,11 +74,7 @@ class OptionsFragment : Fragment() {
         }
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
         binding.viewModel = settingsViewModel
-        return binding.root
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
@@ -93,6 +90,29 @@ class OptionsFragment : Fragment() {
         }.addOnFailureListener { task ->
             Log.d("FIRESTORE-AVATAR", task.toString())
         }
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        /*
+        firebase = AuthRepository(requireActivity().application)
+        storage = Firebase.storage
+        storageRef = storage.reference
+        avatar = storageRef.child("${firebase.getCurretUid()}/avatar.png")
+
+        avatar.downloadUrl.addOnSuccessListener { task ->
+            var bitmap: Bitmap? = null
+            lifecycleScope.launch(Dispatchers.IO) {
+                bitmap = convertBitmapFromURL(task.toString())
+            }.invokeOnCompletion {
+                updateUI(bitmap)
+            }
+        }.addOnFailureListener { task ->
+            Log.d("FIRESTORE-AVATAR", task.toString())
+        }
+         */
         
         // imposta valore sessione quando viene modificato
         binding.durataPomodoro.addTextChangedListener {

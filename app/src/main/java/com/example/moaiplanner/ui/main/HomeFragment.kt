@@ -2,6 +2,7 @@ package com.example.moaiplanner.ui.main
 
 import RecyclerViewAdapter
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -9,10 +10,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.databinding.HomeFragmentBinding
+import com.example.moaiplanner.databinding.SigninFragmentBinding
 import com.example.moaiplanner.util.ItemsViewModel
 
 
 class HomeFragment : Fragment() {
+    lateinit var binding: HomeFragmentBinding
     lateinit var firebase: AuthRepository
 
     fun newInstance(): HomeFragment? {
@@ -33,12 +37,11 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding = HomeFragmentBinding.inflate(inflater, container, false)
 
         // Inflate il layout per il fragment
-        return inflater.inflate(R.layout.home_fragment, container, false)
+        return binding.root
     }
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,8 +66,6 @@ class HomeFragment : Fragment() {
 
         // on below line we are adding on item
         // click listener for our grid view.
-
-
 
     }
 }
