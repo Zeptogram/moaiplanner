@@ -124,4 +124,8 @@ class AuthRepository(app: Application) {
             return true
         return false
     }
+
+    fun getCurretUid(): String? {
+        return firebaseAuth.uid
+    }
 }

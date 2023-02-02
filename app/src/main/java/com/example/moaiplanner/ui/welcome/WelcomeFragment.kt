@@ -66,6 +66,8 @@ class WelcomeFragment : Fragment() {
 
         firebase = AuthRepository(requireActivity().application)
 
+        // TODO: Da rimuovere, solo per testare rules di Firestore
+        /*
         val storage = Firebase.storage
         val storageRef = storage.reference
         val image = storageRef.child("cat_gang.png")
@@ -78,6 +80,7 @@ class WelcomeFragment : Fragment() {
                 updateUI(bitmap)
             }
         }
+         */
 
         binding.buttonEmail.setOnClickListener {
             findNavController().navigate(R.id.signinFragment)

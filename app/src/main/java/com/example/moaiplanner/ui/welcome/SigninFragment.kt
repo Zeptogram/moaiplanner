@@ -36,6 +36,11 @@ class SigninFragment : Fragment() {
         firebase = AuthRepository(requireActivity().application)
         binding.buttonSignIn.setOnClickListener {
             signIn()
+            // TODO: Utilizzare corutines per evitare che finish accada prima di sigIn().
+            if (firebase.isUserAuthenticated()) {
+                findNavController().navigate(R.id.mainActivity)
+            }
+            activity?.finish()
         }
     }
 
@@ -58,9 +63,6 @@ class SigninFragment : Fragment() {
         val password = binding.editTextPassword.text.toString()
         if (validateData(email, password)) {
             firebase.signIn(email, password)
-            if (firebase.isUserAuthenticated()) {
-                findNavController().navigate(R.id.mainActivity)
-            }
         }
     }
 }
