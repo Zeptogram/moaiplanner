@@ -13,6 +13,8 @@ import android.view.ViewGroup
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
 import com.example.moaiplanner.databinding.TomatoFragmentBinding
@@ -61,6 +63,23 @@ class TomatoFragment : Fragment() {
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
         toolbar?.menu?.setGroupVisible(R.id.sett, true)
+
+        toolbar?.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    findNavController().navigate(R.id.optionsFragment, null,
+                        navOptions {
+                            anim {
+                                enter = android.R.anim.fade_in
+                                popEnter = android.R.anim.fade_in
+                            }
+                        }
+                    )
+                    true
+                }
+            }
+            true
+        }
 
 
 

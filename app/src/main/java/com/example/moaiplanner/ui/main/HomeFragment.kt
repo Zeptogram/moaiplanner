@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.*
 import android.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
@@ -29,13 +31,27 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        setHasOptionsMenu(true);
 
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
         toolbar?.menu?.setGroupVisible(R.id.sett, true)
 
-
+        toolbar?.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    findNavController().navigate(R.id.optionsFragment, null,
+                        navOptions {
+                            anim {
+                                enter = android.R.anim.fade_in
+                                popEnter = android.R.anim.fade_in
+                            }
+                        }
+                    )
+                    true
+                }
+            }
+            true
+        }
 
 
 

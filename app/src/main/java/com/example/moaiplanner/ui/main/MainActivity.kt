@@ -3,6 +3,7 @@ package com.example.moaiplanner.ui.main
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.findNavController
 
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -43,32 +44,12 @@ class MainActivity : AppCompatActivity() {
         bottomNav.menu.getItem(2).isChecked = true;
         NavigationUI.setupWithNavController(bottomNav, navController);
 
-        toolbar?.menu?.setGroupVisible(R.id.edit, false)
-        toolbar?.menu?.setGroupVisible(R.id.sett, true)
+        //toolbar?.menu?.setGroupVisible(R.id.edit, false)
+        //toolbar?.menu?.setGroupVisible(R.id.sett, true)
 
 
 
 
-        toolbar.setOnMenuItemClickListener {
-            when(it.itemId){
-
-                R.id.settings -> {
-
-                    navHostFragment.findNavController().navigate(R.id.optionsFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-
-
-                        }
-                    )
-                }
-
-            }
-            true
-        }
 
 
         bottomNav.setOnItemSelectedListener { item ->
