@@ -75,7 +75,6 @@ class TomatoFragment : Fragment() {
                             }
                         }
                     )
-                    true
                 }
             }
             true
