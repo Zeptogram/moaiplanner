@@ -58,16 +58,15 @@ class AuthRepository(app: Application) {
 
     fun signIn(email: String, password: String) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Sign in success
-                    Log.d(TAG, "signInWithEmail:success")
-                    Toast.makeText(application, "Authentication successful", Toast.LENGTH_SHORT).show()
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    Toast.makeText(application, "Authentication failed", Toast.LENGTH_SHORT).show()
-                }
+            .addOnSuccessListener { task ->
+                // Sign in success
+                Log.d(TAG, "signInWithEmail:success")
+                Toast.makeText(application, "Authentication successful", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { task ->
+                // If sign in fails, display a message to the user.
+                Log.w(TAG, "signInWithEmail:failure", task)
+                Toast.makeText(application, "Authentication failed", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -117,7 +116,6 @@ class AuthRepository(app: Application) {
 
     fun signOut() {
         firebaseAuth.signOut()
-        Toast.makeText(application, "Sign out successful", Toast.LENGTH_SHORT).show()
     }
 
     fun isUserAuthenticated(): Boolean {

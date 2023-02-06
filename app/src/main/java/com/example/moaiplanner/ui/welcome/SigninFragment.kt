@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.util.Patterns
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.SigninFragmentBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class SigninFragment : Fragment() {
@@ -34,13 +37,21 @@ class SigninFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         firebase = AuthRepository(requireActivity().application)
+        var isAuthenticated: Boolean = false
         binding.buttonSignIn.setOnClickListener {
-            signIn()
-            // TODO: Utilizzare corutines per evitare che finish accada prima di sigIn().
-            if (firebase.isUserAuthenticated()) {
-                findNavController().navigate(R.id.mainActivity)
+            lifecycleScope.launch(Dispatchers.IO) {
+                signIn()
+            }.invokeOnCompletion {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    isAuthenticated = firebase.isUserAuthenticated()
+                }.invokeOnCompletion {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        if (isAuthenticated) {
+                            findNavController().navigate(R.id.mainActivity)
+                        }
+                    }
+                }
             }
-            activity?.finish()
         }
     }
 
@@ -61,8 +72,16 @@ class SigninFragment : Fragment() {
     fun signIn() {
         val email = binding.editTextEmail.text.toString()
         val password = binding.editTextPassword.text.toString()
-        if (validateData(email, password)) {
-            firebase.signIn(email, password)
+        var validate: Boolean = false
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            validate = validateData(email, password)
+        }.invokeOnCompletion {
+            if (validate) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    firebase.signIn(email, password)
+                }
+            }
         }
     }
 }

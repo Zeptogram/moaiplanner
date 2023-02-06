@@ -3,6 +3,7 @@ package com.example.moaiplanner.ui.main
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
@@ -47,15 +48,9 @@ class MainActivity : AppCompatActivity() {
 
         toolbar.setupWithNavController(navController, appBarConfiguration)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-
-       // bottomNav.setupWithNavController(navController)
-
-
-
-
-
-
-
+        // bottomNav.setupWithNavController(navController)
+        // Mette la home come main
+        bottomNav.menu.getItem(2).isChecked = true;
 
 
         navHostFragment.findNavController().addOnDestinationChangedListener { _, destination, _ ->
@@ -68,7 +63,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
 
 
         toolbar.setOnMenuItemClickListener {
@@ -151,9 +145,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
-
+        navController.navigate(R.id.homeFragment)
 
 
 
@@ -181,9 +173,6 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
-
-
 
 
 

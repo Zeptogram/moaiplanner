@@ -42,6 +42,8 @@ class WelcomeFragment : Fragment() {
         return binding.root
     }
 
+    // TODO: Rimuovere, vecchio codice per scaricare da firebase l'immagine prova dell'app
+    /*
     fun convertBitmapFromURL(url: String): Bitmap? {
         try {
             val url = URL(url)
@@ -60,27 +62,12 @@ class WelcomeFragment : Fragment() {
             binding.imageViewMoaiLogo.setImageBitmap(bitmap)
         }
     }
+     */
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         firebase = AuthRepository(requireActivity().application)
-
-        // TODO: Da rimuovere, solo per testare rules di Firestore
-        /*
-        val storage = Firebase.storage
-        val storageRef = storage.reference
-        val image = storageRef.child("cat_gang.png")
-
-        image.downloadUrl.addOnCompleteListener { task ->
-            var bitmap: Bitmap? = null
-            lifecycleScope.launch(Dispatchers.IO) {
-                bitmap = convertBitmapFromURL(task.result.toString())
-            }.invokeOnCompletion {
-                updateUI(bitmap)
-            }
-        }
-         */
 
         binding.buttonEmail.setOnClickListener {
             findNavController().navigate(R.id.signinFragment)

@@ -46,15 +46,6 @@ class HomeFragment : Fragment() {
         return HomeFragment()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        firebase = AuthRepository(requireActivity().application)
-        if (!firebase.isUserAuthenticated()) {
-            findNavController().navigate(R.id.welcomeActivity)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -73,53 +64,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // initializing variables of grid view with their ids.
-        val recyclerview = activity?.findViewById<RecyclerView>(R.id.recyclerview)
-
-        // this creates a vertical layout Manager
-        GridLayoutManager(requireActivity(), 2).also { recyclerview?.layoutManager = it }
-
-        // ArrayList of class ItemsViewModel
-        val data = ArrayList<ItemsViewModel>()
-        // This will pass the ArrayList to our Adapter
-        var adapter = RecyclerViewAdapter(data)
-        // Setting the Adapter with the recyclerview
-        recyclerview?.adapter = adapter
-
-        // Get list of files from Firestore
-        userDir.listAll()
-            .addOnSuccessListener { (items, prefixes) ->
-                prefixes.forEach { prefix ->
-                    Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                    data.add(ItemsViewModel(prefix.toString().split("/").last()))
-                    prefix.listAll()
-                        .addOnSuccessListener {  (items) ->
-                            items.forEach { item ->
-                                Log.d("FIRESTORAGE-PREFIX-ITEM", item.toString())
-                                // Regex che rimuove avatar e file in più che non servono nelle collections/notes
-                                if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                                    data.add(ItemsViewModel(item.toString().split("/").last()))
-                            }
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
-                        }
-                }
-
-                items.forEach { item ->
-                    Log.d("FIRESTORAGE-ITEM", item.toString())
-                    if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                        data.add(ItemsViewModel(item.toString().split("/").last()))
-                }
-            }
-            .addOnFailureListener {
-                Log.d("FIRESTORAGE-ERROR", "Error getting file list")
-                Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
-            }
-            .addOnSuccessListener {
-                adapter = RecyclerViewAdapter(data)
-                recyclerview?.adapter = adapter
-            }
 
         binding.buttonShowall.setOnClickListener {
             Intent(Intent.ACTION_OPEN_DOCUMENT).also {
@@ -127,6 +71,72 @@ class HomeFragment : Fragment() {
                 startActivityForResult(it, 0)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        firebase = AuthRepository(requireActivity().application)
+        if (!firebase.isUserAuthenticated()) {
+            findNavController().navigate(R.id.welcomeActivity)
+        }
+
+        // initializing variables of grid view with their ids.
+        val recyclerview = activity?.findViewById<RecyclerView>(R.id.recyclerview)
+        Log.d("HOME-FRAGMENT-ONVIEWCREATED", "HIHIHA")
+
+        // this creates a vertical layout Manager
+        GridLayoutManager(requireActivity(), 2).also { recyclerview?.layoutManager = it }
+
+        // ArrayList of class ItemsViewModel
+        val data = ArrayList<ItemsViewModel>()
+        // This will pass the ArrayList to our Adapter
+        val adapter = RecyclerViewAdapter(data)
+        // Setting the Adapter with the recyclerview
+        recyclerview?.adapter = adapter
+
+        getCollections(data, adapter)
+    }
+
+    fun getCollections(data: ArrayList<ItemsViewModel>, adapter: RecyclerViewAdapter) {
+        // Get list of files from Firestore
+        lifecycleScope.launch(Dispatchers.IO) {
+            userDir.listAll()
+                .addOnSuccessListener { (items, prefixes) ->
+                    prefixes.forEach { prefix ->
+                        Log.d("FIRESTORAGE-PREFIX", prefix.toString())
+                        data.add(ItemsViewModel(prefix.toString().split("/").last()))
+                        prefix.listAll()
+                            .addOnSuccessListener {  (items) ->
+                                items.forEach { item ->
+                                    Log.d("FIRESTORAGE-PREFIX-ITEM", item.toString())
+                                    // Regex che rimuove avatar e file in più che non servono nelle collections/notes
+                                    if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
+                                        data.add(ItemsViewModel(item.toString().split("/").last()))
+                                }
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+
+                    items.forEach { item ->
+                        Log.d("FIRESTORAGE-ITEM", item.toString())
+                        if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
+                            data.add(ItemsViewModel(item.toString().split("/").last()))
+                    }
+                }
+                .addOnFailureListener {
+                    Log.d("FIRESTORAGE-ERROR", "Error getting file list")
+                    Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
+                }
+                .addOnSuccessListener {
+                    //adapter = RecyclerViewAdapter(data)
+                    //recyclerview?.adapter = adapter
+                    adapter.notifyDataSetChanged()
+                }
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -151,6 +161,4 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
-
 }
