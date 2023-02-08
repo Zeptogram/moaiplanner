@@ -1,5 +1,6 @@
 package com.example.moaiplanner.ui.main
 
+import android.animation.ObjectAnimator
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,9 +8,12 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.widget.ProgressBar
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -21,6 +25,8 @@ import com.example.moaiplanner.databinding.TomatoFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.TomatoViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class TomatoFragment : Fragment() {
@@ -30,10 +36,11 @@ class TomatoFragment : Fragment() {
     private lateinit var c: Context
     private var minutesSession: Long = 5
     private var minutesBreak: Long = 1
+    private var roundsRemaining: Long = -1
     private var pomodoroDuration: Long = -1
     private var max: Long = -1
     private var running: Boolean = false
-
+    var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss")
 
 
 
@@ -50,15 +57,25 @@ class TomatoFragment : Fragment() {
 
         minutesSession = settingsViewModel.session.value?.toLong() ?: 5
         minutesBreak = settingsViewModel.pausa.value?.toLong() ?: 1
-
+        roundsRemaining = pomodoroViewModel.rounds.value!!
+        if(roundsRemaining.toInt() == -1) {
+            roundsRemaining = settingsViewModel.round.value?.toLong() ?: 1
+            pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong() ?: 1
+            binding.roundsRemaining.text =  roundsRemaining.toString() + "/" + settingsViewModel.round.value.toString()
+        }
 
         // osservazione sui valori delle impostazioni
         settingsViewModel.session.observe(viewLifecycleOwner) {
-            binding.sessione?.text = settingsViewModel.session.value.toString()
+            binding.sessione.text = settingsViewModel.session.value.toString() + " mins"
         }
         settingsViewModel.pausa.observe(viewLifecycleOwner) {
-            binding.pausa?.text = settingsViewModel.pausa.value.toString()
+            binding.pausa.text = settingsViewModel.pausa.value.toString() + " mins"
         }
+
+
+
+
+
 
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -80,6 +97,45 @@ class TomatoFragment : Fragment() {
             true
         }
 
+        updateRound()
+        if(pomodoroViewModel.timeRemaining.value!! > 0) {
+            if(pomodoroViewModel.paused.value == true) {
+                binding.playPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                pomodoroViewModel.timer.value?.cancel()
+                running = false
+                binding.timerLabel.text = pomodoroViewModel.timeLabel.value
+                binding.timerBar.max = pomodoroViewModel.timeMax.value!!.toInt()
+                binding.timerBar.progress = pomodoroViewModel.timeRemaining.value!!.toInt()
+
+            }
+            else {
+                initTimer()
+                pomodoroViewModel.timer.value?.start()
+                running = true
+                binding.playPause.setImageResource(R.drawable.ic_baseline_pause_24)
+
+            }
+        }
+        else {
+            initTimerLabel()
+        }
+
+        binding.playPause.setOnClickListener {
+            if(!running) {
+                start()
+            } else {
+                pause()
+            }
+
+        }
+
+        binding.stop.setOnClickListener {
+            stop(false)
+        }
+
+        binding.reset.setOnClickListener {
+            reset()
+        }
 
 
 
@@ -92,39 +148,12 @@ class TomatoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(pomodoroViewModel.timeRemaining.value!! > 0) {
-            if(pomodoroViewModel.paused.value == true) {
-                binding.playPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                pomodoroViewModel.timer.value?.cancel()
-                running = false
-                binding.timerLabel.text = pomodoroViewModel.timeLabel.value
-                binding.timerBar.max = pomodoroViewModel.timeMax.value!!.toInt()
-                binding.timerBar.progress = pomodoroViewModel.timeRemaining.value!!.toInt()
-            }
-            else {
-                initTimer()
-                pomodoroViewModel.timer.value?.start()
-                running = true
-                binding.playPause.setImageResource(R.drawable.ic_baseline_pause_24)
-            }
-        }
 
-        binding.playPause.setOnClickListener {
-            if(!running) {
-                start()
-            } else {
-               pause()
-            }
-
-        }
-
-        binding.stop.setOnClickListener {
-            stop()
-        }
 
     }
 
     fun initTimer() {
+
 
         pomodoroViewModel.timer.value?.cancel()
         c = requireActivity()
@@ -136,38 +165,48 @@ class TomatoFragment : Fragment() {
             if(pomodoroViewModel.pausa.value == false) {
                 pomodoroDuration = minutesSession * 60 * 1000
                 pomodoroViewModel.pausa.value = true
+                binding.typeLabel.text = "Work"
             }
             else {
                 pomodoroDuration = minutesBreak * 60 * 1000
                 pomodoroViewModel.pausa.value = false
+                binding.typeLabel.text = "Break"
+
             }
             binding.timerBar.max = pomodoroDuration.toInt()
             pomodoroViewModel.timeMax.value = pomodoroDuration
             max = pomodoroDuration
-        } else
-            binding.timerBar.max = max.toInt()
+            if(pomodoroViewModel.paused.value == false)
+                binding.timerBar.progress = binding.timerBar.max
+        } else {
+            binding.timerBar.max = pomodoroViewModel.timeMax.value!!.toInt()
+            if(pomodoroViewModel.paused.value == false)
+                binding.timerBar.progress = pomodoroViewModel.timeMax.value!!.toInt()
+        }
+
         pomodoroViewModel.timer.value = object: CountDownTimer(pomodoroDuration, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 pomodoroViewModel.updateTimer(millisUntilFinished)
-                binding.timerBar.progress = millisUntilFinished.toInt()
-                val secondsRemaining = millisUntilFinished / 1000
-                val minutes = secondsRemaining / 60
-                val seconds = secondsRemaining % 60
-                val hours = minutes / 60
+                binding.timerBar.setProgress(millisUntilFinished.toInt(), false)
+
+                val date = Date(millisUntilFinished)
                 if(max >= 3600000) {
-                    binding.timerLabel.text = "${hours}:${minutes}:${seconds}"
-                    pomodoroViewModel.timeLabel.value = "${hours}:${minutes}:${seconds}"
+                    simpleDateFormat = SimpleDateFormat("hh:mm:ss")
+                    binding.timerLabel.text = simpleDateFormat.format(date)
+                    pomodoroViewModel.timeLabel.value = simpleDateFormat.format(date)
                 }
                 else if(max >= 60000) {
-                    binding.timerLabel.text = "${minutes}:${seconds}"
-                    pomodoroViewModel.timeLabel.value = "${minutes}:${seconds}"
+                    simpleDateFormat= SimpleDateFormat("mm:ss")
+                    binding.timerLabel.text = simpleDateFormat.format(date)
+                    pomodoroViewModel.timeLabel.value = simpleDateFormat.format(date)
+
                 }
             }
 
 
             override fun onFinish() {
 
-                stop()
+                stop(true)
                 if(settingsViewModel.notifiche.value == true) {
                     val notificationManager =
                         c.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -184,42 +223,81 @@ class TomatoFragment : Fragment() {
                         notificationManager.createNotificationChannel(channel)
                     }
                     val notification: Notification
+                    // Se devo fare la pausa
                     if(pomodoroViewModel.pausa.value == true) {
                         notification = NotificationCompat.Builder(c, channelId)
                             .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
                             .setContentTitle("Moai Planner")
-                            .setContentText("Tempo di pausa! Inizia la pausa di ${minutesBreak} minuti/o!")
+                            .setContentText("Tempo di pausa! Inizia la pausa di ${minutesBreak} minuti!")
                             .setAutoCancel(true)
                             .build()
                     }
                     else{
-                        notification = NotificationCompat.Builder(c, channelId)
-                            .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                            .setContentTitle("Moai Planner")
-                            .setContentText("Round terminato! Inizia la sessione di ${minutesSession} minuti/o!")
-                            .setAutoCancel(true)
-                            .build()
+                        roundsRemaining--
+                        pomodoroViewModel.rounds.value = roundsRemaining
+                        if(roundsRemaining <= 0){
+                            notification = NotificationCompat.Builder(c, channelId)
+                                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
+                                .setContentTitle("Moai Planner")
+                                .setContentText("Ultimo round terminato! Ben fatto!")
+                                .setAutoCancel(true)
+                                .build()
+                        }
+                        else {
+                            notification = NotificationCompat.Builder(c, channelId)
+                                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
+                                .setContentTitle("Moai Planner")
+                                .setContentText("Round terminato! Inizia la sessione di ${minutesSession} minuti! Round rimanenti: ${roundsRemaining}")
+                                .setAutoCancel(true)
+                                .build()
+                        }
                     }
 
                     notificationManager.notify(notificationId, notification)
                 }
-                restart()
+                if(roundsRemaining <= 0) {
+                    if(roundsRemaining < 0) {
+                        pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
+                        roundsRemaining = settingsViewModel.round.value?.toLong()!!
+                        binding.roundsRemaining.text = roundsRemaining.toString();
+                    }
+                }
+                else
+                    restart()
 
             }
         }
     }
 
-    fun stop() {
+    fun stop(forced: Boolean) {
         pomodoroViewModel.stopTimer()
-        binding.timerBar.progress = 100
-        binding.timerLabel.text = pomodoroViewModel.timeLabel.value
-        max = -1
+        if(max != -1L)
+            binding.timerBar.progress = max.toInt()
+        else
+            binding.timerBar.progress = 100
+        initTimerLabel()
+        binding.typeLabel.text = "Time to focus!"
+        binding.timerBar.max = 100
+        max = 100
         running = false
         binding.playPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+        if(roundsRemaining <= 0 && pomodoroViewModel.pausa.value == false && !forced){
+            pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
+            roundsRemaining = settingsViewModel.round.value?.toLong()!!
+            updateRound()
+        }
+        else if(pomodoroViewModel.pausa.value == false && !forced){
+            roundsRemaining--
+            pomodoroViewModel.rounds.value = roundsRemaining
+            updateRound()
+        }
+
 
     }
 
     fun start() {
+        if(roundsRemaining <= 0)
+            reset()
         initTimer()
         pomodoroViewModel.timer.value?.start()
         running = true
@@ -237,6 +315,40 @@ class TomatoFragment : Fragment() {
     fun restart() {
         start()
     }
+
+    fun reset(){
+        stop(false)
+        pomodoroViewModel.pausa.value = false
+        pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
+        roundsRemaining = settingsViewModel.round.value?.toLong()!!
+        binding.typeLabel.text = "Time to focus!"
+        updateRound()
+    }
+
+    fun updateRound(){
+        pomodoroViewModel.rounds.observe(viewLifecycleOwner) {
+            if(roundsRemaining < 0)
+                binding.roundsRemaining.text = settingsViewModel.round.value.toString() + "/" + settingsViewModel.round.value.toString()
+            else
+                binding.roundsRemaining.text = pomodoroViewModel.rounds.value.toString() + "/" + settingsViewModel.round.value.toString()
+        }
+    }
+
+    fun initTimerLabel() {
+        var startLabel = (settingsViewModel.session.value?.toInt()?.times(60) ?: 1) * 1000
+
+        if(startLabel >= 3600000) {
+            simpleDateFormat= SimpleDateFormat("hh:mm:ss")
+            binding.timerLabel.text = simpleDateFormat.format(startLabel)
+
+        }
+        else if(startLabel >= 60000) {
+            simpleDateFormat= SimpleDateFormat("mm:ss")
+            binding.timerLabel.text = simpleDateFormat.format(startLabel)
+        }
+    }
+
+
 
 
 

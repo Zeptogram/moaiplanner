@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -16,6 +17,8 @@ import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.SettingsViewModel
+import com.example.moaiplanner.util.disableNotifications
+import com.example.moaiplanner.util.enableLight
 
 
 class OptionsFragment : Fragment() {
@@ -91,12 +94,23 @@ class OptionsFragment : Fragment() {
                 settingsViewModel.pausa.value = it.toString()
         }
 
+        binding.numeroRound.addTextChangedListener {
+            //Log.d("SETTINGS", it.toString())
+            if(it.toString().isBlank()) {
+                settingsViewModel.round.value = "1"
+            }
+            else
+                settingsViewModel.round.value = it.toString()
+        }
+
         binding.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
             settingsViewModel.notifiche.value = isChecked
-            if (!isChecked) {
-                val notificationManager = ContextCompat.getSystemService(requireActivity(), NotificationManager::class.java)
-                notificationManager?.cancelAll()
-            }
+            disableNotifications(isChecked, requireContext())
+        }
+
+        binding.themeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            settingsViewModel.lightMode.value = isChecked
+            enableLight(isChecked)
         }
 
     }

@@ -22,10 +22,7 @@
     <string name="edit">Edit</string>
     <string name="preview">Preview</string>
 
-    <string name="app_name_short">Markdown</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="action_help">Help</string>
     <string name="action_edit">Edit</string>
     <string name="action_preview">Preview</string>
 
@@ -51,24 +48,10 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="pref_title_autosave">Enable autosave</string>
-    <string name="pref_description_autosave">Automatically save files when closing the app</string>
     <string name="action_lock_swipe">Lock Swiping</string>
     <string name="action_select">Select</string>
-    <string name="action_privacy">Privacy</string>
     <string name="pref_key_error_reports_enabled">crashlytics.enable</string>
-    <string name="pref_title_error_reports">Enable automated error reports</string>
-    <string name="pref_error_reports_off">Error reports will not be sent</string>
-    <string name="pref_error_reports_on">Error reports will be sent</string>
-    <string name="readability_enabled">readability.enable</string>
-    <string name="pref_title_readability">Enable readability highlighting (experimental)</string>
-    <string name="pref_readability_off">Readability highlighting is off</string>
-    <string name="pref_readability_on">Readability highlighting is on</string>
-    <string name="pref_autosave_on">Files will automatically save</string>
-    <string name="pref_autosave_off">Files will not be automatically saved</string>
     <string name="pref_custom_css">pref.custom_css</string>
-    <string name="pref_title_custom_css">Custom CSS</string>
-    <string name="pref_description_custom_css">Paste or write your own CSS to be used for the preview pane</string>
     <string name="pref_custom_css_default" translatable="false">pre {overflow:scroll; padding:15px; background: #F1F1F1;}</string>
     <string name="pref_custom_css_default_dark" translatable="false">body{background:
         #333333;color: #F1F1F1;}a{color:#7b91ff;}pre{background:#111111;}</string>
@@ -84,20 +67,8 @@
     <string name="prompt_save_changes">Would you like to save your changes?</string>
     <string name="action_discard">Discard</string>
     <string name="action_save_as">Save as…</string>
-    <string name="support_info">SimpleMarkdown is a personal project of mine that I develop and
-        maintain in my free time. I very much appreciate any and all forms of support, whether
-        that be assistance with designing the app or icons, adding translations for other
-        languages, contributing to the code, or giving me a tip. If you have any troubles with
-        SimpleMarkdown, please don\'t hesitate to get in touch, and if you haven\'t already,
-        please rate the app on the Play Store.\n\nAlso please keep in mind that the in-app
-        purchases for the tips won\'t unlock any additional functionality in the app.
-        SimpleMarkdown is and always will be completely free and open source!</string>
-    <string name="action_view_github">View SimpleMarkdown on GitHub</string>
-    <string name="support_title">Support SimpleMarkdown</string>
-    <string name="support_button_purchase">%1$s – %2$s</string>
-    <string name="action_rate">Rate SimpleMarkdown</string>
-    <string name="support_thank_you">Thank you so much for your support!</string>
-    <string name="description_heart">Heart</string>
+    <string name="generale">Generale</string>
+    <string name="abilita_tema_chiaro">Abilita Tema Chiaro</string>
     <string-array name="pref_entries_dark_mode">
         <item>@string/pref_value_light</item>
         <item>@string/pref_value_dark</item>
@@ -108,6 +79,4 @@
         <item>@string/pref_key_dark_mode_dark</item>
         <item>@string/pref_key_dark_mode_auto</item>
     </string-array>
-    <string name="plausible_host">https://plausible.wbrawner.com</string>
-    <string name="plausible_domain">simplemarkdown.android.wbrawner.com</string>
 </resources>
