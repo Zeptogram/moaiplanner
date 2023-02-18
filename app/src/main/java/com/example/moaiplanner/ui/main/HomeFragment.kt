@@ -94,6 +94,12 @@ class HomeFragment : Fragment() {
         val adapter = RecyclerViewAdapter(data)
         // Setting the Adapter with the recyclerview
         recyclerview?.adapter = adapter
+        // OnClick on Recycler elements
+        adapter.setOnItemClickListener(object : RecyclerViewAdapter.onItemClickListener {
+            override fun onItemClick(position: Int) {
+                Toast.makeText(context, "POSITION $position", Toast.LENGTH_SHORT).show()
+            }
+        })
 
         getCollections(data, adapter)
     }
