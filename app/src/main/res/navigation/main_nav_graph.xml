@@ -10,6 +10,11 @@
         android:label="@string/settings"
         tools:layout="@layout/options_fragment"/>
     <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.moaiplanner.ui.welcome.RegisterFragment"
+        android:label="Test"
+        tools:layout="@layout/register_fragment" />
+    <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.moaiplanner.ui.main.HomeFragment"
         android:label="@string/app_name"
@@ -25,4 +30,10 @@
         android:name="com.example.moaiplanner.ui.welcome.WelcomeActivity"
         android:label="activity_welcome"
         tools:layout="@layout/activity_welcome" />
+        android:label="Pomodoro"
+        tools:layout="@layout/tomato_fragment" />
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="com.example.moaiplanner.ui.main.NoteFragment"
+        android:label="Untitled.md" />
 </navigation>

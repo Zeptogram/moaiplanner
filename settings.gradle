@@ -3,6 +3,12 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        maven {
+            url "https://s3.amazonaws.com/repo.commonsware.com"
+        }
+        maven {
+            url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+        }
     }
 }
 dependencyResolutionManagement {
@@ -10,7 +16,15 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "https://s3.amazonaws.com/repo.commonsware.com"
+        }
+        maven {
+            url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+        }
     }
 }
+
+
 rootProject.name = "Moai Planner"
 include ':app'

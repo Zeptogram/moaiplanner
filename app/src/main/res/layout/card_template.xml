@@ -45,9 +45,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight=".50"
-
                 />
-
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/star"
@@ -55,7 +53,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".25" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -63,7 +60,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:orientation="vertical">
-
 
             <TextView
                 android:id="@+id/text_test"

@@ -20,4 +20,69 @@
     <string name="show_all">Show All</string>
     <string name="sigin">Sign In</string>
     <string name="signup">Sign Up</string>
+    <string name="start">Start</string>
+    <string name="edit">Edit</string>
+    <string name="preview">Preview</string>
+
+    <string name="action_edit">Edit</string>
+    <string name="action_preview">Preview</string>
+
+    <string name="markdown_here">Markdown here…</string>
+    <string name="action_save">Save</string>
+    <string name="action_share">Share</string>
+    <string name="action_export">Export</string>
+    <string name="no_shareable_apps">Unable to share file - no capable apps installed</string>
+    <string name="share_file">Share file to…</string>
+    <string name="no_permissions">Unable to save file without permissions</string>
+    <string name="file_saved">Successfully saved %1$s</string>
+    <string name="action_load">Load</string>
+    <string name="open_file">Select a file to open</string>
+    <string name="no_filebrowser">No file browser apps found</string>
+    <string name="file_save_error">An error occurred while saving the file</string>
+    <string name="file_loaded">File successfully loaded</string>
+    <string name="error_write">An error occurred while writing the file</string>
+    <string name="file_load_error">An error occurred while opening the file</string>
+    <string name="action_libraries">Libraries</string>
+    <string name="action_new">New</string>
+    <string name="action_done">Done</string>
+    <string name="action_open">Open</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="action_lock_swipe">Lock Swiping</string>
+    <string name="action_select">Select</string>
+    <string name="pref_key_error_reports_enabled">crashlytics.enable</string>
+
+    <string name="pref_custom_css">pref.custom_css</string>
+
+    <string name="pref_custom_css_default" translatable="false">pre {overflow:scroll; padding:15px; background: #F1F1F1;}</string>
+    <string name="pref_custom_css_default_dark" translatable="false">body{background:
+        #1A1A1A;color: #F1F1F1;}a{color:#7b91ff;}pre{background:#111111;}</string>
+    <string name="pref_key_dark_mode">darkMode</string>
+    <string name="title_dark_mode">Dark Mode</string>
+    <string name="pref_value_light">Light</string>
+    <string name="pref_value_dark">Dark</string>
+    <string name="pref_value_auto">Auto</string>
+    <string name="pref_key_dark_mode_light" translatable="false">light</string>
+    <string name="pref_key_dark_mode_dark" translatable="false">dark</string>
+    <string name="pref_key_dark_mode_auto" translatable="false">auto</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="prompt_save_changes">Would you like to save your changes?</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_save_as">Save as…</string>
+    <string name="generale">Generale</string>
+    <string name="abilita_tema_chiaro">Abilita Tema Chiaro</string>
+    <string name="folders">Folders</string>
+    <string name="friends">Friends</string>
+
+    <string-array name="pref_entries_dark_mode">
+        <item>@string/pref_value_light</item>
+        <item>@string/pref_value_dark</item>
+        <item>@string/pref_value_auto</item>
+    </string-array>
+    <string-array name="pref_values_dark_mode">
+        <item>@string/pref_key_dark_mode_light</item>
+        <item>@string/pref_key_dark_mode_dark</item>
+        <item>@string/pref_key_dark_mode_auto</item>
+    </string-array>
 </resources>

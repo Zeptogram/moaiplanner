@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout >
-
     <data>
         <variable
             name="viewModel"
@@ -96,7 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:text="@string/notifiche"
+            android:text="@string/generale"
             android:textColor="?android:attr/textColorSecondary"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/layoutNotifiche"
@@ -134,10 +133,52 @@
                 android:layout_width="match_parent"
                 android:layout_weight="5"
                 android:layout_height="wrap_content"
+                android:checked="@{viewModel.notifiche}"
                 android:minWidth="48dp"
                 android:minHeight="48dp" />
 
         </LinearLayout>
+
+
+
+        <LinearLayout
+            android:id="@+id/layoutTheme"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/custom_layout"
+            android:orientation="horizontal"
+            android:paddingStart="15dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutNotifiche">
+
+
+            <TextView
+                android:id="@+id/theme_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/abilita_tema_chiaro"
+                android:layout_weight="2"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/theme_switch"
+                android:layout_width="match_parent"
+                android:layout_weight="5"
+                android:layout_height="wrap_content"
+                android:checked="@{viewModel.lightMode}"
+                android:minWidth="48dp"
+                android:minHeight="48dp" />
+
+        </LinearLayout>
+
+
 
         <TextView
             android:id="@+id/tomato_section"
@@ -163,7 +204,7 @@
             android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutNotifiche">
+            app:layout_constraintTop_toBottomOf="@+id/layoutTheme">
 
             <TextView
                 android:layout_width="match_parent"
@@ -174,12 +215,15 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
+
             <EditText
                 android:id="@+id/durataPomodoro"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.session.toString()}"
-                android:ems="5"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:text="@{viewModel.session}"
+                android:ems="3"
                 android:inputType="number" />
 
 
@@ -213,8 +257,47 @@
                 android:id="@+id/durataPausa"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.pausa.toString()}"
-                android:ems="5"
+                android:text="@{viewModel.pausa}"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:ems="3"
+                android:inputType="number" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutRound"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/custom_layout"
+            android:orientation="horizontal"
+            android:paddingStart="15dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutPausa">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Numero Round"
+                android:layout_weight="2"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/numeroRound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.round}"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:ems="3"
                 android:inputType="number" />
 
 
@@ -246,7 +329,7 @@
             android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutPausa">
+            app:layout_constraintTop_toBottomOf="@+id/layoutRound">
 
             <TextView
                 android:id="@+id/email_label"
