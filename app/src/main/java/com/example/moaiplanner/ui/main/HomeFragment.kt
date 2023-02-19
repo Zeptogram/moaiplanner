@@ -70,12 +70,12 @@ class HomeFragment : Fragment() {
         val recyclerview = activity?.findViewById<RecyclerView>(R.id.recyclerview)
 
         // this creates a vertical layout Manager
-        GridLayoutManager(requireActivity(), 2).also { recyclerview?.layoutManager = it }
+        GridLayoutManager(requireActivity(), 1).also { recyclerview?.layoutManager = it }
 
         // ArrayList of class ItemsViewModel
         val data = ArrayList<ItemsViewModel>()
 
-        for (i in 1..9) {
+        for (i in 1..4) {
             data.add(ItemsViewModel("Item " + i))
         }
 

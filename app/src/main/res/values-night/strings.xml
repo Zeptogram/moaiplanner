@@ -70,6 +70,8 @@
     <string name="action_save_as">Save as…</string>
     <string name="generale">Generale</string>
     <string name="abilita_tema_chiaro">Abilita Tema Chiaro</string>
+    <string name="folders">Folders</string>
+    <string name="friends">Friends</string>
 
     <string-array name="pref_entries_dark_mode">
         <item>@string/pref_value_light</item>

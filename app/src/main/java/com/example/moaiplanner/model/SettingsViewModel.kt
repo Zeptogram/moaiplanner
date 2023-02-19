@@ -9,8 +9,8 @@ import com.example.moaiplanner.data.repository.settings.SettingsRepository
 
 class SettingsViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
 
-    var session: MutableLiveData<String?> = MutableLiveData("5")
-    var pausa: MutableLiveData<String?> = MutableLiveData("1")
+    var session: MutableLiveData<String?> = MutableLiveData("25")
+    var pausa: MutableLiveData<String?> = MutableLiveData("5")
     var round: MutableLiveData<String?> = MutableLiveData("1")
     var notifiche: MutableLiveData<Boolean?> = MutableLiveData(true)
     var lightMode: MutableLiveData<Boolean?> = MutableLiveData(false)

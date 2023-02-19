@@ -55,6 +55,11 @@ class TomatoFragment : Fragment() {
         pomodoroViewModel = ViewModelProvider(requireActivity())[TomatoViewModel::class.java]
         settingsViewModel.restoreSettings()
 
+        if(pomodoroViewModel.maxRounds.value?.toInt() == -1)
+            pomodoroViewModel.maxRounds.value = settingsViewModel.round.value?.toLong()
+        else if(pomodoroViewModel.maxRounds.value?.toInt() != settingsViewModel.round.value?.toInt())
+            reset()
+
         minutesSession = settingsViewModel.session.value?.toLong() ?: 5
         minutesBreak = settingsViewModel.pausa.value?.toLong() ?: 1
         roundsRemaining = pomodoroViewModel.rounds.value!!
@@ -321,6 +326,8 @@ class TomatoFragment : Fragment() {
         pomodoroViewModel.pausa.value = false
         pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
         roundsRemaining = settingsViewModel.round.value?.toLong()!!
+        pomodoroViewModel.maxRounds.value = settingsViewModel.round.value?.toLong()
+
         binding.typeLabel.text = "Time to focus!"
         updateRound()
     }

@@ -27,5 +27,5 @@
     <fragment
         android:id="@+id/noteFragment"
         android:name="com.example.moaiplanner.ui.main.NoteFragment"
-        android:label="NoteFragment" />
+        android:label="Untitled.md" />
 </navigation>

@@ -19,14 +19,14 @@ class SettingsRepository(context: Context) {
     }
 
     fun loadSettings(): Quintuple<String, String, String, Boolean, Boolean> {
-        val session = sharedPreferences.getString("session", "5")
-        val pausa = sharedPreferences.getString("pausa", "1")
+        val session = sharedPreferences.getString("session", "25")
+        val pausa = sharedPreferences.getString("pausa", "5")
         val round = sharedPreferences.getString("round", "1")
         var notifiche = sharedPreferences.getBoolean("notifications_enabled", true)
         var lightMode = sharedPreferences.getBoolean("light_enabled", false)
 
 
-        return Quintuple(session ?: "5", pausa ?: "1", round?: "1", notifiche ?: true, lightMode ?: false)
+        return Quintuple(session ?: "25", pausa ?: "5", round?: "1", notifiche ?: true, lightMode ?: false)
     }
 }
 
