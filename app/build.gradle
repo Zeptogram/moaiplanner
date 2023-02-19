@@ -70,6 +70,8 @@ dependencies {
     implementation 'com.commonsware.cwac:anddown:0.4.0'
     implementation 'com.wbrawner.plausible:plausible-android:0.1.0-SNAPSHOT'
     implementation 'eu.crydee:syllable-counter:4.0.2'
+    implementation platform('com.google.firebase:firebase-bom:31.2.0')
+    implementation 'com.google.android.gms:play-services-auth:20.4.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

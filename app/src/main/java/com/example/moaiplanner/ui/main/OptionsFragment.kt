@@ -1,24 +1,41 @@
 package com.example.moaiplanner.ui.main
 
 
+import android.app.Activity
 import android.app.NotificationManager
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.moaiplanner.R
 import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
+import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.util.disableNotifications
 import com.example.moaiplanner.util.enableLight
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.FileDescriptor
+import java.io.FileInputStream
+import java.io.IOException
+import java.net.URL
 
 
 class OptionsFragment : Fragment() {
@@ -26,6 +43,10 @@ class OptionsFragment : Fragment() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var binding: OptionsFragmentBinding
     private lateinit var settingsRepository: SettingsRepository
+    private lateinit var firebase: AuthRepository
+    private lateinit var storage: FirebaseStorage
+    private lateinit var storageRef: StorageReference
+    private lateinit var avatar: StorageReference
 
     fun newInstance(): OptionsFragment? {
         return OptionsFragment()
@@ -39,6 +60,7 @@ class OptionsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         settingsViewModel.restoreSettings()
+
     }
 
 
@@ -58,6 +80,21 @@ class OptionsFragment : Fragment() {
         }
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
         binding.viewModel = settingsViewModel
+        firebase = AuthRepository(requireActivity().application)
+        storage = Firebase.storage
+        storageRef = storage.reference
+        avatar = storageRef.child("${firebase.getCurretUid()}/avatar.png")
+
+        avatar.downloadUrl.addOnSuccessListener { task ->
+            var bitmap: Bitmap? = null
+            lifecycleScope.launch(Dispatchers.IO) {
+                bitmap = convertBitmapFromURL(task.toString())
+            }.invokeOnCompletion {
+                updateUI(bitmap)
+            }
+        }.addOnFailureListener { task ->
+            Log.d("FIRESTORE-AVATAR", task.toString())
+        }
         return binding.root
 
 
@@ -113,6 +150,48 @@ class OptionsFragment : Fragment() {
             enableLight(isChecked)
         }
 
+    }
+
+    fun convertBitmapFromURL(url: String): Bitmap? {
+        try {
+            val url = URL(url)
+            val input = url.openStream()
+
+            return BitmapFactory.decodeStream(input)
+        } catch (e: IOException) {
+            Log.d("Exception", e.toString())
+        }
+
+        return null
+    }
+
+    fun updateUI(bitmap: Bitmap?) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            binding.profilepic.setImageBitmap(bitmap)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == 0) {
+            val uri = data?.data
+            Log.d("AVATAR URI", uri.toString())
+            val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
+            // val file = Uri.fromFile(uri?.toFile() as File)
+
+            //val file = File(uri?.toFile())
+            val uploadTask = avatar.putStream(stream)
+
+            // Register observers to listen for when the download is done or if it fails
+            uploadTask.addOnFailureListener {
+                Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
+                stream.close()
+            }.addOnSuccessListener { taskSnapshot ->
+                Toast.makeText(context, "Image uploaded successful", Toast.LENGTH_SHORT).show()
+                stream.close()
+                binding.profilepic.setImageURI(uri)
+            }
+        }
     }
 
     override fun onStop() {

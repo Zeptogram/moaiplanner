@@ -1,3 +1,4 @@
+import android.location.GnssAntennaInfo.Listener
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,16 @@ import com.example.moaiplanner.util.ItemsViewModel
 
 class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
+    private lateinit var mListener : onItemClickListener
+
+    interface onItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    fun setOnItemClickListener(listener: onItemClickListener) {
+        mListener = listener
+    }
+
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // inflates the card_view_design view
@@ -15,7 +26,7 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_template, parent, false)
 
-        return ViewHolder(view)
+        return ViewHolder(view, mListener)
     }
 
     // binds the list items to a view
@@ -26,7 +37,6 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
         // sets the image to the imageview from our itemHolder class
         // sets the text to the textview from our itemHolder class
         holder.textView.text = ItemsViewModel.text
-
     }
 
     // return the number of the items in the list
@@ -35,7 +45,13 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
     }
 
     // Holds the views for adding it to image and text
-    class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+    class ViewHolder(ItemView: View, listener: onItemClickListener) : RecyclerView.ViewHolder(ItemView) {
         val textView: TextView = itemView.findViewById(R.id.text_test)
+
+        init {
+            itemView.setOnClickListener {
+                listener.onItemClick(adapterPosition)
+            }
+        }
     }
 }

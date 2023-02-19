@@ -28,4 +28,10 @@
         android:id="@+id/noteFragment"
         android:name="com.example.moaiplanner.ui.main.NoteFragment"
         android:label="Untitled.md" />
+    <include app:graph="@navigation/welcome_nav_graph" />
+    <activity
+        android:id="@+id/welcomeActivity"
+        android:name="com.example.moaiplanner.ui.welcome.WelcomeActivity"
+        android:label="activity_welcome"
+        tools:layout="@layout/activity_welcome" />
 </navigation>

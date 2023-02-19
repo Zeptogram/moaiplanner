@@ -41,7 +41,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/app_name"
                 android:scaleType="fitXY"
-                android:src="@drawable/huge_avatar" />
+                android:src="@drawable/account" />
 
             <!-- Contenuti della scheda qui -->
 

@@ -71,6 +71,8 @@
     <string name="abilita_tema_chiaro">Abilita Tema Chiaro</string>
     <string name="folders">Folders</string>
     <string name="friends">Friends</string>
+    <string name="sigin">Sign In</string>
+    <string name="signup">Sign Up</string>
     <string-array name="pref_entries_dark_mode">
         <item>@string/pref_value_light</item>
         <item>@string/pref_value_dark</item>

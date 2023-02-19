@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.welcome.RegisterFragment"
-    tools:layout="@layout/register_fragment">
+    tools:context=".ui.welcome.SigninFragment"
+    tools:layout="@layout/signin_fragment">
 
     <LinearLayout
         android:layout_width="409dp"
@@ -25,7 +25,7 @@
             android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:layout_marginTop="128dp"
+            android:layout_marginTop="128sp"
             android:drawablePadding="12dp"
             android:drawableTint="?attr/colorSecondaryVariant"
             android:ems="10"
@@ -45,24 +45,7 @@
             android:hint="Password"
             android:background="@drawable/custom_edit"
             android:inputType="textPassword"
-            android:layout_marginTop="24dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:drawablePadding="12dp"
-            android:drawableTint="?attr/colorSecondaryVariant"
-            />
-
-        <EditText
-            android:id="@+id/editTextConfirmPassword"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:ems="10"
-            android:inputType="textPassword"
             android:layout_marginTop="24sp"
-            android:hint="Confirm Password"
-            android:background="@drawable/custom_edit"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:layout_marginStart="24dp"
@@ -72,14 +55,14 @@
             />
 
         <Button
-            android:id="@+id/buttonSignUp"
+            android:id="@+id/buttonSignIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
             android:height="56dp"
-            android:text="Sign up"
+            android:text="Sign in"
             android:textColor="@color/white" />
 
     </LinearLayout>
