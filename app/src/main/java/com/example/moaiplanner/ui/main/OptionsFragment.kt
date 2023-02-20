@@ -2,7 +2,7 @@ package com.example.moaiplanner.ui.main
 
 
 import android.app.Activity
-import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,31 +10,34 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
-import android.widget.Toolbar
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.moaiplanner.R
-import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
 import com.example.moaiplanner.data.repository.user.AuthRepository
-import com.example.moaiplanner.model.SettingsViewModelFactory
+import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
+import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.util.disableNotifications
 import com.example.moaiplanner.util.enableLight
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.NetworkPolicy
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.IOException
+import java.io.InputStream
 import java.net.URL
 
 
@@ -78,32 +81,29 @@ class OptionsFragment : Fragment() {
         if (savedInstanceState != null) {
             settingsViewModel.onRestoreInstanceState(savedInstanceState)
         }
+
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
         binding.viewModel = settingsViewModel
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
         avatar = storageRef.child("${firebase.getCurretUid()}/avatar.png")
-
-        avatar.downloadUrl.addOnSuccessListener { task ->
-            var bitmap: Bitmap? = null
-            lifecycleScope.launch(Dispatchers.IO) {
-                bitmap = convertBitmapFromURL(task.toString())
-            }.invokeOnCompletion {
-                updateUI(bitmap)
-            }
-        }.addOnFailureListener { task ->
-            Log.d("FIRESTORE-AVATAR", task.toString())
+        avatar.downloadUrl.addOnSuccessListener { uri -> // Got the download URL for 'users/me/profile.png'
+            // Pass it to Picasso to download, show in ImageView and caching
+            Picasso.get()
+                .load(uri.toString())
+                .priority(Picasso.Priority.HIGH)
+                .into(binding.profilepic)
+        }.addOnFailureListener {
+            // Handle any errors
         }
         return binding.root
 
-
         // Inflate il layout per il fragment
         //return inflater.inflate(R.layout.options_fragment, container, false)
-
-
-
     }
+
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -148,6 +148,23 @@ class OptionsFragment : Fragment() {
         binding.themeSwitch.setOnCheckedChangeListener { _, isChecked ->
             settingsViewModel.lightMode.value = isChecked
             enableLight(isChecked)
+        }
+
+        binding.editImage.setOnClickListener() {
+            Intent(Intent.ACTION_GET_CONTENT).also {
+                it.type = "image/*"
+                startActivityForResult(it, 0)
+            }
+        }
+
+        binding.buttonLogout.setOnClickListener() {
+            lifecycleScope.launch(Dispatchers.IO) {
+                firebase.signOut()
+            }.invokeOnCompletion {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    findNavController().navigate(R.id.welcomeActivity)
+                }
+            }
         }
 
     }
