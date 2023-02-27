@@ -12,11 +12,12 @@
     <item name="android:textColorPrimary">@color/black</item>
     <item name="android:textColorSecondary">@color/gray</item>
     <item name="android:textColorSecondaryInverse">@color/light_gray</item>
-
     <item name="colorOutline">@color/gray</item>
     <item name="colorSurfaceVariant">#F0F0F0</item>
     <item name="colorSecondaryContainer">#F0F0F0</item>
     <item name="popupMenuBackground">@color/white</item>
+    <item name="colorPrimaryContainer">@color/primary</item>
+    <item name="colorOnPrimaryContainer">@color/white</item>
 </style>
 
 <style name="Theme.MoaiPlanner" parent="Base.Theme.MoaiPlanner" />

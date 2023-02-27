@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         // Leva la freccia per il back
         val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(
             R.id.noteFragment, R.id.tomatoFragment,
-            R.id.homeFragment, R.id.registerFragment, R.id.todo
+            R.id.homeFragment, R.id.registerFragment, R.id.toDoListFragment
         ).build()
 
         toolbar.setupWithNavController(navController, appBarConfiguration)
@@ -108,7 +108,14 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.todo -> {
-                    // Respond to navigation item 2 click
+                    navHostFragment.findNavController().popBackStack()
+                    navHostFragment.findNavController().navigate(R.id.toDoListFragment, null,
+                        navOptions {
+                            anim {
+                                enter = android.R.anim.fade_in
+                                popEnter = android.R.anim.fade_in
+                            }
+                        }, null)
                     true
                 }
                 else -> false

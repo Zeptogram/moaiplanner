@@ -34,4 +34,8 @@
         android:name="com.example.moaiplanner.ui.welcome.WelcomeActivity"
         android:label="activity_welcome"
         tools:layout="@layout/activity_welcome" />
+    <fragment
+        android:id="@+id/toDoListFragment"
+        android:name="com.example.moaiplanner.ui.main.ToDoListFragment"
+        android:label="ToDoListFragment" />
 </navigation>

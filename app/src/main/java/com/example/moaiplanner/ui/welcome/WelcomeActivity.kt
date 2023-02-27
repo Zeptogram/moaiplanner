@@ -3,13 +3,21 @@ package com.example.moaiplanner.ui.welcome
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.moaiplanner.R
+import com.example.moaiplanner.data.repository.settings.SettingsRepository
+import com.example.moaiplanner.model.SettingsViewModel
+import com.example.moaiplanner.model.SettingsViewModelFactory
+import com.example.moaiplanner.util.disableNotifications
+import com.example.moaiplanner.util.enableLight
 
 class WelcomeActivity : AppCompatActivity() {
-    lateinit var navHostFragment : NavHostFragment
+    private lateinit var navHostFragment : NavHostFragment
+    private lateinit var settingsViewModel: SettingsViewModel
+    private lateinit var settingsRepository: SettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,5 +27,13 @@ class WelcomeActivity : AppCompatActivity() {
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_welcome_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         toolbar.setupWithNavController(navController)
+        settingsRepository = SettingsRepository(this)
+        val factory = SettingsViewModelFactory(SettingsRepository(this))
+        settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
+
+        settingsViewModel.restoreSettings()
+
+        settingsViewModel.lightMode.value?.let { enableLight(it) }
+        settingsViewModel.notifiche.value?.let { disableNotifications(it, this) }
     }
 }
