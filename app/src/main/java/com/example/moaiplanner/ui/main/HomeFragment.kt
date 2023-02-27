@@ -57,7 +57,7 @@ class HomeFragment : Fragment() {
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
-        userDir = storageRef.child("${firebase.getCurretUid()}")
+        userDir = storageRef.child("${firebase.getCurretUid()}/notes")
 
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
