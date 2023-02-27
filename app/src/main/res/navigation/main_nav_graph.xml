@@ -37,5 +37,5 @@
     <fragment
         android:id="@+id/toDoListFragment"
         android:name="com.example.moaiplanner.ui.main.ToDoListFragment"
-        android:label="ToDoListFragment" />
+        android:label="To Do" />
 </navigation>

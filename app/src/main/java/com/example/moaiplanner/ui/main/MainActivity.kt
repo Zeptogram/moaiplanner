@@ -46,13 +46,13 @@ class MainActivity : AppCompatActivity() {
         // Leva la freccia per il back
         val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(
             R.id.noteFragment, R.id.tomatoFragment,
-            R.id.homeFragment, R.id.registerFragment, R.id.toDoListFragment
+            R.id.homeFragment, R.id.toDoListFragment
         ).build()
 
         toolbar.setupWithNavController(navController, appBarConfiguration)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         // Mette la home come main
-        bottomNav.menu.getItem(2).isChecked = true;
+        bottomNav.menu.getItem(0).isChecked = true;
         NavigationUI.setupWithNavController(bottomNav, navController);
 
         //toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -79,10 +79,6 @@ class MainActivity : AppCompatActivity() {
                                 popEnter = android.R.anim.fade_in
                             }
                         }, null)
-                    true
-                }
-                R.id.calendar -> {
-                    // Respond to navigation item 2 click
                     true
                 }
                 R.id.home -> {

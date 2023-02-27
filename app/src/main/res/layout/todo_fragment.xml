@@ -8,6 +8,62 @@
     tools:context=".ui.main.ToDoListFragment"
     tools:layout="@layout/todo_fragment">
 
+    <com.michalsvec.singlerowcalendar.calendar.SingleRowCalendar
+        android:id="@+id/main_single_row_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:deselection="false"
+        app:longPress="false"
+        app:multiSelection="false" />
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="SELECT A DATE"
+        android:textColor="@color/gray"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/light_gray"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvDate"
+        app:layout_constraintStart_toEndOf="@+id/tvDate"
+        app:layout_constraintTop_toTopOf="@+id/tvDate" />
+
+    <Button
+        android:id="@+id/btnRight"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/ic_baseline_play_arrow_24"
+        app:layout_constraintBottom_toBottomOf="@+id/tvDate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvDate" />
+
+    <Button
+        android:id="@+id/btnLeft"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_baseline_play_arrow_24"
+        app:layout_constraintBottom_toBottomOf="@+id/btnRight"
+        app:layout_constraintEnd_toStartOf="@+id/btnRight"
+        app:layout_constraintTop_toTopOf="@+id/btnRight" />
+
+
     <!-- RecyclerView per visualizzare la lista di elementi -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
