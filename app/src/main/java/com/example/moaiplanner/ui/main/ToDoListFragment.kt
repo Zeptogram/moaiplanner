@@ -3,6 +3,7 @@ package com.example.moaiplanner.ui.main
 import android.app.AlertDialog
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuView.ItemView
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
@@ -19,25 +21,34 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
+import com.example.moaiplanner.adapter.CalendarAdapter
+import com.example.moaiplanner.data.calendar.CalendarData
+import com.example.moaiplanner.databinding.TodoElementBinding
+import com.example.moaiplanner.databinding.TodoFragmentBinding
+import com.example.moaiplanner.databinding.TomatoFragmentBinding
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.michalsvec.singlerowcalendar.calendar.CalendarChangesObserver
-import com.michalsvec.singlerowcalendar.calendar.CalendarViewManager
-import com.michalsvec.singlerowcalendar.calendar.SingleRowCalendar
-import com.michalsvec.singlerowcalendar.calendar.SingleRowCalendarAdapter
-import com.michalsvec.singlerowcalendar.selection.CalendarSelectionManager
-import com.michalsvec.singlerowcalendar.utils.DateUtils
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+
 import java.util.*
 
-class ToDoListFragment : Fragment() {
+class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
 
     // Lista di elementi della to-do list
     private val toDoList = mutableListOf<ToDoItem>()
+    private val sdf = SimpleDateFormat("MMMM yyyy", Locale.ITALIAN)
+    private val cal = Calendar.getInstance(Locale.ITALIAN)
+    private lateinit var toolbar: Toolbar
+    private lateinit var binding: TodoFragmentBinding
+    private val calendarAdapter = CalendarAdapter(this, arrayListOf())
+    private val calendarList = ArrayList<CalendarData>()
 
     // Adapter per la RecyclerView
     private lateinit var adapter: ToDoListAdapter
-    private val calendar = Calendar.getInstance()
-    private var currentMonth = 0
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,9 +56,9 @@ class ToDoListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Infla il layout del Fragment
-        val view = inflater.inflate(R.layout.todo_fragment, container, false)
+        binding = TodoFragmentBinding.inflate(inflater, container, false)
 
-        val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
+        toolbar = activity?.findViewById<Toolbar>(R.id.topAppBar)!!
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
         toolbar?.menu?.setGroupVisible(R.id.sett, true)
 
@@ -67,151 +78,27 @@ class ToDoListFragment : Fragment() {
             true
         }
 
-
-        // set current date to calendar and current month to currentMonth variable
-        calendar.time = Date()
-        currentMonth = calendar[Calendar.MONTH]
-
-
-
-        // calendar view manager is responsible for our displaying logic
-        val myCalendarViewManager = object : CalendarViewManager {
-            override fun setCalendarViewResourceId(
-                position: Int,
-                date: Date,
-                isSelected: Boolean
-            ): Int {
-                // set date to calendar according to position where we are
-                val cal = Calendar.getInstance()
-                cal.time = date
-                // if item is selected we return this layout items
-                // in this example monday, wednesday and friday will have special item views and other days
-                // will be using basic item view
-                return if (isSelected)
-                    //R.layout.selected_calendar_item
-                    when (cal[Calendar.DAY_OF_WEEK]) {
-                        Calendar.MONDAY -> R.layout.selected_calendar_item
-                        Calendar.WEDNESDAY -> R.layout.selected_calendar_item
-                        Calendar.FRIDAY -> R.layout.selected_calendar_item
-                        else -> R.layout.selected_calendar_item
-                    }
-                else
-                    //R.layout.calendar_item
-                // here we return items which are not selected
-                    when (cal[Calendar.DAY_OF_WEEK]) {
-                        Calendar.MONDAY -> R.layout.calendar_item
-                        Calendar.WEDNESDAY -> R.layout.calendar_item
-                        Calendar.FRIDAY -> R.layout.calendar_item
-                        else -> R.layout.calendar_item
-                    }
-
-                // NOTE: if we don't want to do it this way, we can simply change color of background
-                // in bindDataToCalendarView method
-            }
-
-            override fun bindDataToCalendarView(
-                holder: SingleRowCalendarAdapter.CalendarViewHolder,
-                date: Date,
-                position: Int,
-                isSelected: Boolean
-            ) {
-                // using this method we can bind data to calendar view
-                // good practice is if all views in layout have same IDs in all item views
-                holder.itemView.findViewById<TextView>(R.id.tv_date_calendar_item).text = DateUtils.getDayNumber(date)
-                holder.itemView.findViewById<TextView>(R.id.tv_day_calendar_item).text = DateUtils.getDay3LettersName(date)
-
-            }
+        init()
+        binding.monthYearPicker.setOnClickListener {
+            displayDatePicker()
         }
 
-        // using calendar changes observer we can track changes in calendar
-        val myCalendarChangesObserver = object : CalendarChangesObserver {
-            // you can override more methods, in this example we need only this one
-            override fun whenSelectionChanged(isSelected: Boolean, position: Int, date: Date) {
-                view.findViewById<TextView>(R.id.tvDate).text = "${DateUtils.getMonthName(date)}, ${DateUtils.getDayNumber(date)} "
-                view.findViewById<TextView>(R.id.tvDay).text = DateUtils.getDayName(date)
-                super.whenSelectionChanged(isSelected, position, date)
-            }
-        }
-
-        // selection manager is responsible for managing selection
-        val mySelectionManager = object : CalendarSelectionManager {
-            override fun canBeItemSelected(position: Int, date: Date): Boolean {
-                // set date to calendar according to position
-                val cal = Calendar.getInstance()
-                cal.time = date
-                //in this example sunday and saturday can't be selected, other item can be selected
-                /*return when (cal[Calendar.DAY_OF_WEEK]) {
-                    Calendar.SATURDAY -> false
-                    Calendar.SUNDAY -> false
-                    else -> true
-                }*/
-                return true
-            }
-        }
-
-        // here we init our calendar, also you can set more properties if you need them
-        val singleRowCalendar = view.findViewById<SingleRowCalendar>(R.id.main_single_row_calendar).apply {
-            calendarViewManager = myCalendarViewManager
-            calendarChangesObserver = myCalendarChangesObserver
-            calendarSelectionManager = mySelectionManager
-            setDates(getFutureDatesOfCurrentMonth())
-            init()
-        }
-
-        view.findViewById<Button>(R.id.btnRight).setOnClickListener {
-            singleRowCalendar.setDates(getDatesOfNextMonth())
-        }
-
-        view.findViewById<Button>(R.id.btnLeft).setOnClickListener {
-            singleRowCalendar.setDates(getDatesOfPreviousMonth())
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        getDates()
+        onSelect(CalendarData(Date(), true), (cal.get(Calendar.DAY_OF_MONTH) - 1))
 
 
 
         // Inizializza la RecyclerView
         adapter = ToDoListAdapter(toDoList)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        val recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
 
         // Aggiungi un listener al bottone "Aggiungi" per aggiungere un nuovo elemento alla lista
-        val addButton = view.findViewById<FloatingActionButton>(R.id.addButton)
+        val addButton = binding.addButton
         addButton.setOnClickListener {
             showAddItemDialog()
-            /*val text = view.findViewById<EditText>(R.id.editText).text.toString()
-            if (text.isNotBlank()) {
-                toDoList.add(ToDoItem(text))
-                adapter.notifyItemInserted(toDoList.lastIndex)
-            }*/
         }
 
         // Aggiungi un item touch helper per eliminare gli elementi tramite lo swipe
@@ -228,20 +115,19 @@ class ToDoListFragment : Fragment() {
         })
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        return view
+        return binding.root
     }
+
 
     // Classe per rappresentare un elemento della to-do list
     private data class ToDoItem(val text: String, var isDone: Boolean = false)
 
     // Adapter per la RecyclerView
     private inner class ToDoListAdapter(private val items: List<ToDoItem>) : RecyclerView.Adapter<ToDoViewHolder>() {
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.todo_element, parent, false)
             return ToDoViewHolder(view)
         }
-
         override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
             val item = items[position]
             holder.textView.text = item.text
@@ -250,7 +136,6 @@ class ToDoListFragment : Fragment() {
                 item.isDone = isChecked
             }
         }
-
         override fun getItemCount(): Int = items.size
     }
 
@@ -259,7 +144,6 @@ class ToDoListFragment : Fragment() {
         val textView: TextView = itemView.findViewById(R.id.textView)
         val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
     }
-
     private fun showAddItemDialog() {
         val layoutInflater = LayoutInflater.from(context)
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
@@ -283,47 +167,75 @@ class ToDoListFragment : Fragment() {
         dialog.show()
 
     }
-    private fun getDatesOfNextMonth(): List<Date> {
-        currentMonth++ // + because we want next month
-        if (currentMonth == 12) {
-            // we will switch to january of next year, when we reach last month of year
-            calendar.set(Calendar.YEAR, calendar[Calendar.YEAR] + 1)
-            currentMonth = 0 // 0 == january
+
+
+    private fun init() {
+        binding.apply {
+
+            toolbar.title = sdf.format(cal.time)
+            calendarView.setHasFixedSize(true)
+            calendarView.adapter = calendarAdapter
+
         }
-        return getDates(mutableListOf())
     }
 
-    private fun getDatesOfPreviousMonth(): List<Date> {
-        currentMonth-- // - because we want previous month
-        if (currentMonth == -1) {
-            // we will switch to december of previous year, when we reach first month of year
-            calendar.set(Calendar.YEAR, calendar[Calendar.YEAR] - 1)
-            currentMonth = 11 // 11 == december
+    private fun displayDatePicker() {
+
+        val datePicker =
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
+        //val materialDatePicker = materialDateBuilder.build()
+
+        datePicker.show(parentFragmentManager, "DatePicker");
+        datePicker.addOnPositiveButtonClickListener {
+
+        try {
+            toolbar.title = sdf.format(it)
+            cal.time = Date(it)
+            getDates()
+            onSelect(CalendarData(Date(it), true), (cal.get(Calendar.DAY_OF_MONTH) - 1))
+        } catch (e: ParseException) { }
+
         }
-        return getDates(mutableListOf())
-    }
 
-    private fun getFutureDatesOfCurrentMonth(): List<Date> {
-        // get all next dates of current month
-        currentMonth = calendar[Calendar.MONTH]
-        return getDates(mutableListOf())
     }
 
 
-    private fun getDates(list: MutableList<Date>): List<Date> {
-        // load dates of whole month
-        calendar.set(Calendar.MONTH, currentMonth)
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        list.add(calendar.time)
-        while (currentMonth == calendar[Calendar.MONTH]) {
-            calendar.add(Calendar.DATE, +1)
-            if (calendar[Calendar.MONTH] == currentMonth)
-                list.add(calendar.time)
+    /*------------------------------ Get Dates of Month ------------------------------*/
+
+    private fun getDates() {
+
+        val dateList = ArrayList<CalendarData>() // For our Calendar Data Class
+        val dates = ArrayList<Date>() // For Date
+        val monthCalendar = cal.clone() as Calendar
+        val maxDaysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+        monthCalendar.set(Calendar.DAY_OF_MONTH, 1)
+
+        while (dates.size < maxDaysInMonth) {
+            dates.add(monthCalendar.time)
+            dateList.add(CalendarData(monthCalendar.time))
+            monthCalendar.add(Calendar.DAY_OF_MONTH, 1)   // Increment Day By 1
         }
-        calendar.add(Calendar.DATE, -1)
-        return list
+
+        calendarList.clear()
+        calendarList.addAll(dateList)
+        calendarAdapter.updateList(dateList)
+
     }
 
+
+
+    override fun onSelect(calendarData: CalendarData, position: Int) {
+
+        // You can get Selected date here....
+        calendarList.forEachIndexed { index, calendarModel ->
+            calendarModel.isSelected = index == position
+        }
+        calendarAdapter.updateList(calendarList)
+        //Log.d("CIAO", "vamos")
+    }
 
 
 }

@@ -21,7 +21,7 @@
     <string name="start">Start</string>
     <string name="edit">Edit</string>
     <string name="preview">Preview</string>
-
+    <string name="mode">Light</string>
 
     <string name="action_edit">Edit</string>
     <string name="action_preview">Preview</string>
