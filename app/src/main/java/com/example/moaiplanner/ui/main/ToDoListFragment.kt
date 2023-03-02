@@ -1,17 +1,19 @@
 package com.example.moaiplanner.ui.main
 
-import android.app.AlertDialog
-import android.os.Build
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
+import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
-import androidx.appcompat.view.menu.MenuView.ItemView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -23,17 +25,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.CalendarAdapter
 import com.example.moaiplanner.data.calendar.CalendarData
-import com.example.moaiplanner.databinding.TodoElementBinding
 import com.example.moaiplanner.databinding.TodoFragmentBinding
-import com.example.moaiplanner.databinding.TomatoFragmentBinding
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import java.lang.Math.abs
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-
 import java.util.*
+import kotlin.math.roundToInt
+
 
 class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
 
@@ -45,6 +46,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
     private lateinit var binding: TodoFragmentBinding
     private val calendarAdapter = CalendarAdapter(this, arrayListOf())
     private val calendarList = ArrayList<CalendarData>()
+    private lateinit var dragHelper: ItemTouchHelper
 
     // Adapter per la RecyclerView
     private lateinit var adapter: ToDoListAdapter
@@ -85,8 +87,9 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
 
         getDates()
         onSelect(CalendarData(Date(), true), (cal.get(Calendar.DAY_OF_MONTH) - 1))
-
-
+        val icon = resources.getDrawable(R.drawable.baseline_delete_forever_24, null)
+        val iconEdit = resources.getDrawable(R.drawable.ic_baseline_edit_note_24, null)
+        val background = ColorDrawable(Color.RED)
 
         // Inizializza la RecyclerView
         adapter = ToDoListAdapter(toDoList)
@@ -102,21 +105,95 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
         }
 
         // Aggiungi un item touch helper per eliminare gli elementi tramite lo swipe
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                return false
+                viewHolder.itemView.elevation = 16F
+
+                val from = viewHolder.adapterPosition
+                val to = target.adapterPosition
+
+                Collections.swap(toDoList, from, to)
+                adapter.notifyItemMoved(from, to)
+                return true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                toDoList.removeAt(position)
-                adapter.notifyItemRemoved(position)
+                // Swipe verso destra
+                if(direction == ItemTouchHelper.RIGHT) {
+                    showEditItemDialog(position)
+                }
+                // Swipe verso sinistra
+                else {
+                    toDoList.removeAt(position)
+                    adapter.notifyItemRemoved(position)
+                }
             }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                val itemView = viewHolder.itemView
+                val backgroundCornerOffset = 20
+
+                if (dX > 0) { // Swipe to right
+                    val iconMargin = (itemView.height - iconEdit.getIntrinsicHeight()) / 2
+                    val iconTop = itemView.top + (itemView.height - iconEdit.getIntrinsicHeight()) / 2
+                    val iconBottom = iconTop + iconEdit.getIntrinsicHeight()
+                    val iconRight = itemView.left + iconMargin + iconEdit.getIntrinsicWidth()
+                    val iconLeft = itemView.left + iconMargin
+                    iconEdit.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    background.color = resources.getColor(R.color.primary, null)
+                    background.setBounds(
+                        itemView.left,
+                        itemView.top,
+                        itemView.left + dX.toInt() + backgroundCornerOffset,
+                        itemView.bottom
+                    )
+                } else if (dX < 0) { // Swipe to left
+                    val iconMargin = (itemView.height - icon.getIntrinsicHeight()) / 2
+                    val iconTop = itemView.top + (itemView.height - icon.getIntrinsicHeight()) / 2
+                    val iconBottom = iconTop + icon.getIntrinsicHeight()
+                    val iconLeft = itemView.right - iconMargin - icon.getIntrinsicWidth()
+                    val iconRight = itemView.right - iconMargin
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    background.color = Color.RED
+                    background.setBounds(
+                        itemView.right + dX.toInt() - backgroundCornerOffset,
+                        itemView.top,
+                        itemView.right,
+                        itemView.bottom
+                    )
+                } else { // view is unSwiped
+                    background.setBounds(0, 0, 0, 0)
+                }
+
+                background.draw(c)
+                if(dX <= -itemView.width * 0.1f) icon.draw(c)
+                if(dX >= itemView.width * 0.1f) iconEdit.draw(c)
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                viewHolder?.itemView?.elevation = 0F
+            }
+
         })
+
+
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         return binding.root
     }
+
 
 
     // Classe per rappresentare un elemento della to-do list
@@ -143,6 +220,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
     private inner class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.textView)
         val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
+
     }
     private fun showAddItemDialog() {
         val layoutInflater = LayoutInflater.from(context)
@@ -163,7 +241,32 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
             }
             .setNegativeButton("Annulla", null)
             .create()
+        dialog.show()
 
+    }
+
+    private fun showEditItemDialog(index: Int) {
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
+        val editTextItem = dialogView.findViewById<EditText>(R.id.editTextItem)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Modifica l'elemento")
+            .setView(dialogView)
+            .setPositiveButton("Modifica") { dialog, which ->
+                val text = editTextItem.text.toString()
+                if (text.isNotBlank()) {
+                    toDoList[index] = ToDoItem(text)
+                    adapter.notifyItemChanged(index)
+                }
+                else{
+                    adapter.notifyItemChanged(index)
+                }
+            }
+            .setNegativeButton("Annulla") { dialog, which ->
+                adapter.notifyItemChanged(index)
+            }
+            .create()
         dialog.show()
 
     }
