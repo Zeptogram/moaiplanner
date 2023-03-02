@@ -31,7 +31,6 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
 
     // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val ItemsViewModel = mList[position]
 
         // sets the image to the imageview from our itemHolder class
@@ -42,6 +41,10 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
     // return the number of the items in the list
     override fun getItemCount(): Int {
         return mList.size
+    }
+
+    fun getFileName(position: Int): String {
+        return mList[position].text
     }
 
     // Holds the views for adding it to image and text

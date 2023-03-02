@@ -19,8 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.EditPagerAdapter
@@ -33,6 +32,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.launch
+import org.jetbrains.kotlin.android.synthetic.res.cachedValue
 import java.io.File
 
 
@@ -153,9 +153,22 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                 else -> true
             }
         }
+
+        setFragmentResultListener("noteNameFromHome") { requestKey, bundle ->
+            val noteName = bundle.getString("noteName")
+            Log.d("noteNameFromHome", noteName.toString())
+            val noteRef = storageRef.child("${firebase.getCurretUid()}/notes/${noteName}")
+            val localFile = File(activity?.cacheDir, noteName.toString());
+            noteRef.getFile(localFile).addOnSuccessListener {
+                lifecycleScope.launch {
+                    context?.let { it1 -> viewModel.load(it1, localFile.toUri()) }
+                }
+            }.addOnFailureListener {
+                Toast.makeText(context, "Failed loading file from database", Toast.LENGTH_SHORT).show()
+            }
+            localFile.delete()
+        }
     }
-
-
 
     override fun onStop() {
         super.onStop()

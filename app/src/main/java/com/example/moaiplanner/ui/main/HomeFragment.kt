@@ -13,6 +13,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -127,6 +128,10 @@ class HomeFragment : Fragment() {
                 val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
                 bottomNav.menu.getItem(0).isChecked = true
                 // TODO: Passare anche il file preso da firebase al fragment note
+                val bundle = Bundle()
+                bundle.putString("noteName", adapter.getFileName(position))
+                // parentFragmentManager.setFragmentResult("noteNameFromHome", bundle)
+                setFragmentResult("noteNameFromHome", bundle)
                 navHostFragment.findNavController().navigate(R.id.noteFragment, null,
                     navOptions {
                         anim {
