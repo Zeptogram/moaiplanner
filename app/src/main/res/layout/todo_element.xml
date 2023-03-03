@@ -10,13 +10,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
     <!-- TextView per visualizzare il testo dell'elemento -->
     <TextView
         android:id="@+id/textView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:gravity="bottom"
+        android:textSize="18sp"
+        android:text="Item"
         android:paddingStart="16dp"/>
+
+        <TextView
+            android:id="@+id/timeView"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="?android:textColorSecondary"
+            android:text="Time"
+            android:paddingStart="16dp"/>
+
+    </LinearLayout>
 
 </LinearLayout>

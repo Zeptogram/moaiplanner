@@ -19,13 +19,38 @@
     >
 
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/editTextItem"
+        android:id="@+id/textItem"
         android:layout_width="match_parent"
         android:padding="14dp"
         android:layout_height="wrap_content" />
 
 
 </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:hint="Inserisci l'orario"
+        android:focusable="false"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/timeItem"
+            android:layout_width="match_parent"
+            android:padding="14dp"
+            android:inputType="none"
+            android:focusable="false"
+            android:layout_height="wrap_content" />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
 

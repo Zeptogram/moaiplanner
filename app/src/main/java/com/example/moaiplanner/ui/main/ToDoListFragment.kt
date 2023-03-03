@@ -1,13 +1,11 @@
 package com.example.moaiplanner.ui.main
 
+import android.app.TimePickerDialog
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.TypedValue
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,12 +26,11 @@ import com.example.moaiplanner.data.calendar.CalendarData
 import com.example.moaiplanner.databinding.TodoFragmentBinding
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import java.lang.Math.abs
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.roundToInt
 
 
 class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
@@ -103,6 +100,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
         addButton.setOnClickListener {
             showAddItemDialog()
         }
+
 
         // Aggiungi un item touch helper per eliminare gli elementi tramite lo swipe
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -195,8 +193,10 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
 
 
 
+
+
     // Classe per rappresentare un elemento della to-do list
-    private data class ToDoItem(val text: String, var isDone: Boolean = false)
+    private data class ToDoItem(val task: String, var time: String, var isDone: Boolean = false)
 
     // Adapter per la RecyclerView
     private inner class ToDoListAdapter(private val items: List<ToDoItem>) : RecyclerView.Adapter<ToDoViewHolder>() {
@@ -206,8 +206,9 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
         }
         override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
             val item = items[position]
-            holder.textView.text = item.text
+            holder.textView.text = item.task
             holder.checkBox.isChecked = item.isDone
+            holder.timeView.text = item.time
             holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
                 item.isDone = isChecked
             }
@@ -218,6 +219,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
     // ViewHolder per gli elementi della RecyclerView
     private inner class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.textView)
+        var timeView: TextView = itemView.findViewById(R.id.timeView)
         val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
 
     }
@@ -225,21 +227,25 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
         val layoutInflater = LayoutInflater.from(context)
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
 
-        val editTextItem = dialogView.findViewById<EditText>(R.id.editTextItem)
+        val editTextItem = dialogView.findViewById<EditText>(R.id.textItem)
+        val editTimeItem = dialogView.findViewById<EditText>(R.id.timeItem)
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Aggiungi elemento")
             .setView(dialogView)
             .setPositiveButton("Aggiungi") { dialog, which ->
                 val text = editTextItem.text.toString()
-                if (text.isNotBlank()) {
-                    toDoList.add(ToDoItem(text))
+                val time = editTimeItem.text.toString()
+                if (text.isNotBlank() && time.isNotBlank()) {
+                    toDoList.add(ToDoItem(text, time))
                     adapter.notifyItemInserted(toDoList.lastIndex)
                 }
                 // Do something with the new item
             }
             .setNegativeButton("Annulla", null)
             .create()
+
+        pickTimeListener(editTimeItem)
         dialog.show()
 
     }
@@ -247,15 +253,18 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
     private fun showEditItemDialog(index: Int) {
         val layoutInflater = LayoutInflater.from(context)
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
-        val editTextItem = dialogView.findViewById<EditText>(R.id.editTextItem)
+        val editTextItem = dialogView.findViewById<EditText>(R.id.textItem)
+        val editTimeItem = dialogView.findViewById<EditText>(R.id.timeItem)
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Modifica l'elemento")
             .setView(dialogView)
             .setPositiveButton("Modifica") { dialog, which ->
                 val text = editTextItem.text.toString()
+                val time = editTimeItem.text.toString()
+
                 if (text.isNotBlank()) {
-                    toDoList[index] = ToDoItem(text)
+                    toDoList[index] = ToDoItem(text, time)
                     adapter.notifyItemChanged(index)
                 }
                 else{
@@ -266,6 +275,10 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
                 adapter.notifyItemChanged(index)
             }
             .create()
+
+
+        pickTimeListener(editTimeItem)
+
         dialog.show()
 
     }
@@ -282,7 +295,6 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
     }
 
     private fun displayDatePicker() {
-
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select date")
@@ -339,5 +351,33 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
         //Log.d("CIAO", "vamos")
     }
 
+
+    private fun pickTimeListener(timeText: EditText){
+
+
+        timeText.setOnClickListener {
+
+            Log.d("TEST", "x")
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val picker = MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setHour(hour)
+                .setMinute(minute)
+                .build()
+
+            picker.addOnPositiveButtonClickListener {
+                val hour = picker.hour
+                val minute = picker.minute
+                val time = String.format("%02d:%02d", hour, minute)
+                timeText.setText(time)
+            }
+
+            picker.show(parentFragmentManager, "TimePicker")
+
+        }
+    }
 
 }
