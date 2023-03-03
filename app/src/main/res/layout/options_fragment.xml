@@ -346,7 +346,6 @@
                 android:text="@string/cambia"
                 android:layout_weight="3"
 
-                android:textColor="#FAFAFA"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/layoutSessione"
                 app:layout_constraintEnd_toEndOf="parent"

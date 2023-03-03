@@ -188,7 +188,6 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface{
 
         })
 
-
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         return binding.root

@@ -1,12 +1,13 @@
+import android.location.GnssAntennaInfo.Listener
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
-import com.example.moaiplanner.util.ItemsViewModel
+import com.example.moaiplanner.util.FolderItem
 
-class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adapter<FolderViewAdapter.ViewHolder>() {
 
     private lateinit var mListener : onItemClickListener
 
@@ -23,7 +24,7 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
         // inflates the card_view_design view
         // that is used to hold list item
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.note_template, parent, false)
+            .inflate(R.layout.folder_template, parent, false)
 
         return ViewHolder(view, mListener)
     }
@@ -31,11 +32,11 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
     // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val ItemsViewModel = mList[position]
+        val folderItem = mList[position]
 
         // sets the image to the imageview from our itemHolder class
         // sets the text to the textview from our itemHolder class
-        holder.textView.text = ItemsViewModel.text
+        holder.textView.text = folderItem.folder_name
     }
 
     // return the number of the items in the list
@@ -45,7 +46,7 @@ class RecyclerViewAdapter(private val mList: List<ItemsViewModel>) : RecyclerVie
 
     // Holds the views for adding it to image and text
     class ViewHolder(ItemView: View, listener: onItemClickListener) : RecyclerView.ViewHolder(ItemView) {
-        val textView: TextView = itemView.findViewById(R.id.fileName)
+        val textView: TextView = itemView.findViewById(R.id.folder_name)
 
         init {
             itemView.setOnClickListener {

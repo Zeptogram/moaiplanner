@@ -1,5 +1,6 @@
 package com.example.moaiplanner.ui.main
 
+import FolderViewAdapter
 import RecyclerViewAdapter
 import android.app.Activity
 import android.content.ContentResolver
@@ -21,6 +22,7 @@ import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.databinding.SigninFragmentBinding
+import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.ItemsViewModel
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -57,6 +59,7 @@ class HomeFragment : Fragment() {
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
+        //        userDir = storageRef.child("${firebase.getCurretUid()}/notes")
         userDir = storageRef.child("${firebase.getCurretUid()}")
 
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
@@ -79,6 +82,17 @@ class HomeFragment : Fragment() {
             true
         }
 
+        binding.buttonFriends.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_friendFragment, null,
+                navOptions {
+                    anim {
+                        enter = android.R.anim.fade_in
+                        popEnter = android.R.anim.fade_in
+                    }
+                }
+            )
+        }
+
         // Inflate il layout per il fragment
         return binding.root
     }
@@ -87,10 +101,21 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonShowall.setOnClickListener {
-            Intent(Intent.ACTION_OPEN_DOCUMENT).also {
+            /*Intent(Intent.ACTION_OPEN_DOCUMENT).also {
                 it.type = "text/markdown"
                 startActivityForResult(it, 0)
-            }
+            }*/
+            findNavController().navigate(R.id.action_homeFragment_to_fileFragment, null,
+                navOptions {
+                    anim {
+                        enter = android.R.anim.fade_in
+                        popEnter = android.R.anim.fade_in
+                    }
+                }
+            )
+
+
+
         }
     }
 
@@ -104,19 +129,21 @@ class HomeFragment : Fragment() {
 
         // initializing variables of grid view with their ids.
         val recyclerview = activity?.findViewById<RecyclerView>(R.id.recyclerview)
-        Log.d("HOME-FRAGMENT-ONVIEWCREATED", "HIHIHA")
 
         // this creates a vertical layout Manager
-        GridLayoutManager(requireActivity(), 2).also { recyclerview?.layoutManager = it }
+        GridLayoutManager(requireActivity(), 1).also { recyclerview?.layoutManager = it }
 
         // ArrayList of class ItemsViewModel
-        val data = ArrayList<ItemsViewModel>()
+        /*val data = ArrayList<ItemsViewModel>()
         // This will pass the ArrayList to our Adapter
-        val adapter = RecyclerViewAdapter(data)
+        val adapter = RecyclerViewAdapter(data)*/
+        var data = ArrayList<FolderItem>()
+        var adapter = FolderViewAdapter(data)
         // Setting the Adapter with the recyclerview
         recyclerview?.adapter = adapter
         // OnClick on Recycler elements
-        adapter.setOnItemClickListener(object : RecyclerViewAdapter.onItemClickListener {
+        //adapter.setOnItemClickListener(object : RecyclerViewAdapter.onItemClickListener {
+        adapter.setOnItemClickListener(object : FolderViewAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
                 Toast.makeText(context, "POSITION $position", Toast.LENGTH_SHORT).show()
             }
@@ -125,21 +152,22 @@ class HomeFragment : Fragment() {
         getCollections(data, adapter)
     }
 
-    fun getCollections(data: ArrayList<ItemsViewModel>, adapter: RecyclerViewAdapter) {
+    //fun getCollections(data: ArrayList<ItemsViewModel>, adapter: RecyclerViewAdapter) {
+    fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter) {
         // Get list of files from Firestore
         lifecycleScope.launch(Dispatchers.IO) {
             userDir.listAll()
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        data.add(ItemsViewModel(prefix.toString().split("/").last()))
+                        data.add(FolderItem(prefix.toString().split("/").last(), "Todo"))
                         prefix.listAll()
                             .addOnSuccessListener {  (items) ->
                                 items.forEach { item ->
                                     Log.d("FIRESTORAGE-PREFIX-ITEM", item.toString())
                                     // Regex che rimuove avatar e file in più che non servono nelle collections/notes
                                     if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                                        data.add(ItemsViewModel(item.toString().split("/").last()))
+                                        data.add(FolderItem(item.toString().split("/").last(),"Todo"))
                                 }
                             }
                             .addOnFailureListener {
@@ -150,7 +178,7 @@ class HomeFragment : Fragment() {
                     items.forEach { item ->
                         Log.d("FIRESTORAGE-ITEM", item.toString())
                         if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                            data.add(ItemsViewModel(item.toString().split("/").last()))
+                            data.add(FolderItem(item.toString().split("/").last(), "Todo"))
                     }
                 }
                 .addOnFailureListener {
