@@ -2,20 +2,14 @@ package com.example.moaiplanner.ui.main
 
 import RecyclerViewAdapter
 import android.app.Activity
-import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.*
 import android.widget.Toast
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
@@ -24,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.HomeFragmentBinding
-import com.example.moaiplanner.databinding.SigninFragmentBinding
 import com.example.moaiplanner.util.ItemsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.ktx.Firebase
@@ -35,8 +28,6 @@ import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.FileDescriptor
 import java.io.FileInputStream
 
@@ -46,7 +37,8 @@ class HomeFragment : Fragment() {
     lateinit var firebase: AuthRepository
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
-    private lateinit var userDir: StorageReference
+    private lateinit var userDirNotes: StorageReference
+    private var currentFolder = ""
 
     fun newInstance(): HomeFragment? {
         return HomeFragment()
@@ -62,7 +54,7 @@ class HomeFragment : Fragment() {
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
-        userDir = storageRef.child("${firebase.getCurretUid()}/notes")
+        userDirNotes = storageRef.child("${firebase.getCurretUid()}/notes")
 
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -123,32 +115,39 @@ class HomeFragment : Fragment() {
         // OnClick on Recycler elements
         adapter.setOnItemClickListener(object : RecyclerViewAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
-                Toast.makeText(context, "POSITION $position", Toast.LENGTH_SHORT).show()
-                val navHostFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-                val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-                bottomNav.menu.getItem(0).isChecked = true
-                // TODO: Passare anche il file preso da firebase al fragment note
                 val bundle = Bundle()
-                bundle.putString("noteName", adapter.getFileName(position))
-                // parentFragmentManager.setFragmentResult("noteNameFromHome", bundle)
-                setFragmentResult("noteNameFromHome", bundle)
-                navHostFragment.findNavController().navigate(R.id.noteFragment, null,
-                    navOptions {
-                        anim {
-                            enter = android.R.anim.fade_in
-                            popEnter = android.R.anim.fade_in
-                        }
-                    }, null)
+                // Se è un file, allora navigation al note fragmnet passando nome file nel bundle
+                if (adapter.getFileName(position).endsWith(".md")) {
+                    val navHostFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                    val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                    bottomNav.menu.getItem(0).isChecked = true
+                    bundle.putString("noteDir", currentFolder.plus(adapter.getFileName(position)))
+                    setFragmentResult("noteDirFromHome", bundle)
+                    navHostFragment.findNavController().navigate(R.id.noteFragment, null,
+                        navOptions {
+                            anim {
+                                enter = android.R.anim.fade_in
+                                popEnter = android.R.anim.fade_in
+                            }
+                        }, null)
+                } else {
+                    data.clear()
+                    // TODO: Dialog per creazione folder e navigazione folder (Con pulsante back tolgo "prova" da dir
+                    currentFolder = "prova/"
+                    getCollections(data, adapter, "prova")
+                }
             }
         })
 
-        getCollections(data, adapter)
+        getCollections(data, adapter, "")
     }
 
-    fun getCollections(data: ArrayList<ItemsViewModel>, adapter: RecyclerViewAdapter) {
+    fun getCollections(data: ArrayList<ItemsViewModel>, adapter: RecyclerViewAdapter, folderName: String) {
         // Get list of files from Firestore
         lifecycleScope.launch(Dispatchers.IO) {
-            userDir.listAll()
+            val folder = storageRef.child("${firebase.getCurretUid()}/notes/${folderName}")
+            Log.d("collectionNotesRef", folder.toString())
+            folder.listAll()
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
@@ -192,10 +191,10 @@ class HomeFragment : Fragment() {
             val uri = data?.data
             Log.d("NOTE URI", uri.toString())
 
-            val fileName = "testInCollection.md"
+            val fileName = "oggi.md"
             val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
 
-            val noteDir = storageRef.child("${firebase.getCurretUid()}/testCollection/${fileName}")
+            val noteDir = storageRef.child("${firebase.getCurretUid()}/notes/prova/${fileName}")
             val uploadTask = noteDir.putStream(stream)
 
             // Register observers to listen for when the download is done or if it fails
