@@ -132,7 +132,7 @@ class HomeFragment : Fragment() {
                         }, null)
                 } else {
                     data.clear()
-                    // TODO: Dialog per creazione folder e navigazione folder (Con pulsante back tolgo "prova" da dir
+                    // TODO: Dialog per creazione folder e navigazione folder (Con pulsante back tolgo "prova" da directory
                     currentFolder = "prova/"
                     getCollections(data, adapter, "prova")
                 }
