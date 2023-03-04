@@ -72,6 +72,7 @@ dependencies {
     implementation 'eu.crydee:syllable-counter:4.0.2'
     implementation platform('com.google.firebase:firebase-bom:31.2.0')
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
     implementation 'com.squareup.picasso:picasso:2.8'
     testImplementation 'junit:junit:4.13.2'
     implementation 'com.firebaseui:firebase-ui-storage:7.2.0'

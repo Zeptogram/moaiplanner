@@ -1,12 +1,12 @@
 package com.example.moaiplanner.ui.main
 
 import android.Manifest
-import android.annotation.SuppressLint
+import android.R.attr.data
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -14,28 +14,34 @@ import android.view.*
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
+import androidx.core.net.toUri
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.ui.AppBarConfiguration
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.EditPagerAdapter
+import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.DisableableViewPager
 import com.google.android.material.tabs.TabLayout
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     private val viewModel: MarkdownViewModel by viewModels()
+    private lateinit var firebase: AuthRepository
+    private lateinit var storage: FirebaseStorage
+    private lateinit var storageRef: StorageReference
+    private lateinit var userDir: StorageReference
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -46,13 +52,10 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         }
     }
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.findViewById<DrawerLayout>(R.id.drawerLayout)?.open()
 
-
         return inflater.inflate(R.layout.note_fragment_main, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,6 +74,11 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
 
         tabLayout?.setupWithViewPager(pager)
 
+        firebase = AuthRepository(requireActivity().application)
+        storage = Firebase.storage
+        storageRef = storage.reference
+        userDir = storageRef.child("${firebase.getCurretUid()}")
+
         /*tabLayout?.getTabAt(0)?.setIcon(R.drawable.ic_baseline_edit_note_24)
         tabLayout?.getTabAt(1)?.setIcon(R.drawable.ic_baseline_remove_red_eye_24)*/
 
@@ -82,9 +90,9 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             when (it.itemId) {
 
                 android.R.id.home -> {
-                     activity?.findViewById<DrawerLayout>(R.id.drawerLayout)?.open()
-                     true
-                 }
+                    activity?.findViewById<DrawerLayout>(R.id.drawerLayout)?.open()
+                    true
+                }
 
                 R.id.action_save -> {
                     //Timber.d("Save clicked")
@@ -97,6 +105,18 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                                 getString(R.string.file_saved, viewModel.fileName.value),
                                 Toast.LENGTH_SHORT
                             ).show()
+                        }
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/notes/${viewModel.fileName.value}")
+                        val uri : Uri = viewModel.uri.value.toString().toUri()
+                        val uploadTask = noteDir.putFile(uri)
+
+                        // Register observers to listen for when the download is done or if it fails
+                        uploadTask.addOnFailureListener {
+                            Toast.makeText(context, "Note upload failed", Toast.LENGTH_SHORT).show()
+                            Log.d("Note", "Failed")
+                        }.addOnSuccessListener { taskSnapshot ->
+                            Toast.makeText(context, "Note uploaded successful", Toast.LENGTH_SHORT).show()
+                            Log.d("Note", "Successful")
                         }
                     }
                     true
@@ -124,17 +144,32 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                     true
                 }
                 R.id.action_lock_swipe -> {
-                     //Timber.d("Lock swiping clicked")
-                     it.isChecked = !it.isChecked
-                     pager!!.setSwipeLocked(it.isChecked)
-                     true
-                 }
+                    //Timber.d("Lock swiping clicked")
+                    it.isChecked = !it.isChecked
+                    pager!!.setSwipeLocked(it.isChecked)
+                    true
+                }
                 else -> true
             }
         }
+
+        setFragmentResultListener("noteDirFromHome") { requestKey, bundle ->
+            val noteDir = bundle.getString("noteDir")
+            Log.d("noteNameFromHome", noteDir.toString())
+            val noteRef = storageRef.child("${firebase.getCurretUid()}/notes/${noteDir}")
+            Log.d("noteStorageRef", noteRef.toString())
+            val noteName = noteDir?.substringAfterLast("/")
+            val localFile = File(activity?.cacheDir, noteName.toString());
+            noteRef.getFile(localFile).addOnSuccessListener {
+                lifecycleScope.launch {
+                    context?.let { it1 -> viewModel.load(it1, localFile.toUri()) }
+                }
+            }.addOnFailureListener {
+                Toast.makeText(context, "Failed loading file from database", Toast.LENGTH_SHORT).show()
+            }
+            localFile.delete()
+        }
     }
-
-
 
     override fun onStop() {
         super.onStop()

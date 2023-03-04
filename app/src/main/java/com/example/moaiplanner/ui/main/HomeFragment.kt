@@ -97,27 +97,16 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonShowall.setOnClickListener {
-            /*Intent(Intent.ACTION_OPEN_DOCUMENT).also {
+
+        /*Intent(Intent.ACTION_OPEN_DOCUMENT).also {
                 it.type = "text/markdown"
                 startActivityForResult(it, 0)
             }*/
-            findNavController().navigate(R.id.action_homeFragment_to_fileFragment, null,
-                navOptions {
-                    anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
-                    }
-                }
-            )
 
 
 
-        }
-    }
+
 
     override fun onStart() {
         super.onStart()
@@ -145,7 +134,16 @@ class HomeFragment : Fragment() {
         //adapter.setOnItemClickListener(object : RecyclerViewAdapter.onItemClickListener {
         adapter.setOnItemClickListener(object : FolderViewAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
-                Toast.makeText(context, "POSITION $position", Toast.LENGTH_SHORT).show()
+                if(position == 0) {
+                    findNavController().navigate(R.id.action_homeFragment_to_fileFragment, null,
+                        navOptions {
+                            anim {
+                                enter = android.R.anim.fade_in
+                                popEnter = android.R.anim.fade_in
+                            }
+                        }
+                    )
+                }
             }
         })
 
@@ -160,14 +158,14 @@ class HomeFragment : Fragment() {
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        data.add(FolderItem(prefix.toString().split("/").last(), "Todo"))
+                        data.add(FolderItem(prefix.toString().split("/").last(), "Todo", false,  R.drawable.folder))
                         prefix.listAll()
                             .addOnSuccessListener {  (items) ->
                                 items.forEach { item ->
                                     Log.d("FIRESTORAGE-PREFIX-ITEM", item.toString())
                                     // Regex che rimuove avatar e file in più che non servono nelle collections/notes
                                     if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                                        data.add(FolderItem(item.toString().split("/").last(),"Todo"))
+                                        data.add(FolderItem(item.toString().split("/").last(),"Todo", false,  R.drawable.baseline_insert_drive_file_24))
                                 }
                             }
                             .addOnFailureListener {
@@ -178,7 +176,7 @@ class HomeFragment : Fragment() {
                     items.forEach { item ->
                         Log.d("FIRESTORAGE-ITEM", item.toString())
                         if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                            data.add(FolderItem(item.toString().split("/").last(), "Todo"))
+                            data.add(FolderItem(item.toString().split("/").last(), "Todo", false, R.drawable.baseline_insert_drive_file_24))
                     }
                 }
                 .addOnFailureListener {

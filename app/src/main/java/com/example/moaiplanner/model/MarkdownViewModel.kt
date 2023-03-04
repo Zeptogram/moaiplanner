@@ -4,12 +4,18 @@ package com.example.moaiplanner.model
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.ui.main.NoteFragment
 import com.example.moaiplanner.util.getName
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -135,13 +141,13 @@ class MarkdownViewModel() : ViewModel() {
             // Uri for them or for some reason we were unable to save to the original Uri. In
             // this case, we need to just save to internal file storage so that we can recover
             val fileUri = Uri.fromFile(File(context.filesDir, fileName.value ?: "Untitled.md"))
-           // timber.i("No cached uri for autosave, saving to $fileUri instead")
+            // timber.i("No cached uri for autosave, saving to $fileUri instead")
             save(context, fileUri)
         }
     }
 
     fun reset(untitledFileName: String, sharedPrefs: SharedPreferences) {
-       // timber.i("Resetting view model to default state")
+        // timber.i("Resetting view model to default state")
         fileName.postValue(untitledFileName)
         uri.postValue(null)
         markdownUpdates.postValue("")

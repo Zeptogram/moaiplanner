@@ -21,7 +21,7 @@
 
 
             <ImageView
-                android:id="@+id/rounded_user_image"
+                android:id="@+id/fileIcon"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
@@ -61,7 +61,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/file_size"
+                        android:id="@+id/fileSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="File size"

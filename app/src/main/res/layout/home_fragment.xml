@@ -41,15 +41,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcome_text">
 
-        <Button
-            android:id="@+id/button_showall"
-            style="?android:attr/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_weight="1"
-            android:text="Note TOREMOVE"
-            android:textStyle="bold" />
 
         <Button
             android:id="@+id/button_friends"
@@ -57,7 +48,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="80dp"
-            android:layout_weight="1"
             android:text="@string/friends"
             android:textStyle="bold" />
     </LinearLayout>
