@@ -126,8 +126,8 @@ class HomeFragment : Fragment() {
         /*val data = ArrayList<ItemsViewModel>()
         // This will pass the ArrayList to our Adapter
         val adapter = RecyclerViewAdapter(data)*/
-        var data = ArrayList<FolderItem>()
-        var adapter = FolderViewAdapter(data)
+        val data = ArrayList<FolderItem>()
+        val adapter = FolderViewAdapter(data)
         // Setting the Adapter with the recyclerview
         recyclerview?.adapter = adapter
         // OnClick on Recycler elements

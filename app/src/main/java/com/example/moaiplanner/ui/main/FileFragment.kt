@@ -8,10 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -31,6 +28,7 @@ import com.example.moaiplanner.databinding.NotelistFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.ItemsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -39,7 +37,7 @@ import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.internal.notifyAll
+import java.io.ByteArrayOutputStream
 import java.io.FileDescriptor
 import java.io.FileInputStream
 
@@ -47,7 +45,6 @@ class FileFragment: Fragment() {
     lateinit var binding: NotelistFragmentBinding
     private var files = ArrayList<FolderItem>()
     private var shownFiles = ArrayList<FolderItem>()
-    private var allFiles = ArrayList<FolderItem>()
     lateinit var firebase: AuthRepository
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
@@ -58,7 +55,6 @@ class FileFragment: Fragment() {
 
     // Adapter per la RecyclerView
     private lateinit var adapter: FolderViewAdapter
-    private var flag = true
 
 
     override fun onCreateView(
@@ -72,7 +68,7 @@ class FileFragment: Fragment() {
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
-        userDirNotes = storageRef.child("${firebase.getCurretUid()}/notes")
+        userDirNotes = storageRef.child("${firebase.getCurretUid()}/Notes")
 
         toolbar = activity?.findViewById<Toolbar>(R.id.topAppBar)!!
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -95,37 +91,51 @@ class FileFragment: Fragment() {
             true
         }
 
-
-
         binding.buttonShowall.setOnClickListener {
-            if(!shownFiles.equals(files)) {
-                shownFiles.clear()
-                shownFiles.addAll(files)
-                adapter.notifyDataSetChanged()
+            binding.buttonShowall.isEnabled = false
+            val iterator = files.iterator()
+            while(iterator.hasNext()) {
+                val file = iterator.next()
+                if(!file.isFavourite && !shownFiles.contains(file)) {
+                    shownFiles.add(file)
+                    adapter.notifyItemInserted(shownFiles.lastIndex)
+                }
 
             }
-
+            binding.buttonFavourites.isEnabled = true
         }
 
         binding.buttonFavourites.setOnClickListener {
-            shownFiles.clear()
-            for(file in files){
-                if(file.isFavourite) {
-                    shownFiles.add(file)
-                }
-            }
-            adapter.notifyDataSetChanged()
+            binding.buttonFavourites.isEnabled = false
+            var i = 0
+            val iterator = shownFiles.iterator()
+            while(iterator.hasNext()) {
+                val file = iterator.next()
+                if(!file.isFavourite) {
+                    iterator.remove()
+                    adapter.notifyItemRemoved(i)
+                    i--
 
+                }
+                i++
+            }
+            binding.buttonShowall.isEnabled = true
         }
 
+        binding.addNoteFolderButton.setOnClickListener {
+            showAddNoteFolderDialog()
+        }
 
-
+        binding.uploadNoteButton.setOnClickListener {
+            Intent(Intent.ACTION_OPEN_DOCUMENT).also {
+                it.type = "text/markdown"
+                startActivityForResult(it, 0)
+            }
+        }
 
         // Inflate il layout per il fragment
         return binding.root
     }
-
-
 
     override fun onStart() {
         super.onStart()
@@ -142,14 +152,12 @@ class FileFragment: Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-
-
-
         // OnClick on Recycler elements
         adapter.setOnItemClickListener(object : FolderViewAdapter.onItemClickListener {
+
             override fun onItemClick(position: Int) {
                 val bundle = Bundle()
-                // Se è un file, allora navigation al note fragmnet passando nome file nel bundle
+                // Se Ã¨ un file, allora navigation al note fragmnet passando nome file nel bundle
                 if (adapter.getFileName(position).endsWith(".md")) {
                     val navHostFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                     val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
@@ -164,25 +172,26 @@ class FileFragment: Fragment() {
                             }
                         }, null)
                 } else {
+                    files.clear()
                     shownFiles.clear()
+                    binding.buttonFavourites.isEnabled = true
+                    binding.buttonShowall.isEnabled = false
+                    adapter.notifyDataSetChanged()
                     // TODO: Dialog per creazione folder e navigazione folder (Con pulsante back tolgo "prova" da directory
                     currentFolder = "prova/"
-                    getCollections(shownFiles, adapter, "prova")
+                    getCollections(files, adapter, "prova")
                 }
             }
         })
 
-        getCollections(shownFiles, adapter, "")
-
-
-
+        getCollections(files, adapter, "")
     }
 
 
     fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter, folderName: String) {
         // Get list of files from Firestore
         lifecycleScope.launch(Dispatchers.IO) {
-            val folder = storageRef.child("${firebase.getCurretUid()}/notes/${folderName}")
+            val folder = storageRef.child("${firebase.getCurretUid()}/Notes/${folderName}")
             Log.d("collectionNotesRef", folder.toString())
             folder.listAll()
                 .addOnSuccessListener { (items, prefixes) ->
@@ -190,17 +199,6 @@ class FileFragment: Fragment() {
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
                         data.add(FolderItem(prefix.toString().split("/").last(), "ciao", false, R.drawable.folder))
                         prefix.listAll()
-                            .addOnSuccessListener {  (items) ->
-                                items.forEach { item ->
-                                    Log.d("FIRESTORAGE-PREFIX-ITEM", item.toString())
-                                    // Regex che rimuove avatar e file in più che non servono nelle collections/notes
-                                    if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                                        data.add(FolderItem(item.toString().split("/").last(), "ciao", false, R.drawable.baseline_insert_drive_file_24))
-                                }
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
-                            }
                     }
 
                     items.forEach { item ->
@@ -216,14 +214,11 @@ class FileFragment: Fragment() {
                 .addOnSuccessListener {
                     //adapter = RecyclerViewAdapter(data)
                     //recyclerview?.adapter = adapter
-                    allFiles.addAll(files)
-                    shownFiles.addAll(allFiles)
+                    shownFiles.clear()
+                    shownFiles.addAll(files)
                     adapter.notifyDataSetChanged()
                 }
         }
-
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -235,7 +230,7 @@ class FileFragment: Fragment() {
             val fileName = "oggi.md"
             val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
 
-            val noteDir = storageRef.child("${firebase.getCurretUid()}/notes/prova/${fileName}")
+            val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${fileName}")
             val uploadTask = noteDir.putStream(stream)
 
             // Register observers to listen for when the download is done or if it fails
@@ -249,10 +244,38 @@ class FileFragment: Fragment() {
         }
     }
 
+    private fun showAddNoteFolderDialog() {
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_note_folder, null)
 
+        val radioButtonNote = dialogView.findViewById<RadioButton>(R.id.radio_button_note)
+        val radioButtonFolder = dialogView.findViewById<RadioButton>(R.id.radio_button_folder)
+        val editTextNoteFolder = dialogView.findViewById<EditText>(R.id.textNoteFolder)
 
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Add note or folder")
+            .setView(dialogView)
+            .setPositiveButton("Add") { dialog, which ->
+                if (radioButtonNote.isEnabled) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${editTextNoteFolder.text}")
+                        val text = " "
+                        val uploadFile = noteDir.putBytes(text.toByteArray())
+                        uploadFile.addOnFailureListener {
+                            Log.d("NOTE-CREATION", "Nota creata")
+                            Toast.makeText(context, "Note created", Toast.LENGTH_SHORT).show()
+                            // Handle unsuccessful uploads
+                        }.addOnSuccessListener { taskSnapshot ->
+                            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
+                            // ...
+                        }
+                    }
 
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
 
-
-
+        dialog.show()
+    }
 }
