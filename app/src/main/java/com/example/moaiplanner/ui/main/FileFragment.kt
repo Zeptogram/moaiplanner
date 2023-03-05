@@ -179,6 +179,8 @@ class FileFragment: Fragment() {
                     files.clear()
                     shownFiles.clear()
                     adapter.notifyDataSetChanged()
+                    binding.buttonFavourites.isEnabled = true
+                    binding.buttonShowall.isEnabled = false
                     // TODO: Dialog per creazione folder e navigazione folder (Con pulsante back tolgo "prova" da directory
                     currentFolder = "prova/"
                     getCollections(files, adapter, "prova")
