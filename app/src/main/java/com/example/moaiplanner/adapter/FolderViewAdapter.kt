@@ -1,4 +1,5 @@
 import android.location.GnssAntennaInfo.Listener
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         mListener = listener
     }
 
+
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // inflates the card_view_design view
@@ -35,7 +37,6 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val item = mList[position]
-
         // sets the image to the imageview from our itemHolder class
         // sets the text to the textview from our itemHolder class
         holder.textViewName.text = item.folder_name
@@ -44,9 +45,12 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         holder.icon.setImageResource(item.icon)
         holder.checkbox.setOnCheckedChangeListener { _, isChecked ->
             item.isFavourite = isChecked
+            Log.d("TEST", "Called Checked: " + position.toString())
+
         }
 
     }
+
 
     // return the number of the items in the list
     override fun getItemCount(): Int {

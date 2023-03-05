@@ -47,7 +47,6 @@ class FileFragment: Fragment() {
     lateinit var binding: NotelistFragmentBinding
     private var files = ArrayList<FolderItem>()
     private var shownFiles = ArrayList<FolderItem>()
-    private var allFiles = ArrayList<FolderItem>()
     lateinit var firebase: AuthRepository
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
@@ -58,7 +57,6 @@ class FileFragment: Fragment() {
 
     // Adapter per la RecyclerView
     private lateinit var adapter: FolderViewAdapter
-    private var flag = true
 
 
     override fun onCreateView(
@@ -96,36 +94,48 @@ class FileFragment: Fragment() {
         }
 
 
-
         binding.buttonShowall.setOnClickListener {
-            if(!shownFiles.equals(files)) {
-                shownFiles.clear()
-                shownFiles.addAll(files)
-                adapter.notifyDataSetChanged()
+
+            binding.buttonShowall.isEnabled = false
+            var iterator = files.iterator()
+            while(iterator.hasNext()) {
+                val file = iterator.next()
+                if(!file.isFavourite && !shownFiles.contains(file)) {
+
+                    shownFiles.add(file)
+                    adapter.notifyItemInserted(shownFiles.lastIndex)
+
+                }
 
             }
+            binding.buttonFavourites.isEnabled = true
 
         }
 
         binding.buttonFavourites.setOnClickListener {
-            shownFiles.clear()
-            for(file in files){
-                if(file.isFavourite) {
-                    shownFiles.add(file)
+
+            binding.buttonFavourites.isEnabled = false
+            var i: Int = 0
+            Log.d("TEST", files.toString())
+            var iterator = shownFiles.iterator()
+            while(iterator.hasNext()) {
+                val file = iterator.next()
+                if(!file.isFavourite) {
+                    iterator.remove()
+                    adapter.notifyItemRemoved(i)
+                    i--
+
                 }
+                i++
             }
-            adapter.notifyDataSetChanged()
-
+            binding.buttonShowall.isEnabled = true
         }
-
 
 
 
         // Inflate il layout per il fragment
         return binding.root
     }
-
-
 
     override fun onStart() {
         super.onStart()
@@ -137,6 +147,7 @@ class FileFragment: Fragment() {
 
         // initializing variables of grid view with their ids.
         // Inizializza la RecyclerView
+
         adapter = FolderViewAdapter(shownFiles)
         val recyclerView = binding.files
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -147,6 +158,7 @@ class FileFragment: Fragment() {
 
         // OnClick on Recycler elements
         adapter.setOnItemClickListener(object : FolderViewAdapter.onItemClickListener {
+
             override fun onItemClick(position: Int) {
                 val bundle = Bundle()
                 // Se è un file, allora navigation al note fragmnet passando nome file nel bundle
@@ -164,15 +176,18 @@ class FileFragment: Fragment() {
                             }
                         }, null)
                 } else {
+                    files.clear()
                     shownFiles.clear()
+                    adapter.notifyDataSetChanged()
                     // TODO: Dialog per creazione folder e navigazione folder (Con pulsante back tolgo "prova" da directory
                     currentFolder = "prova/"
-                    getCollections(shownFiles, adapter, "prova")
+                    getCollections(files, adapter, "prova")
                 }
             }
         })
 
-        getCollections(shownFiles, adapter, "")
+
+        getCollections(files, adapter, "")
 
 
 
@@ -190,17 +205,6 @@ class FileFragment: Fragment() {
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
                         data.add(FolderItem(prefix.toString().split("/").last(), "ciao", false, R.drawable.folder))
                         prefix.listAll()
-                            .addOnSuccessListener {  (items) ->
-                                items.forEach { item ->
-                                    Log.d("FIRESTORAGE-PREFIX-ITEM", item.toString())
-                                    // Regex che rimuove avatar e file in più che non servono nelle collections/notes
-                                    if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                                        data.add(FolderItem(item.toString().split("/").last(), "ciao", false, R.drawable.baseline_insert_drive_file_24))
-                                }
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
-                            }
                     }
 
                     items.forEach { item ->
@@ -216,10 +220,12 @@ class FileFragment: Fragment() {
                 .addOnSuccessListener {
                     //adapter = RecyclerViewAdapter(data)
                     //recyclerview?.adapter = adapter
-                    allFiles.addAll(files)
-                    shownFiles.addAll(allFiles)
+
+                    shownFiles.clear()
+                    shownFiles.addAll(files)
                     adapter.notifyDataSetChanged()
                 }
+
         }
 
 

@@ -147,6 +147,7 @@ class HomeFragment : Fragment() {
             }
         })
 
+
         getCollections(data, adapter)
     }
 
