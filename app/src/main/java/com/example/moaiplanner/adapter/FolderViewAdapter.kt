@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.util.FolderItem
@@ -43,6 +44,9 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         holder.textViewSize.text = item.folder_files
         holder.checkbox.isChecked = item.isFavourite
         holder.icon.setImageResource(item.icon)
+        if(item.icon == R.drawable.folder)
+            holder.checkbox.isVisible = false
+
         holder.checkbox.setOnCheckedChangeListener { _, isChecked ->
             item.isFavourite = isChecked
             Log.d("TEST", "Called Checked: " + position.toString())

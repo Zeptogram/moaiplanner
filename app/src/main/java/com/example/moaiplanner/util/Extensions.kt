@@ -9,6 +9,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.commonsware.cwac.anddown.AndDown
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.storage.StorageMetadata
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.component1
+import com.google.firebase.storage.ktx.component2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.Reader
@@ -79,4 +84,33 @@ suspend fun Uri.getName(context: Context): String {
         ignored.printStackTrace()
     }
     return fileName ?: "Untitled.md"
+}
+
+fun getFolderSize(folder: StorageReference, callback: (Long, Int) -> Unit) {
+    var totalSize = 0L
+    var fileCount = 0
+    folder.listAll()
+        .addOnSuccessListener { (items, prefixes) ->
+            val fileTasks = items.map { it.metadata }
+            Tasks.whenAllSuccess<StorageMetadata>(fileTasks)
+                .addOnSuccessListener { metadatas ->
+                    metadatas.forEach { metadata ->
+                        totalSize += metadata.sizeBytes
+                        fileCount++
+                    }
+                    prefixes.forEach { prefix ->
+                        getFolderSize(prefix) { size, count ->
+                            totalSize += size
+                            fileCount += count
+                        }
+                    }
+                    callback(totalSize, fileCount)
+                }
+                .addOnFailureListener {
+                    callback(-1, 0)
+                }
+        }
+        .addOnFailureListener {
+            callback(-1, 0)
+        }
 }

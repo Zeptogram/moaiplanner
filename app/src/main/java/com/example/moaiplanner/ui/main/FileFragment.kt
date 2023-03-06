@@ -30,9 +30,12 @@ import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.databinding.NotelistFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.ItemsViewModel
+import com.example.moaiplanner.util.getFolderSize
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
@@ -42,6 +45,8 @@ import kotlinx.coroutines.launch
 import okhttp3.internal.notifyAll
 import java.io.FileDescriptor
 import java.io.FileInputStream
+import java.math.BigInteger
+import java.text.DecimalFormat
 
 class FileFragment: Fragment() {
     lateinit var binding: NotelistFragmentBinding
@@ -70,7 +75,7 @@ class FileFragment: Fragment() {
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
-        userDirNotes = storageRef.child("${firebase.getCurretUid()}/notes")
+        userDirNotes = storageRef.child("${firebase.getCurretUid()}/Notes")
 
         toolbar = activity?.findViewById<Toolbar>(R.id.topAppBar)!!
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -181,17 +186,13 @@ class FileFragment: Fragment() {
                     adapter.notifyDataSetChanged()
                     binding.buttonFavourites.isEnabled = true
                     binding.buttonShowall.isEnabled = false
-                    // TODO: Dialog per creazione folder e navigazione folder (Con pulsante back tolgo "prova" da directory
+                    // TODO: Aggiornare la topbar con il foldername
                     currentFolder = "prova/"
                     getCollections(files, adapter, "prova")
                 }
             }
         })
-
-
         getCollections(files, adapter, "")
-
-
 
     }
 
@@ -199,20 +200,42 @@ class FileFragment: Fragment() {
     fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter, folderName: String) {
         // Get list of files from Firestore
         lifecycleScope.launch(Dispatchers.IO) {
-            val folder = storageRef.child("${firebase.getCurretUid()}/notes/${folderName}")
+            val folder = storageRef.child("${firebase.getCurretUid()}/Notes/${folderName}")
             Log.d("collectionNotesRef", folder.toString())
             folder.listAll()
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        data.add(FolderItem(prefix.toString().split("/").last(), "ciao", false, R.drawable.folder))
+                        var fileItem = FolderItem(prefix.toString().split("/").last(), "", false, R.drawable.folder)
+                        data.add(fileItem)
+                        getFolderSize(prefix) { bytes, files ->
+                            val df = DecimalFormat("#,##0.##")
+                            df.maximumFractionDigits = 2
+                            var kb = bytes.toDouble() / 1024
+                            val info = df.format(kb) + "kB - " + files.toString() + " Notes"
+                            fileItem.folder_files = info
+                            adapter.notifyDataSetChanged()
+                        }
+
+                        prefix.listAll()
+
                         prefix.listAll()
                     }
 
                     items.forEach { item ->
                         Log.d("FIRESTORAGE-ITEM", item.toString())
-                        if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                            data.add(FolderItem(item.toString().split("/").last(), "ciao", false, R.drawable.baseline_insert_drive_file_24))
+                        if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex())){
+                            var fileItem = FolderItem(item.toString().split("/").last(), "", false, R.drawable.baseline_insert_drive_file_24)
+                            data.add(fileItem)
+                            item.metadata.addOnSuccessListener {
+                                val df = DecimalFormat("#,##0.##")
+                                df.maximumFractionDigits = 2
+                                var kbytes: Double = it.sizeBytes.toDouble() / 1024
+                                val size = df.format(kbytes) + "kB"
+                                fileItem.folder_files = size
+                                adapter.notifyDataSetChanged()
+                            }
+                        }
                     }
                 }
                 .addOnFailureListener {
@@ -243,7 +266,7 @@ class FileFragment: Fragment() {
             val fileName = "oggi.md"
             val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
 
-            val noteDir = storageRef.child("${firebase.getCurretUid()}/notes/prova/${fileName}")
+            val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/prova/${fileName}")
             val uploadTask = noteDir.putStream(stream)
 
             // Register observers to listen for when the download is done or if it fails

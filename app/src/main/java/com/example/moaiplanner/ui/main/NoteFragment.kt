@@ -106,7 +106,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/notes/${viewModel.fileName.value}")
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${viewModel.fileName.value}")
                         val uri : Uri = viewModel.uri.value.toString().toUri()
                         val uploadTask = noteDir.putFile(uri)
 
@@ -156,7 +156,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         setFragmentResultListener("noteDirFromHome") { requestKey, bundle ->
             val noteDir = bundle.getString("noteDir")
             Log.d("noteNameFromHome", noteDir.toString())
-            val noteRef = storageRef.child("${firebase.getCurretUid()}/notes/${noteDir}")
+            val noteRef = storageRef.child("${firebase.getCurretUid()}/Notes/${noteDir}")
             Log.d("noteStorageRef", noteRef.toString())
             val noteName = noteDir?.substringAfterLast("/")
             val localFile = File(activity?.cacheDir, noteName.toString());

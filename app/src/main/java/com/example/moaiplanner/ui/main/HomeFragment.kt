@@ -24,8 +24,11 @@ import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.databinding.SigninFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.ItemsViewModel
+import com.example.moaiplanner.util.getFolderSize
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.component1
@@ -36,6 +39,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileDescriptor
 import java.io.FileInputStream
+import java.text.DecimalFormat
 
 
 class HomeFragment : Fragment() {
@@ -159,19 +163,19 @@ class HomeFragment : Fragment() {
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        data.add(FolderItem(prefix.toString().split("/").last(), "Todo", false,  R.drawable.folder))
+                        var fileItem = FolderItem(prefix.toString().split("/").last(), "", false, R.drawable.folder)
+                        data.add(fileItem)
+                        getFolderSize(prefix) { bytes, files ->
+                            val df = DecimalFormat("#,##0.##")
+                            df.maximumFractionDigits = 2
+                            var kb = bytes.toDouble() / 1024
+                            val info = df.format(kb) + "kB - " + files.toString() + " Notes"
+                            fileItem.folder_files = info
+                            adapter.notifyDataSetChanged()
+                        }
+
                         prefix.listAll()
-                            .addOnSuccessListener {  (items) ->
-                                items.forEach { item ->
-                                    Log.d("FIRESTORAGE-PREFIX-ITEM", item.toString())
-                                    // Regex che rimuove avatar e file in più che non servono nelle collections/notes
-                                    if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                                        data.add(FolderItem(item.toString().split("/").last(),"Todo", false,  R.drawable.baseline_insert_drive_file_24))
-                                }
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
-                            }
+
                     }
 
                     items.forEach { item ->
@@ -215,4 +219,9 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+
+
+
+
 }
