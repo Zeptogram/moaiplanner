@@ -61,6 +61,7 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
     fun getFileName(position: Int): String {
         return mList[position].folder_name
     }
+
     // Holds the views for adding it to image and text
     class ViewHolder(ItemView: View, listener: onItemClickListener) : RecyclerView.ViewHolder(ItemView) {
         val textViewName: TextView = itemView.findViewById(R.id.fileName)

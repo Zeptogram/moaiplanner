@@ -158,6 +158,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             val noteRef = storageRef.child("${firebase.getCurretUid()}/Notes/${noteDir}")
             Log.d("noteStorageRef", noteRef.toString())
             val noteName = noteDir?.substringAfterLast("/")
+            Log.d("NOTE-NAME", noteName.toString())
             val localFile = File(activity?.cacheDir, noteName.toString());
             noteRef.getFile(localFile).addOnSuccessListener {
                 lifecycleScope.launch {
