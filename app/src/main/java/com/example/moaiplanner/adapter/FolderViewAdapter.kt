@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.util.FolderItem
@@ -16,12 +17,12 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
 
     interface onItemClickListener {
         fun onItemClick(position: Int)
+        fun onItemLongClick(position: Int)
     }
 
     fun setOnItemClickListener(listener: onItemClickListener) {
         mListener = listener
     }
-
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,7 +36,6 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
 
     // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val item = mList[position]
         Log.d("TEST", "Called Holder: " + position.toString())
         // sets the image to the imageview from our itemHolder class
@@ -43,15 +43,13 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         holder.textViewName.text = item.folder_name
         holder.textViewSize.text = item.folder_files
         holder.checkbox.isChecked = item.isFavourite
-
         holder.icon.setImageResource(item.icon)
-        holder.checkbox.setOnCheckedChangeListener { _, isChecked ->
-            Log.d("TEST", "Called Click Star: " + position.toString())
-            item.isFavourite = isChecked
+        if(item.icon == R.drawable.folder)
+            holder.checkbox.isVisible = false
+        holder.checkbox.setOnClickListener {
+            item.isFavourite = !item.isFavourite
         }
-
     }
-
 
     // return the number of the items in the list
     override fun getItemCount(): Int {
@@ -73,6 +71,11 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
             itemView.setOnClickListener {
                 listener.onItemClick(adapterPosition)
                 Log.d("TEST", "Called Click: " + adapterPosition.toString())
+            }
+
+            itemView.setOnLongClickListener {
+                listener.onItemLongClick(adapterPosition)
+                return@setOnLongClickListener true
             }
         }
     }

@@ -42,6 +42,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
     private lateinit var userDir: StorageReference
+    private var noteDir = ""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -105,7 +106,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${viewModel.fileName.value}")
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes${noteDir.substringBeforeLast("/").plus("/")}${viewModel.fileName.value}")
                         val uri : Uri = viewModel.uri.value.toString().toUri()
                         val uploadTask = noteDir.putFile(uri)
 
@@ -153,7 +154,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         }
 
         setFragmentResultListener("noteDirFromHome") { requestKey, bundle ->
-            val noteDir = bundle.getString("noteDir")
+            noteDir = bundle.getString("noteDir").toString()
             Log.d("noteNameFromHome", noteDir.toString())
             val noteRef = storageRef.child("${firebase.getCurretUid()}/Notes/${noteDir}")
             Log.d("noteStorageRef", noteRef.toString())

@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -18,16 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
-import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.databinding.NotelistFragmentBinding
 import com.example.moaiplanner.util.FolderItem
-import com.example.moaiplanner.util.ItemsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.ktx.Firebase
@@ -38,9 +32,9 @@ import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 import java.io.FileDescriptor
 import java.io.FileInputStream
+import java.text.FieldPosition
 
 class FileFragment: Fragment() {
     lateinit var binding: NotelistFragmentBinding
@@ -179,8 +173,12 @@ class FileFragment: Fragment() {
                     binding.buttonFavourites.isEnabled = true
                     binding.buttonShowall.isEnabled = false
                     adapter.notifyDataSetChanged()
-                    getCollections(files, adapter, currentFolder.replace("/", ""))
+                    getCollections(files, adapter, currentFolder)
                 }
+            }
+
+            override fun onItemLongClick(position: Int) {
+                showDeleteNoteFolderDialog(position)
             }
         })
 
@@ -197,14 +195,14 @@ class FileFragment: Fragment() {
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        data.add(FolderItem(prefix.toString().split("/").last(), "ciao", false, R.drawable.folder))
+                        data.add(FolderItem(prefix.toString().split("/").last().replace("%20", " "), "ciao", false, R.drawable.folder))
                         prefix.listAll()
                     }
 
                     items.forEach { item ->
                         Log.d("FIRESTORAGE-ITEM", item.toString())
                         if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                            data.add(FolderItem(item.toString().split("/").last(), "ciao", false, R.drawable.baseline_insert_drive_file_24))
+                            data.add(FolderItem(item.toString().split("/").last().replace("%20", " "), "ciao", false, R.drawable.baseline_insert_drive_file_24))
                     }
                 }
                 .addOnFailureListener {
@@ -215,7 +213,7 @@ class FileFragment: Fragment() {
                     //adapter = RecyclerViewAdapter(data)
                     //recyclerview?.adapter = adapter
                     shownFiles.clear()
-                    shownFiles.addAll(files)
+                    shownFiles.addAll(data)
                     adapter.notifyDataSetChanged()
                 }
         }
@@ -240,6 +238,7 @@ class FileFragment: Fragment() {
             val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
 
             val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${fileName}")
+            Log.d("NOTE-DIR", noteDir.toString())
             val uploadTask = noteDir.putStream(stream)
 
             // Register observers to listen for when the download is done or if it fails
@@ -268,7 +267,7 @@ class FileFragment: Fragment() {
                 if (radioButtonNote.isChecked) {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${editTextNoteFolder.text}")
-                        val text = " "
+                        val text = "# Note created with Moyai Planner"
                         val uploadFile = noteDir.putBytes(text.toByteArray())
                         uploadFile.addOnFailureListener {
                             // Handle unsuccessful uploads
@@ -303,5 +302,53 @@ class FileFragment: Fragment() {
             .create()
 
         dialog.show()
+    }
+
+    private fun showDeleteNoteFolderDialog(position: Int) {
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_note_folder, null)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Delete note or folder")
+            .setView(dialogView)
+            .setPositiveButton("Delete") { dialog, which ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val noteDir: StorageReference
+                    Log.d("NOTE-DIR", adapter.getFileName(position))
+                    if (adapter.getFileName(position).endsWith(".md")) {
+                        noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
+                        Log.d("NOTE-DIR", noteDir.toString())
+                    } else {
+                        noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
+                        Log.d("NOTE-DIR", noteDir.toString())
+                    }
+
+                    noteDir.listAll().addOnSuccessListener { (items, prefixes) ->
+                        items.forEach { item ->
+                            item.delete()
+                        }
+
+                        deleteFolder(prefixes)
+                    }.addOnFailureListener {
+                        Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun deleteFolder(prefixes: List<StorageReference>) {
+        prefixes.forEach { prefix ->
+            prefix.listAll().addOnSuccessListener { (items, prefixes) ->
+                items.forEach { item ->
+                    item.delete()
+                }
+
+                deleteFolder(prefixes)
+            }
+        }
     }
 }

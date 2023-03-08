@@ -145,6 +145,10 @@ class HomeFragment : Fragment() {
                     )
                 }
             }
+
+            override fun onItemLongClick(position: Int) {
+
+            }
         })
 
         getCollections(data, adapter)
@@ -158,7 +162,7 @@ class HomeFragment : Fragment() {
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        data.add(FolderItem(prefix.toString().split("/").last(), "Todo", false,  R.drawable.folder))
+                        data.add(FolderItem(prefix.toString().split("/").last().replace("%20", " "), "Todo", false,  R.drawable.folder))
                         prefix.listAll()
                             .addOnSuccessListener {  (items) ->
                                 items.forEach { item ->
@@ -176,7 +180,7 @@ class HomeFragment : Fragment() {
                     items.forEach { item ->
                         Log.d("FIRESTORAGE-ITEM", item.toString())
                         if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                            data.add(FolderItem(item.toString().split("/").last(), "Todo", false, R.drawable.baseline_insert_drive_file_24))
+                            data.add(FolderItem(item.toString().split("/").last().replace("%20", " "), "Todo", false, R.drawable.baseline_insert_drive_file_24))
                     }
                 }
                 .addOnFailureListener {
