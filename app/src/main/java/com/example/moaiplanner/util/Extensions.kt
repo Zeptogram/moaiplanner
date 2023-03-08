@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDelegate
@@ -95,15 +96,17 @@ fun getFolderSize(folder: StorageReference, callback: (Long, Int) -> Unit) {
             Tasks.whenAllSuccess<StorageMetadata>(fileTasks)
                 .addOnSuccessListener { metadatas ->
                     metadatas.forEach { metadata ->
-                        totalSize += metadata.sizeBytes
-                        fileCount++
+                        if(metadata.name?.endsWith(".md") == true) {
+                            totalSize += metadata.sizeBytes
+                            fileCount++
+                        }
                     }
-                    prefixes.forEach { prefix ->
+                    /*prefixes.forEach { prefix ->
                         getFolderSize(prefix) { size, count ->
                             totalSize += size
                             fileCount += count
                         }
-                    }
+                    }*/
                     callback(totalSize, fileCount)
                 }
                 .addOnFailureListener {

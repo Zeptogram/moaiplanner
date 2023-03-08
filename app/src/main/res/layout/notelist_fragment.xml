@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.main.FileFragment"
@@ -7,49 +8,93 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="16dp">
-
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="12dp">
 
     <LinearLayout
-        android:id="@+id/folderLayout"
+        android:id="@+id/fileFragmentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/button_showall"
-            style="?android:attr/button"
-            android:layout_width="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/folderLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:enabled="false"
-            android:layout_weight="1"
-            android:text="Show All"
-            android:textStyle="bold" />
-        <Button
-            android:id="@+id/button_favourites"
-            style="?android:attr/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/button_showall"
+                style="?android:attr/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="20dp"
+                android:enabled="false"
+                android:layout_weight="1"
+                android:text="Show All"
+                android:textStyle="bold" />
 
-            android:layout_weight="1"
-            android:text="Favourites"
-            android:textStyle="bold" />
-
-    </LinearLayout>
+            <Button
+                android:id="@+id/button_favourites"
+                style="?android:attr/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:text="Favourites"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/files"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/note_template" />
+            tools:listitem="@layout/note_template"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            />
 
+    </LinearLayout>
 
+    <RelativeLayout
+        android:id="@+id/fabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="bottom|end">
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addNoteFolderButton"
+            style="?attr/floatingActionButtonPrimaryStyle"
+            app:srcCompat="@drawable/baseline_add_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="16dp"
+            android:contentDescription="Add note or folder" />
 
-</LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/uploadNoteButton"
+            style="?attr/floatingActionButtonPrimaryStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/addNoteFolderButton"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Upload a note file"
+            app:srcCompat="@drawable/baseline_upload_file_24" />
+
+    </RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

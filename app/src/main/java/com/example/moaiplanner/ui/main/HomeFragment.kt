@@ -1,14 +1,9 @@
 package com.example.moaiplanner.ui.main
 
 import FolderViewAdapter
-import RecyclerViewAdapter
 import android.app.Activity
-import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -21,22 +16,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.HomeFragmentBinding
-import com.example.moaiplanner.databinding.SigninFragmentBinding
 import com.example.moaiplanner.util.FolderItem
-import com.example.moaiplanner.util.ItemsViewModel
 import com.example.moaiplanner.util.getFolderSize
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.text.DecimalFormat

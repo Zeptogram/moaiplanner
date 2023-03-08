@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "50394403115",
+    "firebase_url": "https://moai-planner-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "moai-planner",
     "storage_bucket": "moai-planner.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "50394403115-mb8mrrod4jcrggacnvoh5crvuor3k1ha.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.moaiplanner",
+            "certificate_hash": "62497dbd0ebd816b7630716ab0994aa5b1175fd7"
+          }
+        },
         {
           "client_id": "50394403115-k98o4pct0grf3dveb47a4ncl4gauuifd.apps.googleusercontent.com",
           "client_type": 3
