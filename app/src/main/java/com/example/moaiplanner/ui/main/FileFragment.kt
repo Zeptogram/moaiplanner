@@ -29,6 +29,7 @@ import com.example.moaiplanner.databinding.NotelistFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.ItemsViewModel
 import com.example.moaiplanner.util.getFolderSize
+import com.example.moaiplanner.util.sizeCache
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -191,7 +192,7 @@ class FileFragment: Fragment() {
                     binding.buttonFavourites.isEnabled = true
                     binding.buttonShowall.isEnabled = false
                     adapter.notifyDataSetChanged()
-                    getCollections(files, adapter, currentFolder.replace("/", ""))
+                    getCollections(files, adapter, currentFolder)
                 }
             }
         })
@@ -208,9 +209,11 @@ class FileFragment: Fragment() {
             folder.listAll()
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
+
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        var fileItem = FolderItem(prefix.toString().split("/").last(), "", false, R.drawable.folder)
+                        var fileItem = FolderItem(prefix.toString().split("/").last().replace("%20", " "), "", false, R.drawable.folder)
                         data.add(fileItem)
+
                         getFolderSize(prefix) { bytes, files ->
                             val df = DecimalFormat("#,##0.##")
                             df.maximumFractionDigits = 2
@@ -219,13 +222,14 @@ class FileFragment: Fragment() {
                             fileItem.folder_files = info
                             adapter.notifyDataSetChanged()
                         }
+
                         prefix.listAll()
                     }
 
                     items.forEach { item ->
                         Log.d("FIRESTORAGE-ITEM", item.toString())
                         if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex())){
-                            var fileItem = FolderItem(item.toString().split("/").last(), "", false, R.drawable.baseline_insert_drive_file_24)
+                            var fileItem = FolderItem(item.toString().split("/").last().replace("%20", " "), "", false, R.drawable.baseline_insert_drive_file_24)
                             data.add(fileItem)
                             item.metadata.addOnSuccessListener {
                                 val df = DecimalFormat("#,##0.##")
@@ -283,6 +287,7 @@ class FileFragment: Fragment() {
             }.addOnSuccessListener { taskSnapshot ->
                 Toast.makeText(context, "Note uploaded successful", Toast.LENGTH_SHORT).show()
                 stream.close()
+                sizeCache.remove("/${firebase.getCurretUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
                 resetFolderView()
             }
         }
@@ -313,6 +318,8 @@ class FileFragment: Fragment() {
                             // ...
                             Log.d("NOTE-CREATION", "Nota creata")
                             Toast.makeText(context, "Note created", Toast.LENGTH_SHORT).show()
+                            sizeCache.remove("/${firebase.getCurretUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
+
                             resetFolderView()
 
                         }
@@ -347,6 +354,7 @@ class FileFragment: Fragment() {
         shownFiles.clear()
         getCollections(files, adapter, currentFolder)
     }
+
 
 
 

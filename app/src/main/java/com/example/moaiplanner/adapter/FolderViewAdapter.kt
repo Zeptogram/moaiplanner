@@ -47,8 +47,8 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         if(item.icon == R.drawable.folder)
             holder.checkbox.isVisible = false
 
-        holder.checkbox.setOnCheckedChangeListener { _, isChecked ->
-            item.isFavourite = isChecked
+        holder.checkbox.setOnClickListener {
+            item.isFavourite = !item.isFavourite
             Log.d("TEST", "Called Checked: " + position.toString())
 
         }
@@ -77,12 +77,4 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
             }
         }
     }
-
-
-
-
-
-
-
-
 }

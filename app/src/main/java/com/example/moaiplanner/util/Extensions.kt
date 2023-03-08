@@ -15,8 +15,8 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 import java.io.Reader
 
 fun View.showKeyboard() {
@@ -87,33 +87,59 @@ suspend fun Uri.getName(context: Context): String {
     return fileName ?: "Untitled.md"
 }
 
-fun getFolderSize(folder: StorageReference, callback: (Long, Int) -> Unit) {
+val sizeCache = HashMap<String, Pair<Long, Int>>() // cache per le dimensioni
+
+suspend fun getTotalSize(folder: StorageReference): Pair<Long, Int> {
+    val folderPath = folder.path
+    val home = folderPath.split("/")
+    if (sizeCache.containsKey(folderPath)  && home.size != 3) {
+        // Se la cartella è già stata processata in precedenza, ritorniamo le dimensioni dalla cache
+        return sizeCache[folderPath]!!
+    }
+
     var totalSize = 0L
-    var fileCount = 0
-    folder.listAll()
-        .addOnSuccessListener { (items, prefixes) ->
-            val fileTasks = items.map { it.metadata }
-            Tasks.whenAllSuccess<StorageMetadata>(fileTasks)
-                .addOnSuccessListener { metadatas ->
-                    metadatas.forEach { metadata ->
-                        if(metadata.name?.endsWith(".md") == true) {
-                            totalSize += metadata.sizeBytes
-                            fileCount++
-                        }
-                    }
-                    /*prefixes.forEach { prefix ->
-                        getFolderSize(prefix) { size, count ->
-                            totalSize += size
-                            fileCount += count
-                        }
-                    }*/
-                    callback(totalSize, fileCount)
-                }
-                .addOnFailureListener {
-                    callback(-1, 0)
-                }
+    var noteCount = 0
+    val (items, prefixes) = folder.listAll().await()
+    val fileTasks = items.map { it.metadata }
+    val metadatas = Tasks.whenAllSuccess<StorageMetadata>(fileTasks).await()
+    metadatas.forEach { metadata ->
+        if(metadata.name?.endsWith(".md") == true) {
+            totalSize += metadata.sizeBytes
+            noteCount++
         }
-        .addOnFailureListener {
+    }
+
+    // Creiamo un array di coroutine job per processare le sotto-cartelle in parallelo
+    val subFolderJobs = prefixes.map { prefix ->
+        GlobalScope.async { getTotalSize(prefix) }
+    }
+
+    // Attendo che tutte le sotto-cartelle siano state processate e sommo le dimensioni e i conteggi
+    val subFolderResults = subFolderJobs.awaitAll()
+    subFolderResults.forEach { (subTotalSize, subNoteCount) ->
+        totalSize += subTotalSize
+        noteCount += subNoteCount
+    }
+
+    // Salviamo le dimensioni nella cache
+    sizeCache[folderPath] = Pair(totalSize, noteCount)
+
+    return Pair(totalSize, noteCount)
+}
+
+// La funzione principale adesso è asincrona e utilizza la coroutine appena definita
+@OptIn(DelicateCoroutinesApi::class)
+fun getFolderSize(
+    folder: StorageReference,
+    callback: (Long, Int) -> Unit
+) {
+    GlobalScope.launch(Dispatchers.Main) {
+        try {
+            val totalSize = getTotalSize(folder).first
+            val fileCount = getTotalSize(folder).second
+            callback(totalSize, fileCount)
+        } catch (e: Exception) {
             callback(-1, 0)
         }
+    }
 }

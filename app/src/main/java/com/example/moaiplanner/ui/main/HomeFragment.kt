@@ -152,13 +152,13 @@ class HomeFragment : Fragment() {
                 .addOnSuccessListener { (items, prefixes) ->
                     prefixes.forEach { prefix ->
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        var fileItem = FolderItem(prefix.toString().split("/").last(), "", false, R.drawable.folder)
+                        var fileItem = FolderItem(prefix.toString().split("/").last().replace("%20", " "), "", false, R.drawable.folder)
                         data.add(fileItem)
                         getFolderSize(prefix) { bytes, files ->
                             val df = DecimalFormat("#,##0.##")
                             df.maximumFractionDigits = 2
                             var kb = bytes.toDouble() / 1024
-                            val info = df.format(kb) + "kB - " + files.toString() + " Notes"
+                            val info = df.format(kb) + "KB - " + files.toString() + " Notes"
                             fileItem.folder_files = info
                             adapter.notifyDataSetChanged()
                         }
@@ -170,7 +170,7 @@ class HomeFragment : Fragment() {
                     items.forEach { item ->
                         Log.d("FIRESTORAGE-ITEM", item.toString())
                         if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex()))
-                            data.add(FolderItem(item.toString().split("/").last(), "Todo", false, R.drawable.baseline_insert_drive_file_24))
+                            data.add(FolderItem(item.toString().split("/").last().replace("%20", " "), "Todo", false, R.drawable.baseline_insert_drive_file_24))
                     }
                 }
                 .addOnFailureListener {
