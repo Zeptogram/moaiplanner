@@ -57,7 +57,7 @@ class FileFragment: Fragment() {
     private lateinit var storageRef: StorageReference
     private lateinit var userDirNotes: StorageReference
     private var currentFolder = ""
-
+    private lateinit var folderPath: String
     private lateinit var toolbar: Toolbar
 
     // Adapter per la RecyclerView
@@ -102,22 +102,24 @@ class FileFragment: Fragment() {
         binding.buttonShowall.setOnClickListener {
 
             binding.buttonShowall.isEnabled = false
-            var iterator = files.iterator()
+           /* var iterator = files.iterator()
             while(iterator.hasNext()) {
                 val file = iterator.next()
                 if(!file.isFavourite && !shownFiles.contains(file)) {
-
                     shownFiles.add(file)
                     adapter.notifyItemInserted(shownFiles.lastIndex)
 
                 }
-            }
+            }*/
+            shownFiles.clear()
+            shownFiles.addAll(files)
+            adapter.notifyDataSetChanged()
             binding.buttonFavourites.isEnabled = true
 
         }
         binding.buttonFavourites.setOnClickListener {
             binding.buttonFavourites.isEnabled = false
-            var i: Int = 0
+            /*var i: Int = 0
             Log.d("TEST", files.toString())
             var iterator = shownFiles.iterator()
             while(iterator.hasNext()) {
@@ -128,7 +130,15 @@ class FileFragment: Fragment() {
                     i--
                 }
                 i++
+            }*/
+            shownFiles.clear()
+            for(file in files) {
+                if(file.isFavourite){
+                    shownFiles.add(file)
+                    //adapter.notifyItemInserted(shownFiles.lastIndex)
+                }
             }
+            adapter.notifyDataSetChanged()
             binding.buttonShowall.isEnabled = true
         }
 
@@ -203,6 +213,7 @@ class FileFragment: Fragment() {
 
     fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter, folderName: String) {
         // Get list of files from Firestore
+        folderPath = "/${firebase.getCurretUid()}/Notes/${currentFolder}"
         lifecycleScope.launch(Dispatchers.IO) {
             val folder = storageRef.child("${firebase.getCurretUid()}/Notes/${folderName}")
             Log.d("collectionNotesRef", folder.toString())
@@ -288,6 +299,7 @@ class FileFragment: Fragment() {
                 Toast.makeText(context, "Note uploaded successful", Toast.LENGTH_SHORT).show()
                 stream.close()
                 sizeCache.remove("/${firebase.getCurretUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
+                updateFolderNotesCache(folderPath)
                 resetFolderView()
             }
         }
@@ -318,7 +330,12 @@ class FileFragment: Fragment() {
                             // ...
                             Log.d("NOTE-CREATION", "Nota creata")
                             Toast.makeText(context, "Note created", Toast.LENGTH_SHORT).show()
-                            sizeCache.remove("/${firebase.getCurretUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
+                            updateFolderNotesCache(folderPath)
+
+                            /*while(path != "/${firebase.getCurretUid()}/Notes") {
+                                path = path.substringBeforeLast("/")
+                                sizeCache.remove(path)
+                            }*/
 
                             resetFolderView()
 
@@ -337,6 +354,7 @@ class FileFragment: Fragment() {
                             // ...
                             Log.d("FOLDER-CREATION", "Folder creato")
                             Toast.makeText(context, "Folder created", Toast.LENGTH_SHORT).show()
+                            updateFolderNotesCache(folderPath)
                             resetFolderView()
                         }
                     }
@@ -355,6 +373,13 @@ class FileFragment: Fragment() {
         getCollections(files, adapter, currentFolder)
     }
 
+    private fun updateFolderNotesCache(folder: String) {
+        var path = folder
+        while(path != "/${firebase.getCurretUid()}/Notes") {
+            path = path.substringBeforeLast("/")
+            sizeCache.remove(path)
+        }
+    }
 
 
 

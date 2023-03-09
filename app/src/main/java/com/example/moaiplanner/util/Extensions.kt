@@ -91,8 +91,8 @@ val sizeCache = HashMap<String, Pair<Long, Int>>() // cache per le dimensioni
 
 suspend fun getTotalSize(folder: StorageReference): Pair<Long, Int> {
     val folderPath = folder.path
-    val home = folderPath.split("/")
-    if (sizeCache.containsKey(folderPath)  && home.size != 3) {
+    //val home = folderPath.split("/")
+    if (sizeCache.containsKey(folderPath)  /*&& home.size != 3*/) {
         // Se la cartella è già stata processata in precedenza, ritorniamo le dimensioni dalla cache
         return sizeCache[folderPath]!!
     }

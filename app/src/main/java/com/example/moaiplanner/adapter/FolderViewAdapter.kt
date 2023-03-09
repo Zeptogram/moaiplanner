@@ -44,8 +44,7 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         holder.textViewSize.text = item.folder_files
         holder.checkbox.isChecked = item.isFavourite
         holder.icon.setImageResource(item.icon)
-        if(item.icon == R.drawable.folder)
-            holder.checkbox.isVisible = false
+        holder.checkbox.isVisible = item.icon != R.drawable.folder
 
         holder.checkbox.setOnClickListener {
             item.isFavourite = !item.isFavourite
