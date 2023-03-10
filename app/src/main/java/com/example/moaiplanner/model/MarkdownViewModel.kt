@@ -58,10 +58,10 @@ class MarkdownViewModel() : ViewModel() {
                     val fileInput = FileInputStream(it.fileDescriptor)
                     val fileName = uri.getName(context)
                     val content = fileInput.reader().use(Reader::readText)
-                    if (content.isBlank()) {
+                    /*if (content.isBlank()) {
                         // Non ho aperto nulla
                         return@withContext false
-                    }
+                    }*/
                     editorActions.postValue(EditorAction.Load(content))
                     markdownUpdates.postValue(content)
                     this@MarkdownViewModel.fileName.postValue(fileName)

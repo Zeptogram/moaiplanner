@@ -138,6 +138,10 @@ class HomeFragment : Fragment() {
                     )
                 }
             }
+
+            override fun onItemLongClick(position: Int) {
+                // Empty
+            }
         })
 
 

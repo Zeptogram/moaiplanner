@@ -17,6 +17,8 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
 
     interface onItemClickListener {
         fun onItemClick(position: Int)
+        fun onItemLongClick(position: Int)
+
     }
 
     fun setOnItemClickListener(listener: onItemClickListener) {
@@ -73,6 +75,11 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         init {
             itemView.setOnClickListener {
                 listener.onItemClick(adapterPosition)
+            }
+
+            itemView.setOnLongClickListener {
+                listener.onItemLongClick(adapterPosition)
+                return@setOnLongClickListener true
             }
         }
     }

@@ -42,7 +42,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
     private lateinit var userDir: StorageReference
-    private var noteDir = ""
+    private var noteDir = "Notes/"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -107,7 +107,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes${noteDir.substringBeforeLast("/").plus("/")}${viewModel.fileName.value}")
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/${noteDir}")
                         val uri : Uri = viewModel.uri.value.toString().toUri()
                         val uploadTask = noteDir.putFile(uri)
 
@@ -155,9 +155,9 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         }
 
         setFragmentResultListener("noteDirFromHome") { requestKey, bundle ->
-            noteDir = bundle.getString("noteDir").toString()
+            noteDir =  noteDir.plus(bundle.getString("noteDir").toString())
             Log.d("noteNameFromHome", noteDir.toString())
-            val noteRef = storageRef.child("${firebase.getCurretUid()}/Notes/${noteDir}")
+            val noteRef = storageRef.child("${firebase.getCurretUid()}/${noteDir}")
             Log.d("noteStorageRef", noteRef.toString())
             val noteName = noteDir?.substringAfterLast("/")
             val localFile = File(activity?.cacheDir, noteName.toString());
@@ -208,7 +208,6 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         when (requestCode) {
             REQUEST_OPEN_FILE -> {
                 if (resultCode != Activity.RESULT_OK || data?.data == null) {
-
                     return
                 }
 

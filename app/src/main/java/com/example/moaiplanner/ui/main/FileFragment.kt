@@ -167,7 +167,7 @@ class FileFragment: Fragment() {
 
         // initializing variables of grid view with their ids.
         // Inizializza la RecyclerView
-
+        initFolderView()
         adapter = FolderViewAdapter(shownFiles)
         val recyclerView = binding.files
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -204,6 +204,11 @@ class FileFragment: Fragment() {
                     adapter.notifyDataSetChanged()
                     getCollections(files, adapter, currentFolder)
                 }
+            }
+
+            override fun onItemLongClick(position: Int) {
+                showDeleteNoteFolderDialog(position)
+
             }
         })
         getCollections(files, adapter, "")
@@ -320,7 +325,7 @@ class FileFragment: Fragment() {
                 if (radioButtonNote.isChecked) {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${editTextNoteFolder.text}")
-                        val text = " "
+                        val text = "# Note created with Moai Planner"
                         val uploadFile = noteDir.putBytes(text.toByteArray())
                         uploadFile.addOnFailureListener {
                             resetFolderView()
@@ -368,9 +373,12 @@ class FileFragment: Fragment() {
 
 
     private fun resetFolderView(){
+        binding.buttonFavourites.isEnabled = true
+        binding.buttonShowall.isEnabled = false
         files.clear()
         shownFiles.clear()
         getCollections(files, adapter, currentFolder)
+
     }
 
     private fun updateFolderNotesCache(folder: String) {
@@ -379,6 +387,71 @@ class FileFragment: Fragment() {
             path = path.substringBeforeLast("/")
             sizeCache.remove(path)
         }
+    }
+
+    private fun showDeleteNoteFolderDialog(position: Int) {
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_note_folder, null)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Delete note or folder")
+            .setView(dialogView)
+            .setPositiveButton("Delete") { dialog, which ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val noteDir: StorageReference
+                    Log.d("NOTE-DIR", adapter.getFileName(position))
+                    if (adapter.getFileName(position).endsWith(".md")) {
+                        noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
+                        Log.d("NOTE-DIR", noteDir.toString())
+
+                        noteDir.delete().addOnSuccessListener {
+                            Toast.makeText(context, "File deleted", Toast.LENGTH_SHORT).show()
+                            resetFolderView()
+
+                        }.addOnFailureListener {
+                            Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
+                        Log.d("NOTE-DIR", noteDir.toString())
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            shownFiles.removeAt(position)
+                            binding.buttonFavourites.isEnabled = true
+                            binding.buttonShowall.isEnabled = false
+                            adapter.notifyDataSetChanged()
+                        }
+
+                        noteDir.listAll().addOnSuccessListener { (items, prefixes) ->
+                            items.forEach { item ->
+                                item.delete()
+                            }
+                            deleteFolder(prefixes)
+                        }.addOnFailureListener {
+                            Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun deleteFolder(prefixes: List<StorageReference>) {
+        prefixes.forEach { prefix ->
+            prefix.listAll().addOnSuccessListener { (items, prefixes) ->
+                items.forEach { item ->
+                    item.delete()
+                }
+                deleteFolder(prefixes)
+            }
+        }
+    }
+
+    private fun initFolderView() {
+        files.clear()
+        shownFiles.clear()
     }
 
 
