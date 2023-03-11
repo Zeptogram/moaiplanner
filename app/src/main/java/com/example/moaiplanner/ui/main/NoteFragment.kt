@@ -107,7 +107,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/${noteDir}")
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/${noteDir.substringBeforeLast("/")}/${viewModel.fileName.value}")
                         val uri : Uri = viewModel.uri.value.toString().toUri()
                         val uploadTask = noteDir.putFile(uri)
 
