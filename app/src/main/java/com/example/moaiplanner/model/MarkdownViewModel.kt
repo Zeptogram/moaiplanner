@@ -28,12 +28,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 const val PREF_KEY_AUTOSAVE_URI = "autosave.uri"
 
-class MarkdownViewModel() : ViewModel() {
+class MarkdownViewModel : ViewModel() {
     val fileName = MutableLiveData("Untitled.md")
     val markdownUpdates = MutableLiveData<String>()
     val editorActions = MutableLiveData<EditorAction>()
     val uri = MutableLiveData<Uri?>()
-    var currentDir = MutableLiveData<String>("Notes/")
+    var currentDir = MutableLiveData("Notes/")
     private val isDirty = AtomicBoolean(false)
     private val saveMutex = Mutex()
 
@@ -102,6 +102,7 @@ class MarkdownViewModel() : ViewModel() {
                     ?.use {
                         it.write(markdownUpdates.value ?: "")
                         it.close()
+                        it.flush()
                     }
                     ?: run {
                         return@withContext false

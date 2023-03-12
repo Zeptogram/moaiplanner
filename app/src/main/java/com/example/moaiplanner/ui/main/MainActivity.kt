@@ -1,13 +1,16 @@
 package com.example.moaiplanner.ui.main
 
 
-import android.R.menu
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
@@ -16,7 +19,6 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
-import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.util.disableNotifications
@@ -29,19 +31,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navHostFragment : NavHostFragment
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var settingsRepository: SettingsRepository
+    private lateinit var navController: NavController
+    private lateinit var bottomNav: BottomNavigationView
 
 
     @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.topAppBar)
 
 
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
+        //navController.popBackStack(R.id.welcomeFragment, true)
 
         // Leva la freccia per il back
         val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(
@@ -50,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         ).build()
 
         toolbar.setupWithNavController(navController, appBarConfiguration)
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         // Mette la home come main
         bottomNav.menu.getItem(0).isChecked = true;
         NavigationUI.setupWithNavController(bottomNav, navController);
@@ -125,6 +131,8 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+
 
 
 }

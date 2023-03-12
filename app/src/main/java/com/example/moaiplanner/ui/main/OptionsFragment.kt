@@ -23,6 +23,7 @@ import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
+import com.example.moaiplanner.ui.welcome.WelcomeActivity
 import com.example.moaiplanner.util.disableNotifications
 import com.example.moaiplanner.util.enableLight
 import com.google.android.material.snackbar.Snackbar
@@ -160,11 +161,12 @@ class OptionsFragment : Fragment() {
 
         binding.buttonLogout.setOnClickListener() {
             lifecycleScope.launch(Dispatchers.IO) {
-                firebase.signOut()
+                firebase.signOut(requireContext())
             }.invokeOnCompletion {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    findNavController().navigate(R.id.welcomeActivity)
-                }
+                val intent = Intent(requireActivity(), WelcomeActivity::class.java)
+                startActivity(intent)
+                requireActivity().finish()
+
             }
         }
 

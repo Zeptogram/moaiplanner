@@ -3,11 +3,15 @@ package com.example.moaiplanner.data.repository.user
 import android.app.Activity
 import android.app.Application
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -21,6 +25,10 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.coroutineContext
 import kotlin.math.sign
 
 class AuthRepository(app: Application) {
@@ -55,19 +63,32 @@ class AuthRepository(app: Application) {
             }
     }
 
-    fun signIn(email: String, password: String) {
+/*fun signIn(email: String, password: String) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { task ->
                 // Sign in success
                 Log.d(TAG, "signInWithEmail:success")
                 Toast.makeText(application, "Authentication successful", Toast.LENGTH_SHORT).show()
+
             }
             .addOnFailureListener { task ->
                 // If sign in fails, display a message to the user.
                 Log.w(TAG, "signInWithEmail:failure", task)
                 Toast.makeText(application, "Authentication failed", Toast.LENGTH_SHORT).show()
+
             }
+    }*/
+
+    suspend fun signIn(email: String, password: String): Boolean {
+        return try {
+            firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            Log.d("USER", firebaseAuth.currentUser.toString())
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
+
 
     // TODO Rimuovere questa parte
     fun signInGoogle(activity: Activity) {
@@ -113,8 +134,14 @@ class AuthRepository(app: Application) {
             }
     }
 
-    fun signOut() {
+    fun signOut(context: Context) {
+        val sharedPref: SharedPreferences = context.getSharedPreferences("user", Context.MODE_PRIVATE)
+        sharedPref.edit {
+            putBoolean("auth", false)
+            apply()
+        }
         firebaseAuth.signOut()
+
     }
 
     fun isUserAuthenticated(): Boolean {
@@ -126,4 +153,6 @@ class AuthRepository(app: Application) {
     fun getCurretUid(): String? {
         return firebaseAuth.uid
     }
+
+
 }

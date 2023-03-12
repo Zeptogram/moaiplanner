@@ -119,6 +119,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                         }
                         val noteDir = storageRef.child("${firebase.getCurretUid()}/${noteDir.substringBeforeLast("/")}/${viewModel.fileName.value}")
                         //viewModel.currentDir.value = noteDir.toString()
+                        Log.d("PROVA", noteDir.toString())
                         val uri : Uri = viewModel.uri.value.toString().toUri()
                         val uploadTask = noteDir.putFile(uri)
 
@@ -164,10 +165,12 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                     true
                 }
                 R.id.action_load -> {
+                    noteDir = "Notes/"
                     requestFileOp(REQUEST_OPEN_FILE)
                     true
                 }
                 R.id.action_new -> {
+                    noteDir = "Notes/"
                     promptSaveOrDiscardChanges()
                     true
                 }
@@ -316,7 +319,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             //Timber.w("File op requested but context was null, aborting")
             return
         }
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+       /* if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED) {
             //Timber.i("Storage permission not granted, requesting")
             requestPermissions(
@@ -324,7 +327,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                 requestType
             )
             return
-        }
+        }*/
         val intent = when (requestType) {
             REQUEST_SAVE_FILE -> {
                 //Timber.d("Requesting save op")

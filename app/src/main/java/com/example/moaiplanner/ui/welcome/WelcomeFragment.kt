@@ -1,5 +1,7 @@
 package com.example.moaiplanner.ui.welcome
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -10,6 +12,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.WelcomeFragmentBinding
@@ -37,7 +40,6 @@ class WelcomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = WelcomeFragmentBinding.inflate(inflater, container, false)
-
         // Inflate il layout per il fragment
         return binding.root
     }
@@ -70,15 +72,35 @@ class WelcomeFragment : Fragment() {
         firebase = AuthRepository(requireActivity().application)
 
         binding.buttonEmail.setOnClickListener {
-            findNavController().navigate(R.id.signinFragment)
+            findNavController().navigate(R.id.signinFragment, null,
+                navOptions {
+                    anim {
+                        enter = android.R.anim.fade_in
+                        popEnter = android.R.anim.fade_in
+                    }
+                }, null)
         }
 
         binding.buttonGoogle.setOnClickListener {
-            findNavController().navigate(R.id.googleSignInActivity)
+            findNavController().navigate(R.id.googleSignInActivity, null,
+                navOptions {
+                    anim {
+                        enter = android.R.anim.fade_in
+                        popEnter = android.R.anim.fade_in
+
+                    }
+                }, null)
         }
 
         binding.textViewSignUpNow.setOnClickListener {
-            findNavController().navigate(R.id.registerFragment)
+            findNavController().navigate(R.id.registerFragment, null,
+                navOptions {
+                    anim {
+                        enter = android.R.anim.fade_in
+                        popEnter = android.R.anim.fade_in
+
+                    }
+                }, null)
         }
     }
 }
