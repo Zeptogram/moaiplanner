@@ -33,6 +33,7 @@ class MarkdownViewModel() : ViewModel() {
     val markdownUpdates = MutableLiveData<String>()
     val editorActions = MutableLiveData<EditorAction>()
     val uri = MutableLiveData<Uri?>()
+    var currentDir = MutableLiveData<String>("Notes/")
     private val isDirty = AtomicBoolean(false)
     private val saveMutex = Mutex()
 
@@ -161,6 +162,25 @@ class MarkdownViewModel() : ViewModel() {
 
     fun shouldPromptSave() = isDirty.get()
 
+    fun loadDir(
+        context: Context,
+        sharedPrefs: SharedPreferences = context.getSharedPreferences("Note", Context.MODE_PRIVATE)
+    ): String?
+    {
+        return sharedPrefs.getString("currentdir", "")
+    }
+
+    fun saveDir(
+        context: Context,
+        sharedPrefs: SharedPreferences = context.getSharedPreferences("Note", Context.MODE_PRIVATE)
+    ): Boolean
+    {
+        sharedPrefs.edit().apply {
+            putString("currentdir", currentDir.value.toString())
+            apply()
+        }
+        return true
+    }
     sealed class EditorAction {
         val consumed = AtomicBoolean(false)
         data class Load(val markdown: String) : EditorAction()

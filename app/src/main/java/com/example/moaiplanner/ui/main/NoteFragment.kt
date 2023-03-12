@@ -26,6 +26,7 @@ import com.example.moaiplanner.adapter.EditPagerAdapter
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.DisableableViewPager
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -55,6 +56,8 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.findViewById<DrawerLayout>(R.id.drawerLayout)?.open()
+        viewModel.currentDir.value = viewModel.loadDir(requireContext()).toString()
+        noteDir = viewModel.currentDir.value!!
 
         return inflater.inflate(R.layout.note_fragment_main, container, false)
     }
@@ -101,22 +104,46 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                         if (!viewModel.save(requireContext())) {
                             requestFileOp(REQUEST_SAVE_FILE)
                         } else {
-                            Toast.makeText(
+                            /*Toast.makeText(
                                 requireContext(),
                                 getString(R.string.file_saved, viewModel.fileName.value),
                                 Toast.LENGTH_SHORT
-                            ).show()
+                            ).show()*/
+                            Snackbar.make(view, getString(R.string.file_saved, viewModel.fileName.value), Snackbar.LENGTH_SHORT)
+                                .setAction("OK") {
+                                    // Responds to click on the action
+                                }
+                                .setActionTextColor(resources.getColor(R.color.primary, null))
+                                .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                .show()
                         }
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/${noteDir}")
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/${noteDir.substringBeforeLast("/")}/${viewModel.fileName.value}")
+                        //viewModel.currentDir.value = noteDir.toString()
                         val uri : Uri = viewModel.uri.value.toString().toUri()
                         val uploadTask = noteDir.putFile(uri)
 
                         // Register observers to listen for when the download is done or if it fails
                         uploadTask.addOnFailureListener {
-                            Toast.makeText(context, "Note upload failed", Toast.LENGTH_SHORT).show()
+
+                            Snackbar.make(view, "Note upload failed", Snackbar.LENGTH_SHORT)
+                                .setAction("OK") {
+                                    // Responds to click on the action
+                                }
+                                //.setBackgroundTint(resources.getColor(R.color.pr))
+                                .setActionTextColor(resources.getColor(R.color.primary, null))
+                                .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                .show()
+                            //Toast.makeText(requireActivity(), "Note upload failed", Toast.LENGTH_SHORT).show()
                             Log.d("Note", "Failed")
                         }.addOnSuccessListener { taskSnapshot ->
-                            Toast.makeText(context, "Note uploaded successful", Toast.LENGTH_SHORT).show()
+                            Snackbar.make(view, "Note uploaded successful", Snackbar.LENGTH_SHORT)
+                                .setAction("OK") {
+                                    // Responds to click on the action
+                                }
+                                .setActionTextColor(resources.getColor(R.color.primary, null))
+                                .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                .show()
+                            //Toast.makeText(requireActivity(), "Note uploaded successful", Toast.LENGTH_SHORT).show()
                             Log.d("Note", "Successful")
                         }
                     }
@@ -155,8 +182,10 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         }
 
         setFragmentResultListener("noteDirFromHome") { requestKey, bundle ->
+            noteDir = "Notes/"
             noteDir =  noteDir.plus(bundle.getString("noteDir").toString())
-            Log.d("noteNameFromHome", noteDir.toString())
+            viewModel.currentDir.value = noteDir
+            Log.d("noteNameFromHome", noteDir)
             val noteRef = storageRef.child("${firebase.getCurretUid()}/${noteDir}")
             Log.d("noteStorageRef", noteRef.toString())
             val noteName = noteDir?.substringAfterLast("/")
@@ -166,7 +195,14 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                     context?.let { it1 -> viewModel.load(it1, localFile.toUri()) }
                 }
             }.addOnFailureListener {
-                Toast.makeText(context, "Failed loading file from database", Toast.LENGTH_SHORT).show()
+                Snackbar.make(view, "Failed loading file from database", Snackbar.LENGTH_SHORT)
+                    .setAction("OK") {
+                        // Responds to click on the action
+                    }
+                    .setActionTextColor(resources.getColor(R.color.primary, null))
+                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                    .show()
+                //Toast.makeText(context, "Failed loading file from database", Toast.LENGTH_SHORT).show()
             }
             localFile.delete()
         }
@@ -177,6 +213,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         val context = context?.applicationContext ?: return
         lifecycleScope.launch {
             viewModel.autosave(context, PreferenceManager.getDefaultSharedPreferences(context))
+            viewModel.saveDir(requireContext())
         }
     }
 
@@ -196,8 +233,13 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                     // Permission denied, do nothing
                     //Timber.d("Storage permissions denied, unable to save or load files")
                     context?.let {
-                        Toast.makeText(it, R.string.no_permissions, Toast.LENGTH_SHORT)
-                            .show()
+                        /*Toast.makeText(it, R.string.no_permissions, Toast.LENGTH_SHORT)
+                            .show()*/
+                        view?.let { it1 ->
+                            Snackbar.make(it1, R.string.no_permissions, Snackbar.LENGTH_SHORT).setAction("OK") { /* Responds to click on the action*/ }.setActionTextColor(resources.getColor(R.color.primary, null))
+                                .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                .show()
+                        }
                     }
                 }
             }
@@ -214,7 +256,10 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                 lifecycleScope.launch {
                     context?.let {
                         if (!viewModel.load(it, data.data)) {
-                            Toast.makeText(it, R.string.file_load_error, Toast.LENGTH_SHORT).show()
+                            view?.let { it1 -> Snackbar.make(it1, R.string.file_load_error, Snackbar.LENGTH_SHORT).setAction("OK") { /* Responds to click on the action*/ }.setActionTextColor(resources.getColor(R.color.primary, null))
+                                .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                .show() }
+                            //Toast.makeText(it, R.string.file_load_error, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -318,6 +363,8 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         const val REQUEST_SAVE_FILE = 2
         const val KEY_AUTOSAVE = "autosave"
     }
+
+
 
 
 

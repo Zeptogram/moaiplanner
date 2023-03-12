@@ -53,6 +53,7 @@ class TomatoFragment : Fragment() {
         val factory = SettingsViewModelFactory(SettingsRepository(requireActivity()))
         settingsViewModel = ViewModelProvider(requireActivity(), factory)[SettingsViewModel::class.java]
         pomodoroViewModel = ViewModelProvider(requireActivity())[TomatoViewModel::class.java]
+        pomodoroViewModel = ViewModelProvider(requireActivity())[TomatoViewModel::class.java]
         settingsViewModel.restoreSettings()
 
         if(pomodoroViewModel.maxRounds.value?.toInt() == -1)

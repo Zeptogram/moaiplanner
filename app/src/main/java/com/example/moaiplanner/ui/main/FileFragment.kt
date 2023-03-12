@@ -6,9 +6,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.addCallback
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.documentfile.provider.DocumentFile
@@ -25,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.HomeFragmentBinding
-import com.example.moaiplanner.databinding.NotelistFragmentBinding
+import com.example.moaiplanner.databinding.FileFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.ItemsViewModel
 import com.example.moaiplanner.util.getFolderSize
@@ -33,6 +35,7 @@ import com.example.moaiplanner.util.sizeCache
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
@@ -49,7 +52,7 @@ import java.math.BigInteger
 import java.text.DecimalFormat
 
 class FileFragment: Fragment() {
-    lateinit var binding: NotelistFragmentBinding
+    lateinit var binding: FileFragmentBinding
     private var files = ArrayList<FolderItem>()
     private var shownFiles = ArrayList<FolderItem>()
     lateinit var firebase: AuthRepository
@@ -70,7 +73,7 @@ class FileFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        binding = NotelistFragmentBinding.inflate(inflater, container, false)
+        binding = FileFragmentBinding.inflate(inflater, container, false)
 
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
@@ -94,10 +97,10 @@ class FileFragment: Fragment() {
                         }
                     )
                 }
+
             }
             true
         }
-
 
         binding.buttonShowall.setOnClickListener {
 
@@ -152,6 +155,43 @@ class FileFragment: Fragment() {
                 startActivityForResult(it, 0)
             }
         }
+
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if(currentFolder.equals("")) {
+                findNavController().navigate(
+                    R.id.homeFragment, null,
+                    navOptions {
+                        anim {
+                            enter = android.R.anim.fade_in
+                            popEnter = android.R.anim.fade_in
+                        }
+                    }
+                )
+            }
+            else if(currentFolder.split("/").size == 2) {
+                currentFolder = ""
+                binding.buttonFavourites.isEnabled = true
+                binding.buttonShowall.isEnabled = false
+                getCollections(files, adapter, currentFolder)
+                toolbar.title = "My Notes"
+            }
+            else {
+                Log.d("AAA", currentFolder)
+                currentFolder = currentFolder.substringBeforeLast("/").substringBeforeLast("/").plus("/")
+                Log.d("AAA", currentFolder)
+                binding.buttonFavourites.isEnabled = true
+                binding.buttonShowall.isEnabled = false
+                getCollections(files, adapter, currentFolder)
+                toolbar.title = currentFolder
+
+           }
+        }
+
+
+
+
+
+
 
         // Inflate il layout per il fragment
         return binding.root
@@ -218,7 +258,11 @@ class FileFragment: Fragment() {
 
     fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter, folderName: String) {
         // Get list of files from Firestore
+        files.clear()
+        shownFiles.clear()
+        adapter.notifyDataSetChanged()
         folderPath = "/${firebase.getCurretUid()}/Notes/${currentFolder}"
+        Log.d("AAA", folderPath)
         lifecycleScope.launch(Dispatchers.IO) {
             val folder = storageRef.child("${firebase.getCurretUid()}/Notes/${folderName}")
             Log.d("collectionNotesRef", folder.toString())
@@ -260,7 +304,16 @@ class FileFragment: Fragment() {
                 }
                 .addOnFailureListener {
                     Log.d("FIRESTORAGE-ERROR", "Error getting file list")
-                    Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
+                    view?.let { it1 ->
+                        Snackbar.make(it1, "Error Getting Files", Snackbar.LENGTH_SHORT)
+                            .setAction("OK") {
+                                // Responds to click on the action
+                            }
+                            //.setBackgroundTint(resources.getColor(R.color.pr))
+                            .setActionTextColor(resources.getColor(R.color.primary, null))
+                            .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                            .show()
+                    }
                 }
                 .addOnSuccessListener {
                     shownFiles.clear()
@@ -297,11 +350,29 @@ class FileFragment: Fragment() {
 
             // Register observers to listen for when the download is done or if it fails
             uploadTask.addOnFailureListener {
-                Toast.makeText(context, "Note upload failed", Toast.LENGTH_SHORT).show()
+                view?.let { it1 ->
+                    Snackbar.make(it1, "Note upload failed", Snackbar.LENGTH_SHORT)
+                        .setAction("OK") {
+                            // Responds to click on the action
+                        }
+                        //.setBackgroundTint(resources.getColor(R.color.pr))
+                        .setActionTextColor(resources.getColor(R.color.primary, null))
+                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                        .show()
+                }
                 stream.close()
                 resetFolderView()
             }.addOnSuccessListener { taskSnapshot ->
-                Toast.makeText(context, "Note uploaded successful", Toast.LENGTH_SHORT).show()
+                view?.let {
+                    Snackbar.make(it, "Note uploaded successfully", Snackbar.LENGTH_SHORT)
+                        .setAction("OK") {
+                            // Responds to click on the action
+                        }
+                        //.setBackgroundTint(resources.getColor(R.color.pr))
+                        .setActionTextColor(resources.getColor(R.color.primary, null))
+                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                        .show()
+                }
                 stream.close()
                 sizeCache.remove("/${firebase.getCurretUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
                 updateFolderNotesCache(folderPath)
@@ -324,7 +395,7 @@ class FileFragment: Fragment() {
             .setPositiveButton("Add") { dialog, which ->
                 if (radioButtonNote.isChecked) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${editTextNoteFolder.text}")
+                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${editTextNoteFolder.text}.md")
                         val text = "# Note created with Moai Planner"
                         val uploadFile = noteDir.putBytes(text.toByteArray())
                         uploadFile.addOnFailureListener {
@@ -334,7 +405,16 @@ class FileFragment: Fragment() {
                             // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
                             // ...
                             Log.d("NOTE-CREATION", "Nota creata")
-                            Toast.makeText(context, "Note created", Toast.LENGTH_SHORT).show()
+                            view?.let {
+                                Snackbar.make(it, "Note created", Snackbar.LENGTH_SHORT)
+                                    .setAction("OK") {
+                                        // Responds to click on the action
+                                    }
+                                    //.setBackgroundTint(resources.getColor(R.color.pr))
+                                    .setActionTextColor(resources.getColor(R.color.primary, null))
+                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                    .show()
+                            }
                             updateFolderNotesCache(folderPath)
 
                             /*while(path != "/${firebase.getCurretUid()}/Notes") {
@@ -358,7 +438,16 @@ class FileFragment: Fragment() {
                             // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
                             // ...
                             Log.d("FOLDER-CREATION", "Folder creato")
-                            Toast.makeText(context, "Folder created", Toast.LENGTH_SHORT).show()
+                            view?.let {
+                                Snackbar.make(it, "Folder created", Snackbar.LENGTH_SHORT)
+                                    .setAction("OK") {
+                                        // Responds to click on the action
+                                    }
+                                    //.setBackgroundTint(resources.getColor(R.color.pr))
+                                    .setActionTextColor(resources.getColor(R.color.primary, null))
+                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                    .show()
+                            }
                             updateFolderNotesCache(folderPath)
                             resetFolderView()
                         }
@@ -405,11 +494,29 @@ class FileFragment: Fragment() {
                         Log.d("NOTE-DIR", noteDir.toString())
 
                         noteDir.delete().addOnSuccessListener {
-                            Toast.makeText(context, "File deleted", Toast.LENGTH_SHORT).show()
+                            view?.let { it1 ->
+                                Snackbar.make(it1, "File deleted", Snackbar.LENGTH_SHORT)
+                                    .setAction("OK") {
+                                        // Responds to click on the action
+                                    }
+                                    //.setBackgroundTint(resources.getColor(R.color.pr))
+                                    .setActionTextColor(resources.getColor(R.color.primary, null))
+                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                    .show()
+                            }
                             resetFolderView()
 
                         }.addOnFailureListener {
-                            Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
+                            view?.let { it1 ->
+                                Snackbar.make(it1, "Delete failed", Snackbar.LENGTH_SHORT)
+                                    .setAction("OK") {
+                                        // Responds to click on the action
+                                    }
+                                    //.setBackgroundTint(resources.getColor(R.color.pr))
+                                    .setActionTextColor(resources.getColor(R.color.primary, null))
+                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                    .show()
+                            }
                         }
                     } else {
                         noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
@@ -427,7 +534,16 @@ class FileFragment: Fragment() {
                             }
                             deleteFolder(prefixes)
                         }.addOnFailureListener {
-                            Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
+                            view?.let { it1 ->
+                                Snackbar.make(it1, "Delete failed", Snackbar.LENGTH_SHORT)
+                                    .setAction("OK") {
+                                        // Responds to click on the action
+                                    }
+                                    //.setBackgroundTint(resources.getColor(R.color.pr))
+                                    .setActionTextColor(resources.getColor(R.color.primary, null))
+                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                                    .show()
+                            }
                         }
                     }
                 }
@@ -453,6 +569,8 @@ class FileFragment: Fragment() {
         files.clear()
         shownFiles.clear()
     }
+
+
 
 
 

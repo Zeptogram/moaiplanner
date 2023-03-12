@@ -20,6 +20,10 @@
     <item name="colorAccent">@color/primary</item>
     <item name="colorPrimaryContainer">@color/primary</item>
     <item name="colorOnPrimaryContainer">@color/white</item>
+    <!-- Snackbar -->
+    <item name="colorSurfaceInverse">@color/night_background</item>
+    <item name="colorOnSurfaceInverse">@color/white</item>
+
 
 
 

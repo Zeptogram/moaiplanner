@@ -25,6 +25,7 @@ import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.util.disableNotifications
 import com.example.moaiplanner.util.enableLight
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -201,10 +202,28 @@ class OptionsFragment : Fragment() {
 
             // Register observers to listen for when the download is done or if it fails
             uploadTask.addOnFailureListener {
-                Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
+                view?.let { it1 ->
+                    Snackbar.make(it1, "Image upload failed", Snackbar.LENGTH_SHORT)
+                        .setAction("OK") {
+                            // Responds to click on the action
+                        }
+                        //.setBackgroundTint(resources.getColor(R.color.pr))
+                        .setActionTextColor(resources.getColor(R.color.primary, null))
+                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                        .show()
+                }
                 stream.close()
             }.addOnSuccessListener { taskSnapshot ->
-                Toast.makeText(context, "Image uploaded successful", Toast.LENGTH_SHORT).show()
+                view?.let { it1 ->
+                    Snackbar.make(it1, "Imaged uploaded successfully", Snackbar.LENGTH_SHORT)
+                        .setAction("OK") {
+                            // Responds to click on the action
+                        }
+                        //.setBackgroundTint(resources.getColor(R.color.pr))
+                        .setActionTextColor(resources.getColor(R.color.primary, null))
+                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                        .show()
+                }
                 stream.close()
                 binding.profilepic.setImageURI(uri)
             }

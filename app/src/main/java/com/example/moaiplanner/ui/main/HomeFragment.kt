@@ -18,6 +18,7 @@ import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.getFolderSize
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -179,7 +180,16 @@ class HomeFragment : Fragment() {
                 }
                 .addOnFailureListener {
                     Log.d("FIRESTORAGE-ERROR", "Error getting file list")
-                    Toast.makeText(context, "Error getting files", Toast.LENGTH_SHORT).show()
+                    view?.let { it1 ->
+                        Snackbar.make(it1, "Error Getting Files", Snackbar.LENGTH_SHORT)
+                            .setAction("OK") {
+                                // Responds to click on the action
+                            }
+                            //.setBackgroundTint(resources.getColor(R.color.pr))
+                            .setActionTextColor(resources.getColor(R.color.primary, null))
+                            .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
+                            .show()
+                    }
                 }
                 .addOnSuccessListener {
                     //adapter = RecyclerViewAdapter(data)
@@ -190,28 +200,7 @@ class HomeFragment : Fragment() {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == 0) {
-            val uri = data?.data
-            Log.d("NOTE URI", uri.toString())
 
-            val fileName = "testInCollection.md"
-            val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
-
-            val noteDir = storageRef.child("${firebase.getCurretUid()}/testCollection/${fileName}")
-            val uploadTask = noteDir.putStream(stream)
-
-            // Register observers to listen for when the download is done or if it fails
-            uploadTask.addOnFailureListener {
-                Toast.makeText(context, "Note upload failed", Toast.LENGTH_SHORT).show()
-                stream.close()
-            }.addOnSuccessListener { taskSnapshot ->
-                Toast.makeText(context, "Note uploaded successful", Toast.LENGTH_SHORT).show()
-                stream.close()
-            }
-        }
-    }
 
 
 

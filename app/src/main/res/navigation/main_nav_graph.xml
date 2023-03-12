@@ -54,5 +54,5 @@
         android:id="@+id/fileFragment"
         android:name="com.example.moaiplanner.ui.main.FileFragment"
         android:label="My Notes"
-        tools:layout="@layout/notelist_fragment" />
+        tools:layout="@layout/file_fragment" />
 </navigation>
