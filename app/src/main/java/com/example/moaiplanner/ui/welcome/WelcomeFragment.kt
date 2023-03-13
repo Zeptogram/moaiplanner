@@ -81,7 +81,7 @@ class WelcomeFragment : Fragment() {
                 }, null)
         }
 
-        binding.buttonGoogle.setOnClickListener {
+        /*binding.buttonGoogle.setOnClickListener {
             findNavController().navigate(R.id.googleSignInActivity, null,
                 navOptions {
                     anim {
@@ -90,7 +90,7 @@ class WelcomeFragment : Fragment() {
 
                     }
                 }, null)
-        }
+        }*/
 
         binding.textViewSignUpNow.setOnClickListener {
             findNavController().navigate(R.id.registerFragment, null,

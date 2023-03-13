@@ -12,7 +12,7 @@
     <item name="android:textColorPrimary">@color/white</item>
     <item name="android:textColorSecondary">@color/light_gray</item>
     <item name="android:textColorSecondaryInverse">@color/gray</item>
-    <item name="colorOutline">@color/light_gray</item>
+    <item name="colorOutline">@color/gray</item>
     <item name="colorOnSurfaceVariant">@color/light_gray</item>
     <item name="colorSecondaryContainer">@color/gray</item>
     <item name="colorOnSecondaryContainer">@color/white</item>

@@ -12,7 +12,7 @@
     <item name="android:textColorPrimary">@color/black</item>
     <item name="android:textColorSecondary">@color/gray</item>
     <item name="android:textColorSecondaryInverse">@color/light_gray</item>
-    <item name="colorOutline">@color/gray</item>
+    <item name="colorOutline">@color/light_background_variant</item>
     <item name="colorSurfaceVariant">@color/light_background_variant</item>
     <item name="colorSecondaryContainer">@color/light_background_variant</item>
     <item name="popupMenuBackground">@color/white</item>

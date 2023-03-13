@@ -504,6 +504,7 @@ class FileFragment: Fragment() {
                                     .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
                                     .show()
                             }
+                            updateFolderNotesCache(folderPath)
                             resetFolderView()
 
                         }.addOnFailureListener {

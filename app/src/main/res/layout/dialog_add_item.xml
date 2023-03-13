@@ -12,10 +12,10 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:hint="Inserisci un nuovo elemento"
-    app:boxCornerRadiusTopEnd="10dp"
-    app:boxCornerRadiusBottomEnd="10dp"
-    app:boxCornerRadiusBottomStart="10dp"
-    app:boxCornerRadiusTopStart="10dp"
+    app:boxCornerRadiusTopEnd="15dp"
+    app:boxCornerRadiusBottomEnd="15dp"
+    app:boxCornerRadiusBottomStart="15dp"
+    app:boxCornerRadiusTopStart="15dp"
     >
 
     <com.google.android.material.textfield.TextInputEditText
@@ -35,10 +35,10 @@
         android:padding="16dp"
         android:hint="Inserisci l'orario"
         android:focusable="false"
-        app:boxCornerRadiusTopEnd="10dp"
-        app:boxCornerRadiusBottomEnd="10dp"
-        app:boxCornerRadiusBottomStart="10dp"
-        app:boxCornerRadiusTopStart="10dp"
+        app:boxCornerRadiusTopEnd="15dp"
+        app:boxCornerRadiusBottomEnd="15dp"
+        app:boxCornerRadiusBottomStart="15dp"
+        app:boxCornerRadiusTopStart="15dp"
         >
 
         <com.google.android.material.textfield.TextInputEditText
