@@ -93,9 +93,10 @@ class AuthRepository(app: Application) {
     // TODO Rimuovere questa parte
     fun signInGoogle(activity: Activity) {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(R.string.default_web_client_id.toString())
+            .requestIdToken(activity.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
+
 
         googleSignInClient = GoogleSignIn.getClient(activity, googleSignInOptions)
         val intent = googleSignInClient.signInIntent

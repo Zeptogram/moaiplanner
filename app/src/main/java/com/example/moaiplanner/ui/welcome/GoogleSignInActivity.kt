@@ -3,21 +3,15 @@ package com.example.moaiplanner.ui.welcome
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.ui.main.MainActivity
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.android.gms.auth.api.identity.SignInCredential
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.gms.tasks.Task
 
 
 class GoogleSignInActivity : AppCompatActivity() {
@@ -31,15 +25,64 @@ class GoogleSignInActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        firebase = AuthRepository(application)
-        firebase.signInGoogle(this)
+        /*firebase = AuthRepository(application)
+        firebase.signInGoogle(this)*/
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        if(account != null) {
+            val i = Intent(this@GoogleSignInActivity, MainActivity::class.java)
+            startActivity(i)
+            finish()
+        }
 
-        if (firebase.isUserAuthenticated()) {
+
+
+
+        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("50394403115-k98o4pct0grf3dveb47a4ncl4gauuifd.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+
+
+        var googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
+        val intent = googleSignInClient.signInIntent
+        startActivityForResult(intent, 1000)
+
+
+
+        /*if (firebase.isUserAuthenticated()) {
             val i = Intent(this@GoogleSignInActivity, MainActivity::class.java)
             startActivity(i)
             finish()
         } else {
             // navController.navigate(R.id.nav_welcome_fragment)
+        }*/
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == 1000) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
         }
     }
+
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+            // Signed in successfully, show authenticated UI.
+            Log.d("GOOGLE", "Ok")
+            val i = Intent(this@GoogleSignInActivity, MainActivity::class.java)
+            startActivity(i)
+            finish()
+        } catch (e: ApiException) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w("GOOGLE", "signInResult:failed code=" + e.statusCode)
+        }
+    }
+
 }
