@@ -1,7 +1,5 @@
 package com.example.moaiplanner.ui.main
 
-import android.Manifest
-import android.R.attr.data
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -12,11 +10,9 @@ import android.preference.PreferenceManager
 import android.util.Log
 import android.view.*
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
@@ -81,7 +77,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
-        userDir = storageRef.child("${firebase.getCurretUid()}")
+        userDir = storageRef.child("${firebase.getCurrentUid()}")
 
         /*tabLayout?.getTabAt(0)?.setIcon(R.drawable.ic_baseline_edit_note_24)
         tabLayout?.getTabAt(1)?.setIcon(R.drawable.ic_baseline_remove_red_eye_24)*/
@@ -117,7 +113,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                                 .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
                                 .show()
                         }
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/${noteDir.substringBeforeLast("/")}/${viewModel.fileName.value}")
+                        val noteDir = storageRef.child("${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}/${viewModel.fileName.value}")
                         //viewModel.currentDir.value = noteDir.toString()
                         Log.d("PROVA", noteDir.toString())
                         val uri : Uri = viewModel.uri.value.toString().toUri()
@@ -189,7 +185,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             noteDir =  noteDir.plus(bundle.getString("noteDir").toString())
             viewModel.currentDir.value = noteDir
             Log.d("noteNameFromHome", noteDir)
-            val noteRef = storageRef.child("${firebase.getCurretUid()}/${noteDir}")
+            val noteRef = storageRef.child("${firebase.getCurrentUid()}/${noteDir}")
             Log.d("noteStorageRef", noteRef.toString())
             val noteName = noteDir?.substringAfterLast("/")
             val localFile = File(activity?.cacheDir, noteName.toString());

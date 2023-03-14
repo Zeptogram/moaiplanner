@@ -2,30 +2,25 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp">
+    android:padding="16dp">
 
-    <!-- CheckBox per indicare se l'elemento è stato completato -->
-    <CheckBox
-        android:id="@+id/checkBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <!-- TextView per visualizzare il testo dell'elemento -->
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:textSize="18sp"
-        android:text="Item"
-        android:paddingStart="16dp"/>
+        <!-- TextView per visualizzare il testo dell'elemento -->
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:textSize="18sp"
+            android:text="Item"
+            android:paddingStart="16dp"/>
 
         <TextView
             android:id="@+id/timeView"

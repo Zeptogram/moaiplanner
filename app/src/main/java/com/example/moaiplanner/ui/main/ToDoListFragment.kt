@@ -24,6 +24,7 @@ import com.example.moaiplanner.adapter.CalendarAdapter
 import com.example.moaiplanner.data.calendar.CalendarData
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.TodoFragmentBinding
+import com.example.moaiplanner.util.ToDoItem
 import com.example.moaiplanner.util.ToDoItemListener
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -91,7 +92,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         }
 
         database = FirebaseDatabase.getInstance()
-        todoListRef = database.getReference("users/" + auth.getCurretUid().toString())
+        todoListRef = database.getReference("users/" + auth.getCurrentUid().toString())
 
         init()
         binding.monthYearPicker.setOnClickListener {
@@ -222,21 +223,12 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
 
 
     // Classe per rappresentare un elemento della to-do list
-    private data class ToDoItem(
-        var task: String,
-        var time: String,
-        var isDone: Boolean = false,
-        var id: String = "",
-        var userId: String = ""
-    ) {
-        constructor() : this("", "", false, "", "")
-    }
 
 
     // Adapter per la RecyclerView
     private inner class ToDoListAdapter(private val items: List<ToDoItem>) : RecyclerView.Adapter<ToDoViewHolder>() {
 
-        private var todoListener: ToDoItemListener = this@ToDoListFragment as ToDoItemListener
+        private var todoListener: ToDoItemListener = this@ToDoListFragment
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.todo_element, parent, false)
@@ -280,7 +272,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
                     manualUpdateUI = false
                     val dbItem = todoListRef.child("todolist/$currentDate").push()
                     todoItem.id = dbItem.key.toString()
-                    todoItem.userId = auth.getCurretUid().toString()
+                    todoItem.userId = auth.getCurrentUid().toString()
                     dbItem.setValue(todoItem)
 
                     /*toDoList.add(todoItem)
@@ -347,7 +339,6 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
                 .setTitleText("Select date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build()
-        //val materialDatePicker = materialDateBuilder.build()
 
         datePicker.show(parentFragmentManager, "DatePicker");
         datePicker.addOnPositiveButtonClickListener {
@@ -443,6 +434,11 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
                                 toDoList.add(toDoItem!!)
                             }
                         }
+                    }
+                    toDoList.sortBy { item ->
+                        val format = SimpleDateFormat("HH:mm")
+                        val date = format.parse(item.time)
+                        date.time / (60 * 1000)
                     }
                     adapter.notifyDataSetChanged()
                 }

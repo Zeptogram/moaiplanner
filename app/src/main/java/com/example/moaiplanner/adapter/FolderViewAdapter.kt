@@ -1,4 +1,4 @@
-import android.location.GnssAntennaInfo.Listener
+import android.app.Application
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,17 +9,24 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
+import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.util.FolderItem
+import com.google.firebase.database.FirebaseDatabase
 
 class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adapter<FolderViewAdapter.ViewHolder>() {
 
     private lateinit var mListener : onItemClickListener
+    private var auth = AuthRepository(Application())
+    private var database = FirebaseDatabase.getInstance()
+    private var ref = database.getReference("users/" + auth.getCurrentUid().toString())
+
 
     interface onItemClickListener {
         fun onItemClick(position: Int)
         fun onItemLongClick(position: Int)
 
     }
+
 
     fun setOnItemClickListener(listener: onItemClickListener) {
         mListener = listener
@@ -50,8 +57,8 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
 
         holder.checkbox.setOnClickListener {
             item.isFavourite = !item.isFavourite
+            modifyItemState(item.id, item.isFavourite)
             Log.d("TEST", "Called Checked: " + position.toString())
-
         }
 
     }
@@ -83,4 +90,19 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
             }
         }
     }
+
+    private fun modifyItemState(itemObjectId: String, isFavourite: Boolean) {
+        val value = ref.child("favourites").child(itemObjectId)
+        value.child("favourite").setValue(isFavourite)
+    }
+
+    fun onItemDelete(itemObjectId: String) {
+        val value = ref.child("favourites").child(itemObjectId)
+        value.removeValue()
+    }
+
+
+
+
+
 }

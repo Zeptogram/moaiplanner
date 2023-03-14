@@ -96,11 +96,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/folderLayout" />
 
+
+
     <LinearLayout
         android:id="@+id/toDoLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:animateLayoutChanges="true"
         app:layout_constrainedHeight="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,10 +113,24 @@
             android:id="@+id/todoList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/folder_template" />
+            tools:listitem="@layout/todo_element" />
+
+        <TextView
+            android:id="@+id/completed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="10dp"
+            android:text="You have completed all Tasks!"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="gone" />
 
 
     </LinearLayout>
+
+
 
 
     <!-- -->

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+>
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.welcome.RegisterFragment"
     tools:layout="@layout/register_fragment">
 
     <LinearLayout
-        android:layout_width="409dp"
-        android:layout_height="729dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginBottom="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +28,7 @@
             android:text="Register into Moai"
             android:layout_gravity="left"
             android:textSize="40sp"
-            android:layout_marginTop="90dp"
+            android:layout_marginTop="40dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:textStyle="bold"
@@ -49,6 +50,39 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+
+        <com.google.android.material.textfield.TextInputLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="24sp"
+            app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/account"
+            android:textColorHint="?android:textColorSecondaryInverseNoDisable"
+            app:boxBackgroundColor="?attr/colorSecondary"
+            app:boxCornerRadiusTopEnd="15dp"
+            app:boxCornerRadiusBottomEnd="15dp"
+            app:boxCornerRadiusBottomStart="15dp"
+            app:boxCornerRadiusTopStart="15dp"
+            app:startIconTint="@color/primary"
+            app:endIconTint="@color/primary"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextUsername"
+                android:layout_width="match_parent"
+                android:padding="14dp"
+                android:hint="Username"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
 
 
 
@@ -156,7 +190,7 @@
             android:textSize="14sp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginTop="85dp"
+            android:layout_marginTop="35dp"
 
             app:icon="@drawable/baseline_app_registration_24"
             app:iconGravity="textStart"
@@ -220,3 +254,4 @@
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

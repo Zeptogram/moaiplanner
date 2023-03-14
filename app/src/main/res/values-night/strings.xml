@@ -76,6 +76,7 @@
     <string name="folders">Folders</string>
     <string name="friends">Friends</string>
     <string name="forgot_password">Forgot Password?</string>
+    <string name="pomodoro">Pomodoro</string>
 
     <string-array name="pref_entries_dark_mode">
         <item>@string/pref_value_light</item>

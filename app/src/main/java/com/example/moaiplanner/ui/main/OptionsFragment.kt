@@ -2,21 +2,17 @@ package com.example.moaiplanner.ui.main
 
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
+import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
 import com.example.moaiplanner.data.repository.user.AuthRepository
@@ -26,21 +22,19 @@ import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.ui.welcome.WelcomeActivity
 import com.example.moaiplanner.util.disableNotifications
 import com.example.moaiplanner.util.enableLight
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import com.squareup.picasso.MemoryPolicy
-import com.squareup.picasso.NetworkPolicy
+import com.google.firebase.storage.ktx.component1
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.IOException
-import java.io.InputStream
 import java.net.URL
 
 
@@ -50,10 +44,9 @@ class OptionsFragment : Fragment() {
     private lateinit var binding: OptionsFragmentBinding
     private lateinit var settingsRepository: SettingsRepository
     private lateinit var firebase: AuthRepository
-    private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
     private lateinit var avatar: StorageReference
-
+    private lateinit var ref: StorageReference
     fun newInstance(): OptionsFragment? {
         return OptionsFragment()
     }
@@ -87,19 +80,7 @@ class OptionsFragment : Fragment() {
 
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
         binding.viewModel = settingsViewModel
-        firebase = AuthRepository(requireActivity().application)
-        storage = Firebase.storage
-        storageRef = storage.reference
-        avatar = storageRef.child("${firebase.getCurretUid()}/avatar.png")
 
-        avatar.downloadUrl.addOnSuccessListener { uri ->
-            Picasso.get()
-                .load(uri.toString())
-                .priority(Picasso.Priority.HIGH)
-                .into(binding.profilepic)
-        }.addOnFailureListener {
-            Log.e("A", "File not found in storage: ${it.message}")
-        }
 
 
         return binding.root
@@ -113,6 +94,46 @@ class OptionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        firebase = AuthRepository(requireActivity().application, view)
+        storageRef = Firebase.storage.reference
+        avatar = storageRef.child("${firebase.getCurrentUid()}/avatar.png")
+        ref = storageRef.child("${firebase.getCurrentUid()}/")
+
+        ref.listAll().addOnSuccessListener { (items) ->
+            items.forEach { item ->
+                Log.d("OPTIONS", item.toString())
+                if(item.toString().substringAfterLast("/") == "avatar.png") {
+                    avatar.downloadUrl.addOnSuccessListener { uri ->
+                        Picasso.get()
+                            .load(uri.toString())
+                            .priority(Picasso.Priority.HIGH)
+                            .into(binding.profilepic)
+                    }.addOnFailureListener { exception ->
+                        if (exception is StorageException &&
+                            (exception as StorageException).errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
+                            // File not found, handle appropriately
+                            Log.e("IMAGE", "File not found in storage")
+                        } else {
+                            // Other storage exception, handle appropriately
+                            Log.e("IMAGE", "StorageException: ${exception.message}")
+                        }
+                    }
+                }
+            }
+        }
+            .addOnFailureListener {
+                Log.e("IMAGE", "Using default picture")
+
+            }
+
+        binding.usermail.text = firebase.getEmail()
+        binding.username.text = firebase.getDisplayName()
+
+
+
+
+
 
 
         // imposta valore sessione quando viene modificato
@@ -160,6 +181,18 @@ class OptionsFragment : Fragment() {
                 it.type = "image/*"
                 startActivityForResult(it, 0)
             }
+        }
+
+        binding.buttonChangeName.setOnClickListener {
+            showEditNameDialog()
+        }
+
+        binding.buttonChangeEmail.setOnClickListener {
+            showEditMailDialog()
+        }
+
+        binding.buttonChangePass.setOnClickListener {
+            showEditPasswordDialog()
         }
 
         binding.buttonLogout.setOnClickListener() {
@@ -245,7 +278,77 @@ class OptionsFragment : Fragment() {
         savedInstanceState?.let { settingsViewModel.onRestoreInstanceState(it) }
     }
 
+    private fun showEditNameDialog() {
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_change_username, null)
+        val editUsername = dialogView.findViewById<EditText>(R.id.userText)
 
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Modifica l'Username")
+            .setView(dialogView)
+            .setPositiveButton("Modifica") { dialog, which ->
+                val text = editUsername.text.toString()
+
+                if (text.isNotBlank()) {
+                    firebase.setDisplayName(text, binding.username)
+                }
+            }
+            .setNegativeButton("Annulla") { dialog, which ->
+            }
+            .create()
+
+        dialog.show()
+
+    }
+
+    private fun showEditMailDialog() {
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_change_email, null)
+        val editEmail = dialogView.findViewById<EditText>(R.id.emailText)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Modifica la Email")
+            .setView(dialogView)
+            .setPositiveButton("Modifica") { dialog, which ->
+                val text = editEmail.text.toString()
+
+                if (text.isNotBlank()) {
+                    firebase.setEmail(text, binding.username)
+                }
+            }
+            .setNegativeButton("Annulla") { dialog, which ->
+            }
+            .create()
+
+        dialog.show()
+
+    }
+
+    private fun showEditPasswordDialog() {
+        val layoutInflater = LayoutInflater.from(context)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_change_password, null)
+        val oldPass = dialogView.findViewById<EditText>(R.id.oldPassText)
+        val newPass = dialogView.findViewById<EditText>(R.id.newPassText)
+
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Modifica la Password")
+            .setView(dialogView)
+            .setPositiveButton("Modifica") { dialog, which ->
+                val old = oldPass.text.toString()
+                var new = newPass.text.toString()
+
+                if (old.isNotBlank() && new.isNotBlank()) {
+                    firebase.setPassword(old, new)
+                }
+            }
+            .setNegativeButton("Annulla") { dialog, which ->
+            }
+            .create()
+
+        dialog.show()
+
+    }
 
 
 }

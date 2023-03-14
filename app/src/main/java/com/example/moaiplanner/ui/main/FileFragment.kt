@@ -6,12 +6,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.addCallback
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -20,35 +18,27 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
-import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.databinding.FileFragmentBinding
 import com.example.moaiplanner.util.FolderItem
-import com.example.moaiplanner.util.ItemsViewModel
 import com.example.moaiplanner.util.getFolderSize
 import com.example.moaiplanner.util.sizeCache
-import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.internal.notifyAll
 import java.io.FileDescriptor
 import java.io.FileInputStream
-import java.math.BigInteger
 import java.text.DecimalFormat
 
 class FileFragment: Fragment() {
@@ -59,6 +49,12 @@ class FileFragment: Fragment() {
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
     private lateinit var userDirNotes: StorageReference
+    private lateinit var favouritesRef: DatabaseReference
+    private lateinit var realtimeDb: FirebaseDatabase
+    private var currentData = ArrayList<FolderItem>()
+    private var init: Boolean = true
+
+
     private var currentFolder = ""
     private lateinit var folderPath: String
     private lateinit var toolbar: Toolbar
@@ -78,7 +74,13 @@ class FileFragment: Fragment() {
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
-        userDirNotes = storageRef.child("${firebase.getCurretUid()}/Notes")
+        userDirNotes = storageRef.child("${firebase.getCurrentUid()}/Notes")
+
+        realtimeDb = FirebaseDatabase.getInstance()
+        favouritesRef = realtimeDb.getReference("users/" + firebase.getCurrentUid().toString())
+
+
+
 
         toolbar = activity?.findViewById<Toolbar>(R.id.topAppBar)!!
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -103,42 +105,18 @@ class FileFragment: Fragment() {
         }
 
         binding.buttonShowall.setOnClickListener {
-
             binding.buttonShowall.isEnabled = false
-           /* var iterator = files.iterator()
-            while(iterator.hasNext()) {
-                val file = iterator.next()
-                if(!file.isFavourite && !shownFiles.contains(file)) {
-                    shownFiles.add(file)
-                    adapter.notifyItemInserted(shownFiles.lastIndex)
-
-                }
-            }*/
             shownFiles.clear()
             shownFiles.addAll(files)
             adapter.notifyDataSetChanged()
             binding.buttonFavourites.isEnabled = true
-
         }
         binding.buttonFavourites.setOnClickListener {
             binding.buttonFavourites.isEnabled = false
-            /*var i: Int = 0
-            Log.d("TEST", files.toString())
-            var iterator = shownFiles.iterator()
-            while(iterator.hasNext()) {
-                val file = iterator.next()
-                if(!file.isFavourite) {
-                    iterator.remove()
-                    adapter.notifyItemRemoved(i)
-                    i--
-                }
-                i++
-            }*/
             shownFiles.clear()
             for(file in files) {
                 if(file.isFavourite){
                     shownFiles.add(file)
-                    //adapter.notifyItemInserted(shownFiles.lastIndex)
                 }
             }
             adapter.notifyDataSetChanged()
@@ -156,8 +134,8 @@ class FileFragment: Fragment() {
             }
         }
 
-        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if(currentFolder.equals("")) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if(currentFolder == "") {
                 findNavController().navigate(
                     R.id.homeFragment, null,
                     navOptions {
@@ -184,10 +162,8 @@ class FileFragment: Fragment() {
                 getCollections(files, adapter, currentFolder)
                 toolbar.title = currentFolder
 
-           }
+            }
         }
-
-
 
 
 
@@ -251,9 +227,15 @@ class FileFragment: Fragment() {
 
             }
         })
-        getCollections(files, adapter, "")
+        if(init) {
+            init = false
+            fetchFavouritesFromFirebase()
+            Log.d("HEY", "x")
+        }
+        getCollections(files, adapter, currentFolder)
 
     }
+
 
 
     fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter, folderName: String) {
@@ -261,10 +243,9 @@ class FileFragment: Fragment() {
         files.clear()
         shownFiles.clear()
         adapter.notifyDataSetChanged()
-        folderPath = "/${firebase.getCurretUid()}/Notes/${currentFolder}"
-        Log.d("AAA", folderPath)
+        folderPath = "/${firebase.getCurrentUid()}/Notes/${currentFolder}"
         lifecycleScope.launch(Dispatchers.IO) {
-            val folder = storageRef.child("${firebase.getCurretUid()}/Notes/${folderName}")
+            val folder = storageRef.child("${firebase.getCurrentUid()}/Notes/${folderName}")
             Log.d("collectionNotesRef", folder.toString())
             folder.listAll()
                 .addOnSuccessListener { (items, prefixes) ->
@@ -272,16 +253,29 @@ class FileFragment: Fragment() {
 
                         Log.d("FIRESTORAGE-PREFIX", prefix.toString())
                         var fileItem = FolderItem(prefix.toString().split("/").last().replace("%20", " "), "", false, R.drawable.folder)
-                        data.add(fileItem)
-
-                        getFolderSize(prefix) { bytes, files ->
-                            val df = DecimalFormat("#,##0.##")
-                            df.maximumFractionDigits = 2
-                            var kb = bytes.toDouble() / 1024
-                            val info = df.format(kb) + "KB - " + files.toString() + " Notes"
-                            fileItem.folder_files = info
+                        fileItem.userId = firebase.getCurrentUid().toString()
+                        fileItem.path = currentFolder.substringBeforeLast("/")
+                        val value: FolderItem? = checkItemPresence(fileItem)
+                        if(value == null) {
+                            var dbItem = favouritesRef.child("favourites").push()
+                            fileItem.id = dbItem.key.toString()
+                            data.add(fileItem)
+                            getFolderSize(prefix) { bytes, files ->
+                                val df = DecimalFormat("#,##0.##")
+                                df.maximumFractionDigits = 2
+                                var kb = bytes.toDouble() / 1024
+                                val info = df.format(kb) + "KB - " + files.toString() + " Notes"
+                                fileItem.folder_files = info
+                                dbItem.setValue(fileItem)
+                                adapter.notifyDataSetChanged()
+                            }
+                        } else {
+                            data.add(value)
                             adapter.notifyDataSetChanged()
+
                         }
+
+                        //data.add(fileItem)
 
                         prefix.listAll()
                     }
@@ -290,13 +284,26 @@ class FileFragment: Fragment() {
                         Log.d("FIRESTORAGE-ITEM", item.toString())
                         if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex())){
                             var fileItem = FolderItem(item.toString().split("/").last().replace("%20", " "), "", false, R.drawable.baseline_insert_drive_file_24)
-                            data.add(fileItem)
-                            item.metadata.addOnSuccessListener {
-                                val df = DecimalFormat("#,##0.##")
-                                df.maximumFractionDigits = 2
-                                var kbytes: Double = it.sizeBytes.toDouble() / 1024
-                                val size = df.format(kbytes) + "kB"
-                                fileItem.folder_files = size
+                            fileItem.userId = firebase.getCurrentUid().toString()
+                            fileItem.path = currentFolder.substringBeforeLast("/")
+                            Log.d("PROVA", checkItemPresence(fileItem).toString())
+                            val value: FolderItem? = checkItemPresence(fileItem)
+                            if(value == null) {
+                                var dbItem = favouritesRef.child("favourites").push()
+                                fileItem.id = dbItem.key.toString()
+                                data.add(fileItem)
+                                item.metadata.addOnSuccessListener {
+                                    val df = DecimalFormat("#,##0.##")
+                                    df.maximumFractionDigits = 2
+                                    var kbytes: Double = it.sizeBytes.toDouble() / 1024
+                                    val size = df.format(kbytes) + "kB"
+                                    fileItem.folder_files = size
+                                    dbItem.setValue(fileItem)
+                                    adapter.notifyDataSetChanged()
+                                }
+                            }
+                            else {
+                                data.add(value)
                                 adapter.notifyDataSetChanged()
                             }
                         }
@@ -323,8 +330,6 @@ class FileFragment: Fragment() {
 
         }
 
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -345,7 +350,7 @@ class FileFragment: Fragment() {
 
             val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
 
-            val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${fileName}")
+            val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${fileName}")
             val uploadTask = noteDir.putStream(stream)
 
             // Register observers to listen for when the download is done or if it fails
@@ -374,9 +379,10 @@ class FileFragment: Fragment() {
                         .show()
                 }
                 stream.close()
-                sizeCache.remove("/${firebase.getCurretUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
+                sizeCache.remove("/${firebase.getCurrentUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
                 updateFolderNotesCache(folderPath)
                 resetFolderView()
+
             }
         }
     }
@@ -395,7 +401,7 @@ class FileFragment: Fragment() {
             .setPositiveButton("Add") { dialog, which ->
                 if (radioButtonNote.isChecked) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${editTextNoteFolder.text}.md")
+                        val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${editTextNoteFolder.text}.md")
                         val text = "# Note created with Moai Planner"
                         val uploadFile = noteDir.putBytes(text.toByteArray())
                         uploadFile.addOnFailureListener {
@@ -428,7 +434,7 @@ class FileFragment: Fragment() {
                     }
                 } else if (radioButtonFolder.isChecked) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${editTextNoteFolder.text}/temp.tmp")
+                        val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${editTextNoteFolder.text}/temp.tmp")
                         val text = " "
                         val uploadFile = noteDir.putBytes(text.toByteArray())
                         uploadFile.addOnFailureListener {
@@ -472,7 +478,7 @@ class FileFragment: Fragment() {
 
     private fun updateFolderNotesCache(folder: String) {
         var path = folder
-        while(path != "/${firebase.getCurretUid()}/Notes") {
+        while(path != "/${firebase.getCurrentUid()}/Notes") {
             path = path.substringBeforeLast("/")
             sizeCache.remove(path)
         }
@@ -490,10 +496,14 @@ class FileFragment: Fragment() {
                     val noteDir: StorageReference
                     Log.d("NOTE-DIR", adapter.getFileName(position))
                     if (adapter.getFileName(position).endsWith(".md")) {
-                        noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
+                        noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
                         Log.d("NOTE-DIR", noteDir.toString())
-
+                        var id = shownFiles[position].id
+                        adapter.onItemDelete(id)
                         noteDir.delete().addOnSuccessListener {
+
+                            currentData.remove(shownFiles[position])
+
                             view?.let { it1 ->
                                 Snackbar.make(it1, "File deleted", Snackbar.LENGTH_SHORT)
                                     .setAction("OK") {
@@ -520,20 +530,24 @@ class FileFragment: Fragment() {
                             }
                         }
                     } else {
-                        noteDir = storageRef.child("${firebase.getCurretUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
+                        noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
                         Log.d("NOTE-DIR", noteDir.toString())
                         lifecycleScope.launch(Dispatchers.Main) {
+                            adapter.onItemDelete(shownFiles[position].id)
+                            currentData.remove(shownFiles[position])
                             shownFiles.removeAt(position)
                             binding.buttonFavourites.isEnabled = true
                             binding.buttonShowall.isEnabled = false
                             adapter.notifyDataSetChanged()
                         }
 
+
                         noteDir.listAll().addOnSuccessListener { (items, prefixes) ->
                             items.forEach { item ->
                                 item.delete()
                             }
                             deleteFolder(prefixes)
+
                         }.addOnFailureListener {
                             view?.let { it1 ->
                                 Snackbar.make(it1, "Delete failed", Snackbar.LENGTH_SHORT)
@@ -571,6 +585,41 @@ class FileFragment: Fragment() {
         shownFiles.clear()
     }
 
+    private fun fetchFavouritesFromFirebase() {
+        val favouritesListListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val favouritesData = snapshot.child("favourites").children
+                for (item in favouritesData) {
+                    val folderItem = item.getValue(FolderItem::class.java)
+                    if (folderItem != null) {
+                        if(folderItem.id.isNotBlank()) {
+                            currentData.add(folderItem)
+                            //shownFiles.add(folderItem)
+                        }
+                    }
+                }
+                //adapter.notifyDataSetChanged()
+                Log.d("CURRENT", currentData.toString())
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("FileFragment", "loadFavouritesList:onCancelled", error.toException())
+            }
+
+        }
+        favouritesRef.addValueEventListener(favouritesListListener)
+    }
+
+    private fun checkItemPresence(item: FolderItem): FolderItem? {
+        for(i in currentData) {
+            if(i.folder_name == item.folder_name &&
+                i.path == item.path &&
+                i.icon == item.icon &&
+                i.userId == item.userId)
+                return i
+        }
+        return null
+    }
 
 
 

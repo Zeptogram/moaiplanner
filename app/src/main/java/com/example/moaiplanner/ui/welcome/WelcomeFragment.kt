@@ -1,28 +1,15 @@
 package com.example.moaiplanner.ui.welcome
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.WelcomeFragmentBinding
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 class WelcomeFragment : Fragment() {
     lateinit var binding: WelcomeFragmentBinding

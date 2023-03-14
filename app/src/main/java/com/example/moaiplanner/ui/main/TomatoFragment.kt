@@ -205,7 +205,6 @@ class TomatoFragment : Fragment() {
                     simpleDateFormat= SimpleDateFormat("mm:ss")
                     binding.timerLabel.text = simpleDateFormat.format(date)
                     pomodoroViewModel.timeLabel.value = simpleDateFormat.format(date)
-
                 }
             }
 

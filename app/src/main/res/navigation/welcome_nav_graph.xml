@@ -46,5 +46,5 @@
         android:id="@+id/googleSignInActivity"
         android:name="com.example.moaiplanner.ui.welcome.GoogleSignInActivity"
         android:label="activity_google_sign_in"
-        tools:layout="@layout/activity_google_sign_in" />
+        tools:layout="@layout/activity_welcome" />
 </navigation>
