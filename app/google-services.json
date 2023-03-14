@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "50394403115-mb8mrrod4jcrggacnvoh5crvuor3k1ha.apps.googleusercontent.com",
+          "client_id": "50394403115-vl26fosqrisjhg7k94dup8o4ejc8anf8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.moaiplanner",
-            "certificate_hash": "62497dbd0ebd816b7630716ab0994aa5b1175fd7"
+            "certificate_hash": "16d1c55cca6c5fc38f07ab046dbbdf3e3ffddcd8"
           }
         },
         {

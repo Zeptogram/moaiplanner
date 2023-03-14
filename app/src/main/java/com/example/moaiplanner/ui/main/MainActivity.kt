@@ -24,6 +24,7 @@ import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.util.disableNotifications
 import com.example.moaiplanner.util.enableLight
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity() {

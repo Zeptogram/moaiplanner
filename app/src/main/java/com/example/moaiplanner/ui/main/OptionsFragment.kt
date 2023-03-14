@@ -29,6 +29,7 @@ import com.example.moaiplanner.util.enableLight
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.MemoryPolicy
@@ -90,15 +91,17 @@ class OptionsFragment : Fragment() {
         storage = Firebase.storage
         storageRef = storage.reference
         avatar = storageRef.child("${firebase.getCurretUid()}/avatar.png")
-        avatar.downloadUrl.addOnSuccessListener { uri -> // Got the download URL for 'users/me/profile.png'
-            // Pass it to Picasso to download, show in ImageView and caching
+
+        avatar.downloadUrl.addOnSuccessListener { uri ->
             Picasso.get()
                 .load(uri.toString())
                 .priority(Picasso.Priority.HIGH)
                 .into(binding.profilepic)
         }.addOnFailureListener {
-            // Handle any errors
+            Log.e("A", "File not found in storage: ${it.message}")
         }
+
+
         return binding.root
 
         // Inflate il layout per il fragment
