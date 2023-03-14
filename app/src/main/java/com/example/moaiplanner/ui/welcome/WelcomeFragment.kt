@@ -82,14 +82,8 @@ class WelcomeFragment : Fragment() {
         }
 
         binding.buttonGoogleLogin.setOnClickListener {
-            findNavController().navigate(R.id.googleSignInActivity, null,
-                navOptions {
-                    anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
-
-                    }
-                }, null)
+            findNavController().navigate(R.id.googleSignInActivity)
+            requireActivity().finish()
         }
 
         binding.textViewSignUpNow.setOnClickListener {

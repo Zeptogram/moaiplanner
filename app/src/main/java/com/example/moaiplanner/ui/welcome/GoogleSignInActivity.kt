@@ -6,10 +6,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.ui.main.MainActivity
@@ -29,48 +32,28 @@ class GoogleSignInActivity : AppCompatActivity() {
     private lateinit var firebase: AuthRepository
     private lateinit var googleSignInClient : GoogleSignInClient
     private var firebaseAuth: FirebaseAuth = Firebase.auth
+    private lateinit var navHostFragment : NavHostFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_google_sign_in)
+        setContentView(R.layout.activity_welcome)
+
+
+
     }
 
     override fun onStart() {
         super.onStart()
-
-        /*firebase = AuthRepository(application)
-        firebase.signInGoogle(this)*/
-        /*val account = GoogleSignIn.getLastSignedInAccount(this)
-        if(account != null) {
-            val i = Intent(this@GoogleSignInActivity, MainActivity::class.java)
-            startActivity(i)
-            finish()
-        } */
-
-
-
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
-
         googleSignInClient = GoogleSignIn.getClient(this , gso)
         googleSignInClient.signOut()
         val intent = googleSignInClient.signInIntent
         launcher.launch(intent)
-
-
-
-
-        /*if (firebase.isUserAuthenticated()) {
-            val i = Intent(this@GoogleSignInActivity, MainActivity::class.java)
-            startActivity(i)
-            finish()
-        } else {
-            // navController.navigate(R.id.nav_welcome_fragment)
-        }*/
     }
 
     private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
@@ -127,5 +110,4 @@ class GoogleSignInActivity : AppCompatActivity() {
             }
         }
     }
-
 }

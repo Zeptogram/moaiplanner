@@ -47,6 +47,13 @@ class SigninFragment : Fragment() {
     ): View? {
         binding = SigninFragmentBinding.inflate(inflater, container, false)
         // Inflate il layout per il fragment
+
+        binding.buttonGoogleLogin.setOnClickListener {
+            findNavController().navigate(R.id.googleSignInActivity)
+            requireActivity().finish()
+        }
+
+
         return binding.root
     }
 

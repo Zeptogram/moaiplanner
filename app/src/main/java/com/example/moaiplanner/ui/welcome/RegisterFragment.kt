@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.user.AuthRepository
 import com.example.moaiplanner.databinding.RegisterFragmentBinding
@@ -31,6 +32,11 @@ class RegisterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = RegisterFragmentBinding.inflate(inflater, container, false)
+
+        binding.buttonGoogleLogin.setOnClickListener {
+            findNavController().navigate(R.id.googleSignInActivity)
+            requireActivity().finish()
+        }
 
         // Inflate il layout per il fragment
         return binding.root
