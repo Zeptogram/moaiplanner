@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Log
 import android.util.Patterns
 import android.view.View
@@ -371,6 +372,29 @@ class AuthRepository(app: Application, view: View? = null) {
         return hasLowerCase && hasUpperCase && hasDigit && hasSpecialChar
     }
 
+    fun getProvider(): String {
+        val user = Firebase.auth.currentUser
+        var providerId: String = ""
+        user?.let {
+            for (profile in it.providerData) {
+                providerId = profile.providerId
+
+            }
+        }
+        return providerId
+    }
+
+    fun getGoogleImage(): Uri?{
+        val user = Firebase.auth.currentUser
+        var photo: Uri? = null
+        user?.let {
+            for (profile in it.providerData) {
+                photo = profile.photoUrl
+
+            }
+        }
+        return photo
+    }
 
 
 }

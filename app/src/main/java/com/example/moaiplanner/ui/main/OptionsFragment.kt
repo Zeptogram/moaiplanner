@@ -83,6 +83,8 @@ class OptionsFragment : Fragment() {
 
 
 
+
+
         return binding.root
 
         // Inflate il layout per il fragment
@@ -100,32 +102,30 @@ class OptionsFragment : Fragment() {
         avatar = storageRef.child("${firebase.getCurrentUid()}/avatar.png")
         ref = storageRef.child("${firebase.getCurrentUid()}/")
 
+        if(firebase.getProvider() == "google.com") {
+            binding.buttonChangePass.isEnabled = false
+            binding.buttonChangeEmail.isEnabled = false
+            binding.buttonChangeName.isEnabled = false
+        }
+
         ref.listAll().addOnSuccessListener { (items) ->
             items.forEach { item ->
                 Log.d("OPTIONS", item.toString())
                 if(item.toString().substringAfterLast("/") == "avatar.png") {
-                    avatar.downloadUrl.addOnSuccessListener { uri ->
-                        Picasso.get()
-                            .load(uri.toString())
-                            .priority(Picasso.Priority.HIGH)
-                            .into(binding.profilepic)
-                    }.addOnFailureListener { exception ->
-                        if (exception is StorageException &&
-                            (exception as StorageException).errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
-                            // File not found, handle appropriately
-                            Log.e("IMAGE", "File not found in storage")
-                        } else {
-                            // Other storage exception, handle appropriately
-                            Log.e("IMAGE", "StorageException: ${exception.message}")
-                        }
-                    }
+                    downloadImage()
                 }
             }
-        }
-            .addOnFailureListener {
-                Log.e("IMAGE", "Using default picture")
-
+            if(firebase.getProvider() == "google.com") {
+                var uri = firebase.getGoogleImage().toString()
+                Picasso.get()
+                    .load(uri)
+                    .priority(Picasso.Priority.HIGH)
+                    .into(binding.profilepic)
             }
+        }
+        .addOnFailureListener {
+            Log.e("IMAGE", "Using default picture")
+        }
 
         binding.usermail.text = firebase.getEmail()
         binding.username.text = firebase.getDisplayName()
@@ -348,6 +348,24 @@ class OptionsFragment : Fragment() {
 
         dialog.show()
 
+    }
+
+    fun downloadImage(){
+        avatar.downloadUrl.addOnSuccessListener { uri ->
+            Picasso.get()
+                .load(uri.toString())
+                .priority(Picasso.Priority.HIGH)
+                .into(binding.profilepic)
+        }.addOnFailureListener { exception ->
+            if (exception is StorageException &&
+                (exception as StorageException).errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
+                // File not found, handle appropriately
+                Log.e("IMAGE", "File not found in storage")
+            } else {
+                // Other storage exception, handle appropriately
+                Log.e("IMAGE", "StorageException: ${exception.message}")
+            }
+        }
     }
 
 
