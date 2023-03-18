@@ -1,5 +1,6 @@
 package com.example.moaiplanner.ui.welcome
 
+import GoogleSignInHelper
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -7,14 +8,16 @@ import android.os.Bundle
 import android.util.Patterns
 import android.view.*
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.SigninFragmentBinding
 import com.example.moaiplanner.ui.main.MainActivity
+import com.example.moaiplanner.util.NetworkUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -28,6 +31,12 @@ class SigninFragment : Fragment() {
 
     lateinit var binding: SigninFragmentBinding
     lateinit var firebase: AuthRepository
+    private lateinit var googleSignInHelper: GoogleSignInHelper
+    private val signInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        googleSignInHelper.handleActivityResult(result.resultCode, result.data)
+    }
 
     fun newInstance(): SigninFragment? {
         return SigninFragment()
@@ -41,10 +50,6 @@ class SigninFragment : Fragment() {
         binding = SigninFragmentBinding.inflate(inflater, container, false)
         // Inflate il layout per il fragment
 
-        binding.buttonGoogleLogin.setOnClickListener {
-            findNavController().navigate(R.id.googleSignInActivity)
-            requireActivity().finish()
-        }
 
 
         return binding.root
@@ -52,12 +57,20 @@ class SigninFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        NetworkUtils.notifyMissingNetwork(requireContext(), view, activity)
         firebase = AuthRepository(requireActivity().application)
+
+        binding.buttonGoogleLogin.setOnClickListener {
+            googleSignInHelper = GoogleSignInHelper(requireActivity(), signInLauncher, view)
+            googleSignInHelper.signInGoogle()
+        }
 
         binding.forgotPassword.setOnClickListener {
             showResetDialog()
         }
 
+
+        // Da semplificare
         var isAuthenticated: Boolean = false
         binding.buttonSignIn.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -69,7 +82,7 @@ class SigninFragment : Fragment() {
                         lifecycleScope.launch(Dispatchers.Main) {
                             if (isAuthenticated) {
                                 val sharedPref: SharedPreferences =
-                                    (activity?.getSharedPreferences("user", Context.MODE_PRIVATE) ?: null) as SharedPreferences
+                                    activity?.getSharedPreferences("user", Context.MODE_PRIVATE) as SharedPreferences
                                 sharedPref.edit {
                                     putBoolean("auth", isAuthenticated)
                                     apply()

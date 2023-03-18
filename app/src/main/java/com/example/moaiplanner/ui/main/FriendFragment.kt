@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.CalendarAdapter
 import com.example.moaiplanner.data.calendar.CalendarData
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.FriendFragmentBinding
 import com.example.moaiplanner.databinding.TodoFragmentBinding
 import com.google.firebase.ktx.Firebase

@@ -9,7 +9,7 @@ import androidx.preference.PreferenceManager
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.ui.main.NoteFragment
 import com.example.moaiplanner.util.getName
 import com.google.firebase.ktx.Firebase

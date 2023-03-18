@@ -1,21 +1,32 @@
 package com.example.moaiplanner.ui.welcome
 
+import GoogleSignInHelper
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.WelcomeFragmentBinding
+import com.example.moaiplanner.util.NetworkUtils
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class WelcomeFragment : Fragment() {
     lateinit var binding: WelcomeFragmentBinding
     lateinit var firebase: AuthRepository
-    private val REQ_ONE_TAP = 2
-    private var showOneTapUI = true
+    private lateinit var googleSignInHelper: GoogleSignInHelper
+    private val signInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        googleSignInHelper.handleActivityResult(result.resultCode, result.data)
+    }
 
     fun newInstance(): SigninFragment? {
         return SigninFragment()
@@ -27,36 +38,21 @@ class WelcomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = WelcomeFragmentBinding.inflate(inflater, container, false)
+
+
+
+
         // Inflate il layout per il fragment
         return binding.root
     }
 
-    // TODO: Rimuovere, vecchio codice per scaricare da firebase l'immagine prova dell'app
-    /*
-    fun convertBitmapFromURL(url: String): Bitmap? {
-        try {
-            val url = URL(url)
-            val input = url.openStream()
-
-            return BitmapFactory.decodeStream(input)
-        } catch (e: IOException) {
-            Log.d("Exception", e.toString())
-        }
-
-        return null
-    }
-
-    fun updateUI(bitmap: Bitmap?) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            binding.imageViewMoaiLogo.setImageBitmap(bitmap)
-        }
-    }
-     */
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        NetworkUtils.notifyMissingNetwork(requireContext(), view, activity)
+        // Mette la home come main
         firebase = AuthRepository(requireActivity().application)
+
 
         binding.buttonEmail.setOnClickListener {
             findNavController().navigate(R.id.signinFragment, null,
@@ -69,8 +65,10 @@ class WelcomeFragment : Fragment() {
         }
 
         binding.buttonGoogleLogin.setOnClickListener {
-            findNavController().navigate(R.id.googleSignInActivity)
-            requireActivity().finish()
+            googleSignInHelper = GoogleSignInHelper(requireActivity(), signInLauncher, view)
+            googleSignInHelper.signInGoogle()
+            /*findNavController().navigate(R.id.googleSignInActivity)
+            requireActivity().finish()*/
         }
 
         binding.textViewSignUpNow.setOnClickListener {

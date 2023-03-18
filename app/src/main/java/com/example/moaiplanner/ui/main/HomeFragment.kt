@@ -1,6 +1,9 @@
 package com.example.moaiplanner.ui.main
 
 import FolderViewAdapter
+import android.app.AlertDialog
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -16,11 +19,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.calendar.CalendarData
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.util.FolderItem
+import com.example.moaiplanner.util.NetworkUtils
 import com.example.moaiplanner.util.ToDoItem
 import com.example.moaiplanner.util.getFolderSize
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
@@ -62,6 +67,16 @@ class HomeFragment : Fragment() {
     ): View? {
         binding = HomeFragmentBinding.inflate(inflater, container, false)
 
+        /*if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Connessione di rete assente")
+                .setMessage("Verifica la tua connessione di rete e riprova")
+                .setPositiveButton("OK", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show()
+        }*/
+
+
         firebase = AuthRepository(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
@@ -93,7 +108,7 @@ class HomeFragment : Fragment() {
             true
         }
 
-        binding.buttonFriends.setOnClickListener {
+        /*binding.buttonFriends.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_friendFragment, null,
                 navOptions {
                     anim {
@@ -102,11 +117,19 @@ class HomeFragment : Fragment() {
                     }
                 }
             )
-        }
+        }*/
 
         currentDate = calendarData.calendarYear + "/" + calendarData.calendarMonth + "/" + calendarData.calendarDate
         // Inflate il layout per il fragment
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        NetworkUtils.notifyMissingNetwork(requireContext(), view)
+        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        // Mette la home come main
+        bottomNav.menu.getItem(0).isChecked = true;
     }
 
 
@@ -123,9 +146,11 @@ class HomeFragment : Fragment() {
         val todoview = activity?.findViewById<RecyclerView>(R.id.todoList)
 
 
-        todoview!!.layoutManager = LinearLayoutManager(requireContext())
+        todoview?.setHasFixedSize(true)
+        todoview?.isNestedScrollingEnabled = true
+
+
         todoview!!.adapter = toDoAdapter
-        todoview!!.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
 
 
 
@@ -181,8 +206,6 @@ class HomeFragment : Fragment() {
                         var noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/temp.tmp")
                         val text = " "
                         var uploadFile = noteDir.putBytes(text.toByteArray())
-                        noteDir = storageRef.child("${firebase.getCurrentUid()}/Shared Notes/temp.tmp")
-                        uploadFile = noteDir.putBytes(text.toByteArray())
                         uploadFile.addOnFailureListener {
                             //resetFolderView()
                             // Handle unsuccessful uploads
@@ -253,7 +276,7 @@ class HomeFragment : Fragment() {
 
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.todo_element, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.todo_view, parent, false)
             return ToDoViewHolder(view)
         }
         override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {

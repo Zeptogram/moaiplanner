@@ -1,37 +1,88 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_calendar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    app:cardBackgroundColor="?attr/colorOnSecondary"
+    app:cardCornerRadius="15dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginStart="5dp"
 
-
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:paddingBottom="10dp"
         android:orientation="vertical">
 
-        <!-- TextView per visualizzare il testo dell'elemento -->
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:textSize="18sp"
-            android:text="Item"
-            android:paddingStart="16dp"/>
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
 
-        <TextView
-            android:id="@+id/timeView"
             android:layout_width="match_parent"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="?android:textColorSecondary"
-            android:text="Time"
-            android:paddingStart="16dp"/>
+            android:orientation="horizontal"
+            >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="0.8">
+
+
+
+                <TextView
+                    android:id="@+id/timeView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.MaterialTimePicker.Title"
+                    android:text="Time"
+                    android:textColor="?android:textColorSecondary" />
+
+
+                <!-- TextView per visualizzare il testo dell'elemento -->
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:scrollbars="horizontal"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textSize="18sp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="TODO"
+                    />
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:orientation="horizontal">
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+
+
+
+
+
 
     </LinearLayout>
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>

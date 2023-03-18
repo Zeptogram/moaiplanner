@@ -18,6 +18,9 @@
     <item name="popupMenuBackground">@color/white</item>
     <item name="colorPrimaryContainer">@color/primary</item>
     <item name="colorOnPrimaryContainer">@color/white</item>
+    <item name="android:statusBarColor">@color/night_background</item>
+    <item name="android:fontFamily"> @font/avenirbold </item>
+
     <!-- Snackbar -->
     <item name="colorOnSurfaceInverse">@color/black</item>
     <item name="colorSurfaceInverse">@color/light_background_variant</item>

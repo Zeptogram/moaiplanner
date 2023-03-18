@@ -38,13 +38,5 @@
         <action
             android:id="@+id/action_welcomeFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
-        <action
-            android:id="@+id/action_welcomeFragment_to_googleSignInActivity"
-            app:destination="@id/googleSignInActivity" />
     </fragment>
-    <activity
-        android:id="@+id/googleSignInActivity"
-        android:name="com.example.moaiplanner.ui.welcome.GoogleSignInActivity"
-        android:label="activity_google_sign_in"
-        tools:layout="@layout/activity_welcome" />
 </navigation>

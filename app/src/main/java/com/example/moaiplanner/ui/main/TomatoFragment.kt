@@ -25,6 +25,7 @@ import com.example.moaiplanner.databinding.TomatoFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.TomatoViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -153,9 +154,9 @@ class TomatoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-
+        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        // Mette la home come main
+        bottomNav.menu.getItem(3).isChecked = true;
     }
 
     fun initTimer() {

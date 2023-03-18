@@ -51,7 +51,6 @@ class WelcomeActivity : AppCompatActivity() {
 
 
 
-
         settingsViewModel.restoreSettings()
 
         settingsViewModel.lightMode.value?.let { enableLight(it) }

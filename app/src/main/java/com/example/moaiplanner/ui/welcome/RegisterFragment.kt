@@ -1,20 +1,30 @@
 package com.example.moaiplanner.ui.welcome
 
+import GoogleSignInHelper
 import android.os.Bundle
 import android.util.Patterns
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.RegisterFragmentBinding
+import com.example.moaiplanner.util.NetworkUtils
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class RegisterFragment : Fragment() {
 
     lateinit var binding: RegisterFragmentBinding
     lateinit var firebase: AuthRepository
+    private lateinit var googleSignInHelper: GoogleSignInHelper
+    private val signInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        googleSignInHelper.handleActivityResult(result.resultCode, result.data)
+    }
 
     fun newInstance(): RegisterFragment? {
         return RegisterFragment()
@@ -26,20 +36,21 @@ class RegisterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = RegisterFragmentBinding.inflate(inflater, container, false)
-
-        binding.buttonGoogleLogin.setOnClickListener {
-            findNavController().navigate(R.id.googleSignInActivity)
-            requireActivity().finish()
-        }
-
         // Inflate il layout per il fragment
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        firebase = AuthRepository(requireActivity().application, view)
+        NetworkUtils.notifyMissingNetwork(requireContext(), view, activity)
+
+        binding.buttonGoogleLogin.setOnClickListener {
+            googleSignInHelper = GoogleSignInHelper(requireActivity(), signInLauncher, view)
+            googleSignInHelper.signInGoogle()
+        }
+
         binding.buttonSignUp.setOnClickListener {
+            firebase = AuthRepository(requireActivity().application, view)
             createAccount()
         }
     }

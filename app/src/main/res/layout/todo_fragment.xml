@@ -14,26 +14,24 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/row_calendar_date" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/row_calendar_date" />
 
-    <!-- RecyclerView per visualizzare la lista di elementi -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        <!-- RecyclerView per visualizzare la lista di elementi -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </LinearLayout>
 

@@ -29,7 +29,13 @@ class PreviewFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.note_preview_fragment, container, false)
+    ): View? {
+        updateWebContent(viewModel.markdownUpdates.value ?: "")
+        viewModel.markdownUpdates.observe(viewLifecycleOwner) {
+            updateWebContent(it)
+        }
+        return inflater.inflate(R.layout.note_preview_fragment, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         markdownPreview = view.findViewById(R.id.markdown_view)
@@ -57,14 +63,6 @@ class PreviewFragment : Fragment() {
                 }
             }
             style = String.format(FORMAT_CSS, css ?: "")
-        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        updateWebContent(viewModel.markdownUpdates.value ?: "")
-        viewModel.markdownUpdates.observe(this) {
-            updateWebContent(it)
         }
     }
 

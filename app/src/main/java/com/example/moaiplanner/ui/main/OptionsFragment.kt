@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory

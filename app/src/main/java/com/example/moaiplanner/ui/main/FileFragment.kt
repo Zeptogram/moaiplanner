@@ -20,9 +20,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.FileFragmentBinding
 import com.example.moaiplanner.util.FolderItem
+import com.example.moaiplanner.util.NetworkUtils
 import com.example.moaiplanner.util.getFolderSize
 import com.example.moaiplanner.util.sizeCache
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -171,6 +172,14 @@ class FileFragment: Fragment() {
 
         // Inflate il layout per il fragment
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        NetworkUtils.notifyMissingNetwork(requireContext(), view)
+        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        // Mette la home come main
+        bottomNav.menu.getItem(1).isChecked = true;
     }
 
     override fun onStart() {

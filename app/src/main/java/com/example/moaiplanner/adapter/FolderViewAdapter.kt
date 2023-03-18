@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.util.FolderItem
 import com.google.firebase.database.FirebaseDatabase
 

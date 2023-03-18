@@ -19,9 +19,10 @@ import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.EditPagerAdapter
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.DisableableViewPager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.ktx.Firebase
@@ -63,6 +64,10 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
 
         toolbar?.menu?.setGroupVisible(R.id.edit, true)
         toolbar?.menu?.setGroupVisible(R.id.sett, false)
+        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        // Mette la home come main
+        bottomNav.menu.getItem(1).isChecked = true;
+
 
         val adapter = EditPagerAdapter(childFragmentManager, view.context)
         val pager = activity?.findViewById<DisableableViewPager>(R.id.pager)

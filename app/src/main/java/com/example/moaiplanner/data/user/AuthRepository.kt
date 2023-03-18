@@ -1,4 +1,4 @@
-package com.example.moaiplanner.data.repository.user
+package com.example.moaiplanner.data.user
 
 import android.app.Activity
 import android.app.Application
@@ -10,8 +10,10 @@ import android.util.Patterns
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import com.example.moaiplanner.R
+import com.example.moaiplanner.ui.welcome.WelcomeActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -29,7 +31,6 @@ import kotlinx.coroutines.tasks.await
 class AuthRepository(app: Application, view: View? = null) {
     private var application: Application
     private var firebaseAuth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
     private var view: View?
 
     private companion object {
@@ -75,22 +76,6 @@ class AuthRepository(app: Application, view: View? = null) {
             }
     }
 
-/*fun signIn(email: String, password: String) {
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener { task ->
-                // Sign in success
-                Log.d(TAG, "signInWithEmail:success")
-                Toast.makeText(application, "Authentication successful", Toast.LENGTH_SHORT).show()
-
-            }
-            .addOnFailureListener { task ->
-                // If sign in fails, display a message to the user.
-                Log.w(TAG, "signInWithEmail:failure", task)
-                Toast.makeText(application, "Authentication failed", Toast.LENGTH_SHORT).show()
-
-            }
-    }*/
-
     suspend fun signIn(email: String, password: String): Boolean {
         return try {
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
@@ -99,52 +84,6 @@ class AuthRepository(app: Application, view: View? = null) {
         } catch (e: Exception) {
             false
         }
-    }
-
-
-    // TODO Rimuovere questa parte
-    fun signInGoogle(activity: Activity) {
-        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(activity.getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-
-        googleSignInClient = GoogleSignIn.getClient(activity, googleSignInOptions)
-        val intent = googleSignInClient.signInIntent
-
-        val accountTask = GoogleSignIn.getSignedInAccountFromIntent(intent)
-        try {
-            val account = accountTask.getResult(ApiException::class.java)
-            authGoogleAccount(account)
-        } catch (e: java.lang.Exception) {
-            Log.d(TAG, "Google Account Task failed")
-        }
-    }
-
-    private fun authGoogleAccount(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        firebaseAuth.signInWithCredential(credential)
-            .addOnSuccessListener { authResult ->
-                // Sign in success
-                Log.d(TAG, "signInWithGoogle:success")
-                Toast.makeText(application, "Authentication with Google successful", Toast.LENGTH_SHORT).show()
-                // val firebaseUser = firebaseAuth.currentUser
-                // val uid = firebaseUser.uid
-                // val email = firebaseUser.email
-
-                if (authResult.additionalUserInfo!!.isNewUser) {
-                    Log.d(TAG, "signInWithGoogle:accountCreated")
-                    Toast.makeText(application, "Account with Google created", Toast.LENGTH_SHORT).show()
-                } else {
-                    Log.d(TAG, "signInWithGoogle:existingUserLoggedIn")
-                    Toast.makeText(application, "Signed in with Google", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.d(TAG, "signInWithGoogle:failed due to ${e.message}")
-                Toast.makeText(application, "Authentication with Google failed", Toast.LENGTH_SHORT).show()
-            }
     }
 
     fun signOut(context: Context) {
@@ -202,7 +141,6 @@ class AuthRepository(app: Application, view: View? = null) {
             }
         }
     }
-
 
     fun setPassword(old: String, new: String) {
         if(validatePassword(new)) {
@@ -291,8 +229,6 @@ class AuthRepository(app: Application, view: View? = null) {
         }
     }
 
-
-
     private fun setDisplayName(username: String) {
         val profileUpdates = userProfileChangeRequest {
             displayName = username
@@ -304,6 +240,7 @@ class AuthRepository(app: Application, view: View? = null) {
                 }
             }
     }
+    // Overload
     fun setDisplayName(username: String, name: TextView) {
         val profileUpdates = userProfileChangeRequest {
             displayName = username
@@ -325,9 +262,6 @@ class AuthRepository(app: Application, view: View? = null) {
         return username;
     }
 
-    fun validateData(email: String, password: String): Boolean {
-        return validateEmail(email) && validatePassword(password)
-    }
 
     fun resetPassword(email: String) {
             Firebase.auth.sendPasswordResetEmail(email)
@@ -336,6 +270,10 @@ class AuthRepository(app: Application, view: View? = null) {
                         Log.d(TAG, "Email sent.")
                     }
                 }
+    }
+
+    fun validateData(email: String, password: String): Boolean {
+        return validateEmail(email) && validatePassword(password)
     }
 
     private fun validateEmail(email: String): Boolean {

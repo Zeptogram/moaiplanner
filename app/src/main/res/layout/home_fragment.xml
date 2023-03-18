@@ -23,14 +23,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Welcome Back!"
-        android:textSize="40sp"
+        android:textAppearance="@style/TextAppearance.Material3.DisplayMedium"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <!-- <LinearLayout
         android:id="@+id/btn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
             android:layout_marginEnd="80dp"
             android:text="@string/friends"
             android:textStyle="bold" />
-    </LinearLayout>
+    </LinearLayout>-->
 
     <TextView
         android:id="@+id/raccolte"
@@ -62,7 +62,7 @@
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome_text" />
 
 
     <LinearLayout
@@ -76,6 +76,8 @@
         app:layout_constraintTop_toBottomOf="@+id/raccolte">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -112,8 +114,11 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/todoList"
             android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:nestedScrollingEnabled="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/todo_element" />
+            tools:listitem="@layout/todo_view" />
 
         <TextView
             android:id="@+id/completed"

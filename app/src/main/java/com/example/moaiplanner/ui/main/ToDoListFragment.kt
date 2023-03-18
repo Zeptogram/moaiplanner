@@ -22,10 +22,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.CalendarAdapter
 import com.example.moaiplanner.data.calendar.CalendarData
-import com.example.moaiplanner.data.repository.user.AuthRepository
+import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.databinding.TodoFragmentBinding
+import com.example.moaiplanner.util.NetworkUtils
 import com.example.moaiplanner.util.ToDoItem
 import com.example.moaiplanner.util.ToDoItemListener
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -216,6 +218,15 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         })
         itemTouchHelper.attachToRecyclerView(recyclerView)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        NetworkUtils.notifyMissingNetwork(requireContext(), view)
+        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        // Mette la home come main
+        bottomNav.menu.getItem(2).isChecked = true;
+
     }
 
 
