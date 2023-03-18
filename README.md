@@ -19,8 +19,8 @@
 - [Firebase Authentication](https://firebase.google.com/docs/auth/android/start?authuser=1#kotlin+ktx_2)
 
 # Current TO-DO
-- Calendario
-- TO-DO List
-- Markdown
-- Autenticazione e salvataggio dati su firebase
-- Pomodoro
+- TO-DO List [Done]
+- Markdown [90%]
+- Autenticazione e salvataggio dati su firebase [Done]
+- Pomodoro [Done]
+- Notes [Done]
