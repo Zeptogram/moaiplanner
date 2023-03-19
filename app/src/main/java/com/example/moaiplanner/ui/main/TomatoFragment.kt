@@ -51,12 +51,13 @@ class TomatoFragment : Fragment() {
     ): View {
 
         binding = TomatoFragmentBinding.inflate(inflater, container, false)
+        // ViewModels
         val factory = SettingsViewModelFactory(SettingsRepository(requireActivity()))
         settingsViewModel = ViewModelProvider(requireActivity(), factory)[SettingsViewModel::class.java]
         pomodoroViewModel = ViewModelProvider(requireActivity())[TomatoViewModel::class.java]
-        pomodoroViewModel = ViewModelProvider(requireActivity())[TomatoViewModel::class.java]
+        // Carico le impostazioni
         settingsViewModel.restoreSettings()
-
+        // Inizializzo il pomodoroViewModel con il valore massimo
         if(pomodoroViewModel.maxRounds.value?.toInt() == -1)
             pomodoroViewModel.maxRounds.value = settingsViewModel.round.value?.toLong()
         else if(pomodoroViewModel.maxRounds.value?.toInt() != settingsViewModel.round.value?.toInt())
@@ -322,29 +323,32 @@ class TomatoFragment : Fragment() {
         start()
     }
 
-    fun reset(){
+    private fun reset(){
         stop(false)
         pomodoroViewModel.pausa.value = false
         pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
         roundsRemaining = settingsViewModel.round.value?.toLong()!!
         pomodoroViewModel.maxRounds.value = settingsViewModel.round.value?.toLong()
-
         binding.typeLabel.text = "Time to focus!"
         updateRound()
     }
 
-    fun updateRound(){
+    private fun updateRound(){
+        // Aggiorno i rounds rimanenti
         pomodoroViewModel.rounds.observe(viewLifecycleOwner) {
+            // Reset Rounds
             if(roundsRemaining < 0)
                 binding.roundsRemaining.text = settingsViewModel.round.value.toString() + "/" + settingsViewModel.round.value.toString()
+            // Aggiorno
             else
                 binding.roundsRemaining.text = pomodoroViewModel.rounds.value.toString() + "/" + settingsViewModel.round.value.toString()
         }
     }
 
-    fun initTimerLabel() {
-        var startLabel = (settingsViewModel.session.value?.toInt()?.times(60) ?: 1) * 1000
-
+    private fun initTimerLabel() {
+        // Ottengo dal ViewModel i minuti
+        val startLabel = (settingsViewModel.session.value?.toInt()?.times(60) ?: 1) * 1000
+        // Formato il tempo
         if(startLabel >= 3600000) {
             simpleDateFormat= SimpleDateFormat("hh:mm:ss")
             binding.timerLabel.text = simpleDateFormat.format(startLabel)
@@ -355,12 +359,6 @@ class TomatoFragment : Fragment() {
             binding.timerLabel.text = simpleDateFormat.format(startLabel)
         }
     }
-
-
-
-
-
-
 }
 
 

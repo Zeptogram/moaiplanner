@@ -20,7 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.user.AuthRepository
+import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.FileFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.NetworkUtils
@@ -46,7 +46,7 @@ class FileFragment: Fragment() {
     lateinit var binding: FileFragmentBinding
     private var files = ArrayList<FolderItem>()
     private var shownFiles = ArrayList<FolderItem>()
-    lateinit var firebase: AuthRepository
+    lateinit var firebase: UserAuthentication
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
     private lateinit var userDirNotes: StorageReference
@@ -72,7 +72,7 @@ class FileFragment: Fragment() {
 
         binding = FileFragmentBinding.inflate(inflater, container, false)
 
-        firebase = AuthRepository(requireActivity().application)
+        firebase = UserAuthentication(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
         userDirNotes = storageRef.child("${firebase.getCurrentUid()}/Notes")
@@ -185,7 +185,7 @@ class FileFragment: Fragment() {
     override fun onStart() {
         super.onStart()
 
-        firebase = AuthRepository(requireActivity().application)
+        firebase = UserAuthentication(requireActivity().application)
         if (!firebase.isUserAuthenticated()) {
             findNavController().navigate(R.id.welcomeActivity)
         }

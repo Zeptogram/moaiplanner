@@ -9,14 +9,14 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.user.AuthRepository
+import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.util.FolderItem
 import com.google.firebase.database.FirebaseDatabase
 
 class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adapter<FolderViewAdapter.ViewHolder>() {
 
     private lateinit var mListener : onItemClickListener
-    private var auth = AuthRepository(Application())
+    private var auth = UserAuthentication(Application())
     private var database = FirebaseDatabase.getInstance()
     private var ref = database.getReference("users/" + auth.getCurrentUid().toString())
 

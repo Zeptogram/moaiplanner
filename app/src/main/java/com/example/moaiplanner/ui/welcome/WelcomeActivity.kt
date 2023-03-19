@@ -7,13 +7,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
@@ -39,21 +34,18 @@ class WelcomeActivity : AppCompatActivity() {
         settingsRepository = SettingsRepository(this)
         val factory = SettingsViewModelFactory(SettingsRepository(this))
         settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
+        val sharedPref: SharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE)
+        val logged = sharedPref.getBoolean("auth", false)
 
-        var sharedPref: SharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE)
-        var check = sharedPref.getBoolean("auth", false)
+        settingsViewModel.restoreSettings()
+        settingsViewModel.lightMode.value?.let { enableLight(it) }
+        settingsViewModel.notifiche.value?.let { disableNotifications(it, this) }
 
-        if(check) {
+        if(logged) {
+            Log.d("WELCOME-A", "User logged")
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
-
-
-
-        settingsViewModel.restoreSettings()
-
-        settingsViewModel.lightMode.value?.let { enableLight(it) }
-        settingsViewModel.notifiche.value?.let { disableNotifications(it, this) }
     }
 }

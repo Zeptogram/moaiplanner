@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.CalendarAdapter
 import com.example.moaiplanner.data.calendar.CalendarData
-import com.example.moaiplanner.data.user.AuthRepository
+import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.TodoFragmentBinding
 import com.example.moaiplanner.util.NetworkUtils
 import com.example.moaiplanner.util.ToDoItem
@@ -50,7 +50,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
     private val calendarList = ArrayList<CalendarData>()
     private lateinit var database: FirebaseDatabase
     private lateinit var todoListRef: DatabaseReference
-    private lateinit var auth: AuthRepository
+    private lateinit var auth: UserAuthentication
     private lateinit var currentDate: String
     private var recyclerView: RecyclerView? = null
     private var manualUpdateUI: Boolean = false
@@ -88,7 +88,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
             true
         }
 
-        auth = AuthRepository(requireActivity().application)
+        auth = UserAuthentication(requireActivity().application)
         if (!auth.isUserAuthenticated()) {
             findNavController().navigate(R.id.welcomeActivity)
         }

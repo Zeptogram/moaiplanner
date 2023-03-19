@@ -19,7 +19,7 @@ import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.EditPagerAdapter
-import com.example.moaiplanner.data.user.AuthRepository
+import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.DisableableViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -36,7 +36,7 @@ import java.io.File
 class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     private val viewModel: MarkdownViewModel by viewModels()
-    private lateinit var firebase: AuthRepository
+    private lateinit var firebase: UserAuthentication
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
     private lateinit var userDir: StorageReference
@@ -79,7 +79,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
 
         tabLayout?.setupWithViewPager(pager)
 
-        firebase = AuthRepository(requireActivity().application)
+        firebase = UserAuthentication(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
         userDir = storageRef.child("${firebase.getCurrentUid()}")

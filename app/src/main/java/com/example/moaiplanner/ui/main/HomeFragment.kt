@@ -1,9 +1,6 @@
 package com.example.moaiplanner.ui.main
 
 import FolderViewAdapter
-import android.app.AlertDialog
-import android.content.Context
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -13,13 +10,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.calendar.CalendarData
-import com.example.moaiplanner.data.user.AuthRepository
+import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.HomeFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.NetworkUtils
@@ -44,7 +39,7 @@ import kotlin.collections.ArrayList
 
 class HomeFragment : Fragment() {
     lateinit var binding: HomeFragmentBinding
-    lateinit var firebase: AuthRepository
+    lateinit var firebase: UserAuthentication
     private lateinit var storage: FirebaseStorage
     private lateinit var db: FirebaseDatabase
     private lateinit var storageRef: StorageReference
@@ -77,7 +72,7 @@ class HomeFragment : Fragment() {
         }*/
 
 
-        firebase = AuthRepository(requireActivity().application)
+        firebase = UserAuthentication(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
         //        userDir = storageRef.child("${firebase.getCurretUid()}/notes")
@@ -136,7 +131,7 @@ class HomeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        firebase = AuthRepository(requireActivity().application)
+        firebase = UserAuthentication(requireActivity().application)
         if (!firebase.isUserAuthenticated()) {
             findNavController().navigate(R.id.welcomeActivity)
         }

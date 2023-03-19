@@ -4,25 +4,18 @@ package com.example.moaiplanner.model
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.moaiplanner.data.user.AuthRepository
 import com.example.moaiplanner.ui.main.NoteFragment
 import com.example.moaiplanner.util.getName
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
-import java.io.OutputStream
 import java.io.Reader
 import java.util.concurrent.atomic.AtomicBoolean
 

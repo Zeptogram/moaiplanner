@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
-import com.example.moaiplanner.data.user.AuthRepository
+import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
@@ -43,7 +43,7 @@ class OptionsFragment : Fragment() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var binding: OptionsFragmentBinding
     private lateinit var settingsRepository: SettingsRepository
-    private lateinit var firebase: AuthRepository
+    private lateinit var firebase: UserAuthentication
     private lateinit var storageRef: StorageReference
     private lateinit var avatar: StorageReference
     private lateinit var ref: StorageReference
@@ -97,7 +97,7 @@ class OptionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        firebase = AuthRepository(requireActivity().application, view)
+        firebase = UserAuthentication(requireActivity().application, view)
         storageRef = Firebase.storage.reference
         avatar = storageRef.child("${firebase.getCurrentUid()}/avatar.png")
         ref = storageRef.child("${firebase.getCurrentUid()}/")
