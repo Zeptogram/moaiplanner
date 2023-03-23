@@ -38,6 +38,11 @@
             android:icon="@drawable/ic_baseline_save_as_24"
             tools:ignore="UnusedAttribute" />
         <item
+            android:id="@+id/action_save_firebase"
+            android:icon="@drawable/baseline_cloud_upload_24"
+            android:alphabeticShortcut="S"
+            android:title="@string/save_on_cloud" />
+        <item
             android:id="@+id/action_lock_swipe"
             android:checkable="true"
             android:title="@string/action_lock_swipe"

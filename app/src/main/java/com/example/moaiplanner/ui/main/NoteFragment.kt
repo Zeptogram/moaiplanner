@@ -1,7 +1,6 @@
 package com.example.moaiplanner.ui.main
 
 import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,7 +10,6 @@ import android.preference.PreferenceManager
 import android.util.Log
 import android.view.*
 import android.webkit.MimeTypeMap
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
@@ -23,6 +21,7 @@ import com.example.moaiplanner.adapter.EditPagerAdapter
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.DisableableViewPager
+import com.example.moaiplanner.util.sizeCache
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -33,12 +32,11 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.concurrent.CopyOnWriteArrayList
 
 
 class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private val viewModel: MarkdownViewModel by viewModels()
+    private val markdownViewModel: MarkdownViewModel by viewModels()
     private lateinit var firebase: UserAuthentication
     private lateinit var storage: FirebaseStorage
     private lateinit var storageRef: StorageReference
@@ -49,15 +47,15 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         super.onAttach(context)
         if (context !is Activity) return
         lifecycleScope.launch {
-            viewModel.load(context, context.intent?.data)
+            markdownViewModel.load(context, context.intent?.data)
             context.intent?.data = null
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.findViewById<DrawerLayout>(R.id.drawerLayout)?.open()
-        viewModel.currentDir.value = viewModel.loadDir(requireContext()).toString()
-        noteDir = viewModel.currentDir.value!!
+        markdownViewModel.currentDir.value = markdownViewModel.loadDir(requireContext()).toString()
+        noteDir = markdownViewModel.currentDir.value!!
 
         return inflater.inflate(R.layout.note_fragment_main, container, false)
     }
@@ -90,7 +88,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         /*tabLayout?.getTabAt(0)?.setIcon(R.drawable.ic_baseline_edit_note_24)
         tabLayout?.getTabAt(1)?.setIcon(R.drawable.ic_baseline_remove_red_eye_24)*/
 
-        viewModel.fileName.observe(viewLifecycleOwner) {
+        markdownViewModel.fileName.observe(viewLifecycleOwner) {
             toolbar?.title = it
         }
 
@@ -106,15 +104,10 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                 R.id.action_save -> {
                     //Timber.d("Save clicked")
                     lifecycleScope.launch {
-                        if (!viewModel.save(requireContext())) {
+                        if (!markdownViewModel.save(requireContext())) {
                             requestFileOp(REQUEST_SAVE_FILE)
                         } else {
-                            /*Toast.makeText(
-                                requireContext(),
-                                getString(R.string.file_saved, viewModel.fileName.value),
-                                Toast.LENGTH_SHORT
-                            ).show()*/
-                            Snackbar.make(view, getString(R.string.file_saved, viewModel.fileName.value), Snackbar.LENGTH_SHORT)
+                            Snackbar.make(view, getString(R.string.file_saved, markdownViewModel.fileName.value), Snackbar.LENGTH_SHORT)
                                 .setAction("OK") {
                                     // Responds to click on the action
                                 }
@@ -122,13 +115,33 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                                 .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
                                 .show()
                         }
-                        val noteDir = storageRef.child("${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}/${viewModel.fileName.value}")
-                        //viewModel.currentDir.value = noteDir.toString()
-                        Log.d("PROVA", noteDir.toString())
-                        val uri : Uri = viewModel.uri.value.toString().toUri()
-                        val uploadTask = noteDir.putFile(uri)
 
-                        // Register observers to listen for when the download is done or if it fails
+
+                    }
+                    true
+                }
+                R.id.action_save_as -> {
+                    requestFileOp(REQUEST_SAVE_FILE)
+                    true
+                }
+                R.id.action_save_firebase -> {
+                    lifecycleScope.launch {
+                        markdownViewModel.autosave(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+                        markdownViewModel.saveDir(requireContext())
+                    }.invokeOnCompletion {
+                        var folder = "/${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}"
+                        var noteDir = storageRef.child("${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}/${markdownViewModel.fileName.value}")
+                        if(!noteDir.toString().contains("Notes")) {
+                            folder = "/${firebase.getCurrentUid()}/Notes"
+                            noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${markdownViewModel.fileName.value}")
+                        }
+
+                        //viewModel.currentDir.value = noteDir.toString()
+                        Log.d("HEY", noteDir.toString())
+                        val uri : Uri = markdownViewModel.uri.value.toString().toUri()
+                        Log.d("HEY", uri.toString())
+                        //val localFile = File(activity?.cacheDir, noteDir.toString());*/
+                        val uploadTask = noteDir.putFile(uri)
                         uploadTask.addOnFailureListener {
 
                             Snackbar.make(view, "Note upload failed", Snackbar.LENGTH_SHORT)
@@ -142,6 +155,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                             //Toast.makeText(requireActivity(), "Note upload failed", Toast.LENGTH_SHORT).show()
                             Log.d("Note", "Failed")
                         }.addOnSuccessListener { taskSnapshot ->
+                            updateFolderNotesCache(folder)
                             Snackbar.make(view, "Note uploaded successful", Snackbar.LENGTH_SHORT)
                                 .setAction("OK") {
                                     // Responds to click on the action
@@ -153,15 +167,15 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                             Log.d("Note", "Successful")
                         }
                     }
-                    true
-                }
-                R.id.action_save_as -> {
-                    requestFileOp(REQUEST_SAVE_FILE)
+
+
+                    // Register observers to listen for when the download is done or if it fails
+
                     true
                 }
                 R.id.action_share -> {
                     val shareIntent = Intent(Intent.ACTION_SEND)
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, viewModel.markdownUpdates.value)
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, markdownViewModel.markdownUpdates.value)
                     shareIntent.type = "text/plain"
                     startActivity(Intent.createChooser(
                         shareIntent,
@@ -192,7 +206,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         setFragmentResultListener("noteDirFromHome") { requestKey, bundle ->
             noteDir = "Notes/"
             noteDir =  noteDir.plus(bundle.getString("noteDir").toString())
-            viewModel.currentDir.value = noteDir
+            markdownViewModel.currentDir.value = noteDir
             Log.d("noteNameFromHome", noteDir)
             val noteRef = storageRef.child("${firebase.getCurrentUid()}/${noteDir}")
             Log.d("noteStorageRef", noteRef.toString())
@@ -200,7 +214,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             val localFile = File(activity?.cacheDir, noteName.toString());
             noteRef.getFile(localFile).addOnSuccessListener {
                 lifecycleScope.launch {
-                    context?.let { it1 -> viewModel.load(it1, localFile.toUri()) }
+                    context?.let { it1 -> markdownViewModel.load(it1, localFile.toUri()) }
                 }
             }.addOnFailureListener {
                 Snackbar.make(view, "Failed loading file from database", Snackbar.LENGTH_SHORT)
@@ -220,8 +234,8 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         super.onStop()
         val context = context?.applicationContext ?: return
         lifecycleScope.launch {
-            viewModel.autosave(context, PreferenceManager.getDefaultSharedPreferences(context))
-            viewModel.saveDir(requireContext())
+            markdownViewModel.autosave(context, PreferenceManager.getDefaultSharedPreferences(context))
+            markdownViewModel.saveDir(requireContext())
 
         }
     }
@@ -264,7 +278,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
 
                 lifecycleScope.launch {
                     context?.let {
-                        if (!viewModel.load(it, data.data)) {
+                        if (!markdownViewModel.load(it, data.data)) {
                             view?.let { it1 -> Snackbar.make(it1, R.string.file_load_error, Snackbar.LENGTH_SHORT).setAction("OK") { /* Responds to click on the action*/ }.setActionTextColor(resources.getColor(R.color.primary, null))
                                 .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
                                 .show() }
@@ -282,7 +296,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
 
                 lifecycleScope.launch {
                     context?.let {
-                        viewModel.save(it, data.data)
+                        markdownViewModel.save(it, data.data)
                     }
                 }
             }
@@ -291,8 +305,8 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
     }
 
     private fun promptSaveOrDiscardChanges() {
-        if (!viewModel.shouldPromptSave()) {
-            viewModel.reset(
+        if (!markdownViewModel.shouldPromptSave()) {
+            markdownViewModel.reset(
                 "Untitled.md",
                 PreferenceManager.getDefaultSharedPreferences(requireContext())
             )
@@ -307,7 +321,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             .setMessage(R.string.prompt_save_changes)
             .setNegativeButton(R.string.action_discard) { _, _ ->
                 //Timber.d("Discarding changes")
-                viewModel.reset(
+                markdownViewModel.reset(
                     "Untitled.md",
                     PreferenceManager.getDefaultSharedPreferences(context)
                 )
@@ -321,25 +335,18 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
     }
 
     private fun requestFileOp(requestType: Int) {
-       /* val context = context ?: run {
+        val context = context ?: run {
             //Timber.w("File op requested but context was null, aborting")
             return
-        }*/
-       /* if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED) {
-            //Timber.i("Storage permission not granted, requesting")
-            requestPermissions(
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                requestType
-            )
-            return
-        }*/
+        }
+
+
         val intent = when (requestType) {
             REQUEST_SAVE_FILE -> {
                 //Timber.d("Requesting save op")
                 Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     type = "text/markdown"
-                    putExtra(Intent.EXTRA_TITLE, viewModel.fileName.value)
+                    putExtra(Intent.EXTRA_TITLE, markdownViewModel.fileName.value)
                 }
             }
             REQUEST_OPEN_FILE -> {
@@ -373,7 +380,13 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         const val KEY_AUTOSAVE = "autosave"
     }
 
-
+    private fun updateFolderNotesCache(folder: String) {
+        var path = folder
+        while(path != "/${firebase.getCurrentUid()}") {
+            sizeCache.remove(path)
+            path = path.substringBeforeLast("/")
+        }
+    }
 
 
 
