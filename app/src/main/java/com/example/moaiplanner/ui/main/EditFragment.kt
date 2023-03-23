@@ -51,7 +51,6 @@ class EditFragment : Fragment(), ViewPagerPage {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.note_edit_fragment, container, false)

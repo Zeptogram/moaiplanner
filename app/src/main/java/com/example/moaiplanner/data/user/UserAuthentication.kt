@@ -11,7 +11,9 @@ import android.util.Patterns
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import com.example.moaiplanner.R
+import com.example.moaiplanner.model.PREF_KEY_AUTOSAVE_URI
 import com.example.moaiplanner.ui.main.MainActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.EmailAuthProvider
@@ -129,11 +131,17 @@ class UserAuthentication(app: Application, view: View? = null) {
 
 
     fun signOut(context: Context) {
-        val sharedPref: SharedPreferences = context.getSharedPreferences("user", Context.MODE_PRIVATE)
+        var sharedPref: SharedPreferences = context.getSharedPreferences("user", Context.MODE_PRIVATE)
         sharedPref.edit {
             putBoolean("auth", false)
             apply()
         }
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
+        sharedPref.edit {
+            remove(PREF_KEY_AUTOSAVE_URI)
+            apply()
+        }
+
         firebaseAuth.signOut()
 
     }

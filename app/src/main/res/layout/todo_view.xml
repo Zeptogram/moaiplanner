@@ -16,10 +16,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="10dp"
+        android:paddingTop="7dp"
         android:paddingEnd="20dp"
         android:paddingStart="20dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="7dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -35,9 +35,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_gravity="center"
                 android:layout_weight="0.8">
 
 
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:scrollbars="horizontal"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textSize="18sp"
+
+                    android:layout_height="wrap_content"
+                    android:text="TODO"
+                    />
 
                 <TextView
                     android:id="@+id/timeView"
@@ -45,20 +56,11 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.Material3.MaterialTimePicker.Title"
                     android:text="Time"
-                    android:textColor="?android:textColorSecondary" />
+                    android:textColor="?android:textColorSecondaryNoDisable" />
 
 
                 <!-- TextView per visualizzare il testo dell'elemento -->
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
-                    android:scrollbars="horizontal"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                    android:textSize="18sp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:text="TODO"
-                    />
+
 
 
 

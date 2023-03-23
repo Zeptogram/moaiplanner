@@ -1,6 +1,7 @@
 package com.example.moaiplanner.ui.main
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -23,6 +24,7 @@ import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.DisableableViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.ktx.Firebase
@@ -31,6 +33,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -92,6 +95,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         }
 
         toolbar?.setOnMenuItemClickListener {
+            // TODO: Separare i salva, da locale a Storage e poi finito
             when (it.itemId) {
 
                 android.R.id.home -> {
@@ -218,6 +222,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         lifecycleScope.launch {
             viewModel.autosave(context, PreferenceManager.getDefaultSharedPreferences(context))
             viewModel.saveDir(requireContext())
+
         }
     }
 
@@ -297,14 +302,14 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             //Timber.w("Context is null, unable to show prompt for save or discard")
             return
         }
-        AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder(context)
             .setTitle(R.string.save_changes)
             .setMessage(R.string.prompt_save_changes)
             .setNegativeButton(R.string.action_discard) { _, _ ->
                 //Timber.d("Discarding changes")
                 viewModel.reset(
                     "Untitled.md",
-                    PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    PreferenceManager.getDefaultSharedPreferences(context)
                 )
             }
             .setPositiveButton(R.string.action_save) { _, _ ->
@@ -316,10 +321,10 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
     }
 
     private fun requestFileOp(requestType: Int) {
-        val context = context ?: run {
+       /* val context = context ?: run {
             //Timber.w("File op requested but context was null, aborting")
             return
-        }
+        }*/
        /* if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED) {
             //Timber.i("Storage permission not granted, requesting")
@@ -367,6 +372,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         const val REQUEST_SAVE_FILE = 2
         const val KEY_AUTOSAVE = "autosave"
     }
+
 
 
 

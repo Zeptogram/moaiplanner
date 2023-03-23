@@ -25,10 +25,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
@@ -49,6 +51,9 @@ class HomeFragment : Fragment() {
     private val toDoAdapter = ToDoViewerAdapter(toDoList)
     private lateinit var currentDate: String
     private var calendarData = CalendarData(Date(), true)
+    private lateinit var avatar: StorageReference
+
+
 
 
     fun newInstance(): HomeFragment? {
@@ -75,6 +80,7 @@ class HomeFragment : Fragment() {
         firebase = UserAuthentication(requireActivity().application)
         storage = Firebase.storage
         storageRef = storage.reference
+        avatar = storageRef.child("${firebase.getCurrentUid()}/avatar.png")
         //        userDir = storageRef.child("${firebase.getCurretUid()}/notes")
         userDir = storageRef.child("${firebase.getCurrentUid()}")
 
@@ -125,6 +131,27 @@ class HomeFragment : Fragment() {
         var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         // Mette la home come main
         bottomNav.menu.getItem(0).isChecked = true;
+
+        userDir.listAll().addOnSuccessListener { (items) ->
+            items.forEach { item ->
+                Log.d("IMAGE", item.toString())
+                if(item.toString().substringAfterLast("/") == "avatar.png") {
+                    downloadImage()
+                }
+            }
+            if(firebase.getProvider() == "google.com") {
+                var uri = firebase.getGoogleImage().toString()
+                Picasso.get()
+                    .load(uri)
+                    .priority(Picasso.Priority.HIGH)
+                    .into(binding.profilepic)
+            }
+        }
+            .addOnFailureListener {
+                Log.e("IMAGE", "Using default picture")
+            }
+
+        binding.user.text = firebase.getDisplayName()
     }
 
 
@@ -340,6 +367,24 @@ class HomeFragment : Fragment() {
         val date = currentDate.split("/")
         val ref = todoListRef.child("todolist").child(date[0]).child(date[1]).child(date[2]).child(itemObjectId)
         ref.child("done").setValue(isDone)
+    }
+
+    private fun downloadImage(){
+        avatar.downloadUrl.addOnSuccessListener { uri ->
+            Picasso.get()
+                .load(uri.toString())
+                .priority(Picasso.Priority.HIGH)
+                .into(binding.profilepic)
+        }.addOnFailureListener { exception ->
+            if (exception is StorageException &&
+                (exception as StorageException).errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
+                // File not found, handle appropriately
+                Log.e("IMAGE", "File not found in storage")
+            } else {
+                // Other storage exception, handle appropriately
+                Log.e("IMAGE", "StorageException: ${exception.message}")
+            }
+        }
     }
 
 

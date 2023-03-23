@@ -131,11 +131,6 @@ class OptionsFragment : Fragment() {
         binding.username.text = firebase.getDisplayName()
 
 
-
-
-
-
-
         // imposta valore sessione quando viene modificato
         binding.durataPomodoro.addTextChangedListener {
             //Log.d("SETTINGS", it.toString())
@@ -208,24 +203,6 @@ class OptionsFragment : Fragment() {
 
     }
 
-    fun convertBitmapFromURL(url: String): Bitmap? {
-        try {
-            val url = URL(url)
-            val input = url.openStream()
-
-            return BitmapFactory.decodeStream(input)
-        } catch (e: IOException) {
-            Log.d("Exception", e.toString())
-        }
-
-        return null
-    }
-
-    fun updateUI(bitmap: Bitmap?) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            binding.profilepic.setImageBitmap(bitmap)
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -350,7 +327,7 @@ class OptionsFragment : Fragment() {
 
     }
 
-    fun downloadImage(){
+    private fun downloadImage(){
         avatar.downloadUrl.addOnSuccessListener { uri ->
             Picasso.get()
                 .load(uri.toString())

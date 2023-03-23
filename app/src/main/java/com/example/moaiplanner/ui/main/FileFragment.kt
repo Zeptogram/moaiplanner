@@ -179,7 +179,7 @@ class FileFragment: Fragment() {
         NetworkUtils.notifyMissingNetwork(requireContext(), view)
         var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         // Mette la home come main
-        bottomNav.menu.getItem(1).isChecked = true;
+        bottomNav.menu.getItem(0).isChecked = true;
     }
 
     override fun onStart() {

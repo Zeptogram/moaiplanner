@@ -28,7 +28,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_preview">Preview</string>
 
-    <string name="markdown_here">Markdown here…</string>
+    <string name="markdown_here">Remember to Save Changes...</string>
     <string name="action_save">Save</string>
     <string name="action_share">Share</string>
     <string name="action_export">Export</string>
@@ -77,6 +77,7 @@
     <string name="friends">Friends</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="pomodoro">Pomodoro</string>
+    <string name="welcome_info_text">Take Notes and manage your Tasks easily, while keeping all synced between your devices</string>
 
     <string-array name="pref_entries_dark_mode">
         <item>@string/pref_value_light</item>
