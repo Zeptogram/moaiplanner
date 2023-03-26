@@ -1,19 +1,20 @@
 package com.example.moaiplanner.ui.main
 
-import android.animation.ObjectAnimator
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
-import android.widget.ProgressBar
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,8 @@ import com.example.moaiplanner.databinding.TomatoFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.TomatoViewModel
+import com.example.moaiplanner.service.MediaPlayerService
+import com.example.moaiplanner.service.MediaPlayerService.LocalBinder
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,8 +45,58 @@ class TomatoFragment : Fragment() {
     private var max: Long = -1
     private var running: Boolean = false
     var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss")
+    private val mediaPlayer = MediaPlayer()
 
+    private var player: MediaPlayerService? = null
+    var serviceBound = false
 
+    //Binding this Client to the AudioPlayer Service
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as LocalBinder
+            player = binder.service
+            serviceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            serviceBound = false
+        }
+    }
+
+    private fun playAudio(media: String) {
+        //Check is service is active
+        if (!serviceBound) {
+            val playerIntent = Intent(requireContext(), MediaPlayerService::class.java)
+            playerIntent.putExtra("media", media)
+            requireContext().startService(playerIntent)
+            requireContext().bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+        } else {
+            //Service is active
+            //Send media with BroadcastReceiver
+        }
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        savedInstanceState.putBoolean("ServiceState", serviceBound)
+        super.onSaveInstanceState(savedInstanceState)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (savedInstanceState != null) {
+            serviceBound = savedInstanceState.getBoolean("ServiceState")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (serviceBound) {
+            requireContext().unbindService(serviceConnection)
+            //service is active
+            player!!.stopSelf()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,11 +132,6 @@ class TomatoFragment : Fragment() {
         settingsViewModel.pausa.observe(viewLifecycleOwner) {
             binding.pausa.text = settingsViewModel.pausa.value.toString() + " mins"
         }
-
-
-
-
-
 
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -134,7 +182,6 @@ class TomatoFragment : Fragment() {
             } else {
                 pause()
             }
-
         }
 
         binding.stop.setOnClickListener {
@@ -145,20 +192,82 @@ class TomatoFragment : Fragment() {
             reset()
         }
 
-
-
-
         return binding.root
-
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         // Mette la home come main
         bottomNav.menu.getItem(3).isChecked = true;
     }
+
+    override fun onStart() {
+        super.onStart()
+        playAudio("https://moai.eu.pythonanywhere.com/2")
+
+        /*
+        var response: Response? = null
+        Log.d("API", "CIAO")
+        lifecycleScope.launch(Dispatchers.IO) {
+            Log.d("API", "CIAO2")
+            val client = OkHttpClient()
+            val request = Request.Builder()
+                .url("https://moai.eu.pythonanywhere.com/1")
+                .get()
+                .build()
+            response = client.newCall(request).execute()
+            Log.d("API", "CIAO3")
+        }.invokeOnCompletion {
+            val rawData = response!!.body?.bytes()
+            if (rawData != null) {
+                Log.d("API", rawData.size.toString())
+            }
+            if (rawData != null) {
+                //playByteArray(rawData)
+                val Mytemp = File.createTempFile("TCL", "mp3", activity?.cacheDir)
+                Mytemp.deleteOnExit()
+                val fos = FileOutputStream(Mytemp)
+                fos.write(rawData)
+                fos.close()
+                val MyFile = FileInputStream(Mytemp)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    mediaPlayer.setDataSource(Mytemp.path)
+                    mediaPlayer.prepare()
+                }.invokeOnCompletion {
+                    mediaPlayer.start()
+                }
+            }
+        }
+         */
+    }
+
+    override fun onStop() {
+        super.onStop()
+        //mediaPlayer.stop()
+        //mediaPlayer.release()
+    }
+
+    /*
+    private fun playByteArray(mp3SoundByteArray: ByteArray) {
+        try {
+            val Mytemp = File.createTempFile("TCL", "mp3", activity?.cacheDir)
+            Mytemp.deleteOnExit()
+            val fos = FileOutputStream(Mytemp)
+            fos.write(mp3SoundByteArray)
+            fos.close()
+            val mediaPlayer = MediaPlayer()
+            val MyFile = FileInputStream(Mytemp)
+            mediaPlayer.setDataSource(Mytemp.path)
+            mediaPlayer.prepare()
+            mediaPlayer.start()
+        } catch (ex: IOException) {
+            val s = ex.toString()
+            ex.printStackTrace()
+        }
+    }
+     */
 
     fun initTimer() {
 
