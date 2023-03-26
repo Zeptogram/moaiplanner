@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
@@ -29,8 +32,11 @@ class WelcomeActivity : AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.topAppBarWelcome)
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_welcome_fragment) as NavHostFragment
+        val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(
+            R.id.welcomeFragment, R.id.viewPagerFragment,
+        ).build()
         val navController = navHostFragment.navController
-        toolbar.setupWithNavController(navController)
+        toolbar.setupWithNavController(navController, appBarConfiguration)
         settingsRepository = SettingsRepository(this)
         val factory = SettingsViewModelFactory(SettingsRepository(this))
         settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
@@ -46,6 +52,23 @@ class WelcomeActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
+        } else if(!onBoardingFinished()) {
+            navController.popBackStack()
+            navHostFragment.findNavController().navigate(R.id.viewPagerFragment, null,
+                navOptions {
+                    anim {
+                        enter = android.R.anim.fade_in
+                        popEnter = android.R.anim.fade_in
+                    }
+                }, null)
         }
+
     }
+
+    private fun onBoardingFinished(): Boolean {
+        val sharedPref = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
+        return sharedPref.getBoolean("Finished", false)
+    }
+
+
 }

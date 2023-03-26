@@ -42,25 +42,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Welcome to Moai Planner"
-            android:layout_marginTop="24dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
+            android:layout_margin="24dp"
             android:textAlignment="center"
             android:textSize="42sp"
             android:textStyle="bold" />
 
 
-        <TextView
-            android:id="@+id/textWelcomeDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome_info_text"
-            android:textColor="?android:textColorSecondaryNoDisable"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="5dp"
-            android:textAlignment="center"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp" />
+
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonEmail"

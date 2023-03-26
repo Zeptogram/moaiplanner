@@ -20,45 +20,28 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.moaiplanner.R
-import com.example.moaiplanner.data.user.UserAuthentication
+import com.example.moaiplanner.data.notes.FolderManager
 import com.example.moaiplanner.databinding.FileFragmentBinding
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.NetworkUtils
-import com.example.moaiplanner.util.getFolderSize
 import com.example.moaiplanner.util.sizeCache
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.database.*
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.component1
-import com.google.firebase.storage.ktx.component2
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.FileDescriptor
 import java.io.FileInputStream
-import java.text.DecimalFormat
 
 class FileFragment: Fragment() {
     lateinit var binding: FileFragmentBinding
     private var files = ArrayList<FolderItem>()
     private var shownFiles = ArrayList<FolderItem>()
-    lateinit var firebase: UserAuthentication
-    private lateinit var storage: FirebaseStorage
-    private lateinit var storageRef: StorageReference
-    private lateinit var userDirNotes: StorageReference
-    private lateinit var favouritesRef: DatabaseReference
-    private lateinit var realtimeDb: FirebaseDatabase
     private var currentData = ArrayList<FolderItem>()
     private var init: Boolean = true
-
-
-    private var currentFolder = ""
-    private lateinit var folderPath: String
+    private lateinit var fm: FolderManager
     private lateinit var toolbar: Toolbar
+
 
     // Adapter per la RecyclerView
     private lateinit var adapter: FolderViewAdapter
@@ -68,20 +51,9 @@ class FileFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = FileFragmentBinding.inflate(inflater, container, false)
-
-        firebase = UserAuthentication(requireActivity().application)
-        storage = Firebase.storage
-        storageRef = storage.reference
-        userDirNotes = storageRef.child("${firebase.getCurrentUid()}/Notes")
-
-        realtimeDb = FirebaseDatabase.getInstance()
-        favouritesRef = realtimeDb.getReference("users/" + firebase.getCurrentUid().toString())
-
-
-
 
         toolbar = activity?.findViewById<Toolbar>(R.id.topAppBar)!!
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
@@ -104,6 +76,21 @@ class FileFragment: Fragment() {
             }
             true
         }
+
+
+
+        // Inflate il layout per il fragment
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fm =  FolderManager(requireActivity(), requireView())
+
+        NetworkUtils.notifyMissingNetwork(requireContext(), view)
+        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        // Mette la home come main
+        bottomNav.menu.getItem(0).isChecked = true;
 
         binding.buttonShowall.setOnClickListener {
             binding.buttonShowall.isEnabled = false
@@ -136,7 +123,7 @@ class FileFragment: Fragment() {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if(currentFolder == "") {
+            if (fm.getCurrentFolder() == "") {
                 findNavController().navigate(
                     R.id.homeFragment, null,
                     navOptions {
@@ -146,58 +133,41 @@ class FileFragment: Fragment() {
                         }
                     }
                 )
-            }
-            else if(currentFolder.split("/").size == 2) {
-                currentFolder = ""
+            } else {
+                if (fm.getCurrentFolder().split("/").size == 2) {
+                    fm.setCurrentFolder("")
+                    toolbar.title = "My Notes"
+                } else {
+                    fm.setCurrentFolder(
+                        fm.getCurrentFolder().substringBeforeLast("/").substringBeforeLast("/")
+                            .plus("/")
+                    )
+                    toolbar.title = fm.getCurrentFolder()
+                }
                 binding.buttonFavourites.isEnabled = true
                 binding.buttonShowall.isEnabled = false
-                getCollections(files, adapter, currentFolder)
-                toolbar.title = "My Notes"
-            }
-            else {
-                Log.d("AAA", currentFolder)
-                currentFolder = currentFolder.substringBeforeLast("/").substringBeforeLast("/").plus("/")
-                Log.d("AAA", currentFolder)
-                binding.buttonFavourites.isEnabled = true
-                binding.buttonShowall.isEnabled = false
-                getCollections(files, adapter, currentFolder)
-                toolbar.title = currentFolder
-
+                lifecycleScope.launch(Dispatchers.Main) {
+                    fm.fetchFavouritesFromFirebase(currentData)
+                    resetFolderView()
+                }
             }
         }
 
 
-
-
-
-        // Inflate il layout per il fragment
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), view)
-        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        // Mette la home come main
-        bottomNav.menu.getItem(0).isChecked = true;
     }
 
     override fun onStart() {
         super.onStart()
 
-        firebase = UserAuthentication(requireActivity().application)
-        if (!firebase.isUserAuthenticated()) {
+        if (!fm.getUserData().isUserAuthenticated()) {
             findNavController().navigate(R.id.welcomeActivity)
         }
-
-        // initializing variables of grid view with their ids.
         // Inizializza la RecyclerView
         initFolderView()
         adapter = FolderViewAdapter(shownFiles)
         val recyclerView = binding.files
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
-
 
         // OnClick on Recycler elements
         adapter.setOnItemClickListener(object : FolderViewAdapter.onItemClickListener {
@@ -209,7 +179,7 @@ class FileFragment: Fragment() {
                     val navHostFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                     val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
                     bottomNav.menu.getItem(1).isChecked = true
-                    bundle.putString("noteDir", currentFolder.plus(adapter.getFileName(position)))
+                    bundle.putString("noteDir", fm.getCurrentFolder().plus(adapter.getFileName(position)))
                     setFragmentResult("noteDirFromHome", bundle)
                     navHostFragment.findNavController().popBackStack()
                     navHostFragment.findNavController().navigate(R.id.noteFragment, null,
@@ -220,178 +190,50 @@ class FileFragment: Fragment() {
                             }
                         }, null)
                 } else {
-                    currentFolder = currentFolder.plus(adapter.getFileName(position).plus("/"))
-                    toolbar.title = currentFolder
+                    fm.setCurrentFolder(fm.getCurrentFolder().plus(adapter.getFileName(position).plus("/")))
+                    toolbar.title = fm.getCurrentFolder()
                     files.clear()
                     shownFiles.clear()
                     binding.buttonFavourites.isEnabled = true
                     binding.buttonShowall.isEnabled = false
                     adapter.notifyDataSetChanged()
-                    getCollections(files, adapter, currentFolder)
+                    fm.fetchFavouritesFromFirebase(currentData)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        fm.getCollections(files, adapter, fm.getCurrentFolder(), shownFiles, currentData)
+                    }
                 }
             }
 
             override fun onItemLongClick(position: Int) {
                 showDeleteNoteFolderDialog(position)
-
             }
         })
         if(init) {
             init = false
-            fetchFavouritesFromFirebase()
-            Log.d("HEY", "x")
+            fm.fetchFavouritesFromFirebase(currentData)
         }
-        getCollections(files, adapter, currentFolder)
-
-    }
-
-
-
-    fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter, folderName: String) {
-        // Get list of files from Firestore
-        files.clear()
-        shownFiles.clear()
-        adapter.notifyDataSetChanged()
-        folderPath = "/${firebase.getCurrentUid()}/Notes/${currentFolder}"
         lifecycleScope.launch(Dispatchers.IO) {
-            val folder = storageRef.child("${firebase.getCurrentUid()}/Notes/${folderName}")
-            Log.d("collectionNotesRef", folder.toString())
-            folder.listAll()
-                .addOnSuccessListener { (items, prefixes) ->
-                    prefixes.forEach { prefix ->
-
-                        Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        var fileItem = FolderItem(prefix.toString().split("/").last().replace("%20", " "), "", false, R.drawable.folder)
-                        fileItem.userId = firebase.getCurrentUid().toString()
-                        fileItem.path = currentFolder.substringBeforeLast("/")
-                        val value: FolderItem? = checkItemPresence(fileItem)
-                        if(value == null) {
-                            var dbItem = favouritesRef.child("favourites").push()
-                            fileItem.id = dbItem.key.toString()
-                            data.add(fileItem)
-                            getFolderSize(prefix) { bytes, files ->
-                                val df = DecimalFormat("#,##0.##")
-                                df.maximumFractionDigits = 2
-                                var kb = bytes.toDouble() / 1024
-                                val info = df.format(kb) + "KB - " + files.toString() + " Notes"
-                                fileItem.folder_files = info
-                                dbItem.setValue(fileItem)
-                                adapter.notifyDataSetChanged()
-                            }
-                        } else {
-                            data.add(value)
-                            adapter.notifyDataSetChanged()
-
-                        }
-
-                        //data.add(fileItem)
-
-                        prefix.listAll()
-                    }
-
-                    items.forEach { item ->
-                        Log.d("FIRESTORAGE-ITEM", item.toString())
-                        if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex())){
-                            var fileItem = FolderItem(item.toString().split("/").last().replace("%20", " "), "", false, R.drawable.baseline_insert_drive_file_24)
-                            fileItem.userId = firebase.getCurrentUid().toString()
-                            fileItem.path = currentFolder.substringBeforeLast("/")
-                            Log.d("PROVA", checkItemPresence(fileItem).toString())
-                            val value: FolderItem? = checkItemPresence(fileItem)
-                            if(value == null) {
-                                var dbItem = favouritesRef.child("favourites").push()
-                                fileItem.id = dbItem.key.toString()
-                                data.add(fileItem)
-                                item.metadata.addOnSuccessListener {
-                                    val df = DecimalFormat("#,##0.##")
-                                    df.maximumFractionDigits = 2
-                                    var kbytes: Double = it.sizeBytes.toDouble() / 1024
-                                    val size = df.format(kbytes) + "kB"
-                                    fileItem.folder_files = size
-                                    dbItem.setValue(fileItem)
-                                    adapter.notifyDataSetChanged()
-                                }
-                            }
-                            else {
-                                data.add(value)
-                                adapter.notifyDataSetChanged()
-                            }
-                        }
-                    }
-                }
-                .addOnFailureListener {
-                    Log.d("FIRESTORAGE-ERROR", "Error getting file list")
-                    view?.let { it1 ->
-                        Snackbar.make(it1, "Error Getting Files", Snackbar.LENGTH_SHORT)
-                            .setAction("OK") {
-                                // Responds to click on the action
-                            }
-                            //.setBackgroundTint(resources.getColor(R.color.pr))
-                            .setActionTextColor(resources.getColor(R.color.primary, null))
-                            .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                            .show()
-                    }
-                }
-                .addOnSuccessListener {
-                    shownFiles.clear()
-                    shownFiles.addAll(files)
-                    adapter.notifyDataSetChanged()
-                }
-
+            fm.getCollections(files, adapter, fm.getCurrentFolder(), shownFiles, currentData)
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 0) {
-            val uri = data?.data
-            Log.d("NOTE URI", uri.toString())
-            var fileName = "null.md"
-            context?.let {
-                if (uri != null) {
-                    val document = DocumentFile.fromSingleUri(it, uri)
-                    if (document != null) {
-                        fileName = document.name.toString()
-                    }
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (data != null) {
+                    fm.uploadNote(data)
                 }
-            }
-            Log.d("NOTE URI", fileName)
-
-            val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
-
-            val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${fileName}")
-            val uploadTask = noteDir.putStream(stream)
-
-            // Register observers to listen for when the download is done or if it fails
-            uploadTask.addOnFailureListener {
-                view?.let { it1 ->
-                    Snackbar.make(it1, "Note upload failed", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                        .show()
+            }.invokeOnCompletion {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    sizeCache.remove(
+                        "/${
+                            fm.getUserData().getCurrentUid()
+                        }/Notes/${fm.getCurrentFolder()}".substringBeforeLast("/")
+                    )
+                    fm.updateFolderNotesCache(fm.getFolderPath())
+                    resetFolderView()
                 }
-                stream.close()
-                resetFolderView()
-            }.addOnSuccessListener { taskSnapshot ->
-                view?.let {
-                    Snackbar.make(it, "Note uploaded successfully", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                        .show()
-                }
-                stream.close()
-                sizeCache.remove("/${firebase.getCurrentUid()}/Notes/${currentFolder}".substringBeforeLast("/"))
-                updateFolderNotesCache(folderPath)
-                resetFolderView()
-
             }
         }
     }
@@ -410,60 +252,20 @@ class FileFragment: Fragment() {
             .setPositiveButton("Add") { dialog, which ->
                 if (radioButtonNote.isChecked) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${editTextNoteFolder.text}.md")
-                        val text = "# Note created with Moai Planner"
-                        val uploadFile = noteDir.putBytes(text.toByteArray())
-                        uploadFile.addOnFailureListener {
+                        fm.createFile(editTextNoteFolder)
+                    }.invokeOnCompletion {
+                        lifecycleScope.launch(Dispatchers.Main){
+                            fm.updateFolderNotesCache(fm.getFolderPath())
                             resetFolderView()
-                            // Handle unsuccessful uploads
-                        }.addOnSuccessListener { taskSnapshot ->
-                            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-                            // ...
-                            Log.d("NOTE-CREATION", "Nota creata")
-                            view?.let {
-                                Snackbar.make(it, "Note created", Snackbar.LENGTH_SHORT)
-                                    .setAction("OK") {
-                                        // Responds to click on the action
-                                    }
-                                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                                    .setActionTextColor(resources.getColor(R.color.primary, null))
-                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                                    .show()
-                            }
-                            updateFolderNotesCache(folderPath)
-
-                            /*while(path != "/${firebase.getCurretUid()}/Notes") {
-                                path = path.substringBeforeLast("/")
-                                sizeCache.remove(path)
-                            }*/
-
-                            resetFolderView()
-
                         }
                     }
+
                 } else if (radioButtonFolder.isChecked) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${editTextNoteFolder.text}/temp.tmp")
-                        val text = " "
-                        val uploadFile = noteDir.putBytes(text.toByteArray())
-                        uploadFile.addOnFailureListener {
-                            resetFolderView()
-                            // Handle unsuccessful uploads
-                        }.addOnSuccessListener { taskSnapshot ->
-                            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-                            // ...
-                            Log.d("FOLDER-CREATION", "Folder creato")
-                            view?.let {
-                                Snackbar.make(it, "Folder created", Snackbar.LENGTH_SHORT)
-                                    .setAction("OK") {
-                                        // Responds to click on the action
-                                    }
-                                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                                    .setActionTextColor(resources.getColor(R.color.primary, null))
-                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                                    .show()
-                            }
-                            updateFolderNotesCache(folderPath)
+                        fm.createFile(editTextNoteFolder, true)
+                    }.invokeOnCompletion {
+                        lifecycleScope.launch(Dispatchers.Main){
+                            fm.updateFolderNotesCache(fm.getFolderPath())
                             resetFolderView()
                         }
                     }
@@ -479,95 +281,37 @@ class FileFragment: Fragment() {
     private fun resetFolderView(){
         binding.buttonFavourites.isEnabled = true
         binding.buttonShowall.isEnabled = false
-        files.clear()
-        shownFiles.clear()
-        getCollections(files, adapter, currentFolder)
-
-    }
-
-    private fun updateFolderNotesCache(folder: String) {
-        var path = folder
-        while(path != "/${firebase.getCurrentUid()}/Notes") {
-            path = path.substringBeforeLast("/")
-            sizeCache.remove(path)
+        lifecycleScope.launch(Dispatchers.IO) {
+            fm.getCollections(files, adapter, fm.getCurrentFolder(), shownFiles, currentData)
         }
+
     }
 
     private fun showDeleteNoteFolderDialog(position: Int) {
         val layoutInflater = LayoutInflater.from(context)
         val dialogView = layoutInflater.inflate(R.layout.dialog_delete_note_folder, null)
-
+        var deleted = false
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Delete note or folder")
             .setView(dialogView)
             .setPositiveButton("Delete") { dialog, which ->
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val noteDir: StorageReference
                     Log.d("NOTE-DIR", adapter.getFileName(position))
                     if (adapter.getFileName(position).endsWith(".md")) {
-                        noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
-                        Log.d("NOTE-DIR", noteDir.toString())
-                        var id = shownFiles[position].id
-                        adapter.onItemDelete(id)
-                        noteDir.delete().addOnSuccessListener {
-
-                            currentData.remove(shownFiles[position])
-
-                            view?.let { it1 ->
-                                Snackbar.make(it1, "File deleted", Snackbar.LENGTH_SHORT)
-                                    .setAction("OK") {
-                                        // Responds to click on the action
-                                    }
-                                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                                    .setActionTextColor(resources.getColor(R.color.primary, null))
-                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                                    .show()
-                            }
-                            updateFolderNotesCache(folderPath)
-                            resetFolderView()
-
-                        }.addOnFailureListener {
-                            view?.let { it1 ->
-                                Snackbar.make(it1, "Delete failed", Snackbar.LENGTH_SHORT)
-                                    .setAction("OK") {
-                                        // Responds to click on the action
-                                    }
-                                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                                    .setActionTextColor(resources.getColor(R.color.primary, null))
-                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                                    .show()
-                            }
-                        }
+                        deleted = fm.deleteNote(adapter, shownFiles, files, currentData, position)
+                        deleteItem(position)
                     } else {
-                        noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${currentFolder}${adapter.getFileName(position)}")
-                        Log.d("NOTE-DIR", noteDir.toString())
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            adapter.onItemDelete(shownFiles[position].id)
-                            currentData.remove(shownFiles[position])
-                            shownFiles.removeAt(position)
-                            binding.buttonFavourites.isEnabled = true
-                            binding.buttonShowall.isEnabled = false
-                            adapter.notifyDataSetChanged()
-                        }
-
-
-                        noteDir.listAll().addOnSuccessListener { (items, prefixes) ->
-                            items.forEach { item ->
-                                item.delete()
-                            }
-                            deleteFolder(prefixes)
-
-                        }.addOnFailureListener {
-                            view?.let { it1 ->
-                                Snackbar.make(it1, "Delete failed", Snackbar.LENGTH_SHORT)
-                                    .setAction("OK") {
-                                        // Responds to click on the action
-                                    }
-                                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                                    .setActionTextColor(resources.getColor(R.color.primary, null))
-                                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                                    .show()
-                            }
+                        deleted = fm.deleteDirectory(adapter, shownFiles, files, currentData, position)
+                        deleteFolderItem(position)
+                    }
+                }.invokeOnCompletion {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        Log.d("DELETED", deleted.toString())
+                        if (!deleted) {
+                            fm.updateFolderNotesCache(fm.getFolderPath())
+                            resetFolderView()
+                        } else {
+                            fm.updateFolderNotesCache(fm.getFolderPath())
                         }
                     }
                 }
@@ -578,59 +322,32 @@ class FileFragment: Fragment() {
         dialog.show()
     }
 
-    private fun deleteFolder(prefixes: List<StorageReference>) {
-        prefixes.forEach { prefix ->
-            prefix.listAll().addOnSuccessListener { (items, prefixes) ->
-                items.forEach { item ->
-                    item.delete()
-                }
-                deleteFolder(prefixes)
-            }
-        }
-    }
+
 
     private fun initFolderView() {
         files.clear()
         shownFiles.clear()
     }
 
-    private fun fetchFavouritesFromFirebase() {
-        val favouritesListListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val favouritesData = snapshot.child("favourites").children
-                for (item in favouritesData) {
-                    val folderItem = item.getValue(FolderItem::class.java)
-                    if (folderItem != null) {
-                        if(folderItem.id.isNotBlank()) {
-                            currentData.add(folderItem)
-                            //shownFiles.add(folderItem)
-                        }
-                    }
-                }
-                //adapter.notifyDataSetChanged()
-                Log.d("CURRENT", currentData.toString())
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("FileFragment", "loadFavouritesList:onCancelled", error.toException())
-            }
-
+    private fun deleteItem(position: Int){
+        lifecycleScope.launch(Dispatchers.Main) {
+            adapter.onItemDelete(shownFiles[position].id, fm.getCurrentFolder())
+            currentData.remove(shownFiles[position])
+            shownFiles.removeAt(position)
+            adapter.notifyDataSetChanged()
         }
-        favouritesRef.addValueEventListener(favouritesListListener)
     }
-
-    private fun checkItemPresence(item: FolderItem): FolderItem? {
-        for(i in currentData) {
-            if(i.folder_name == item.folder_name &&
-                i.path == item.path &&
-                i.icon == item.icon &&
-                i.userId == item.userId)
-                return i
+    private fun deleteFolderItem(position: Int){
+        lifecycleScope.launch(Dispatchers.Main) {
+            val name = shownFiles[position].folder_name
+            adapter.onItemDelete(name, fm.getCurrentFolder())
+            currentData.remove(shownFiles[position])
+            shownFiles.removeAt(position)
+            adapter.notifyDataSetChanged()
         }
-        return null
+
+
     }
-
-
 
 
 

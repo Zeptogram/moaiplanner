@@ -57,7 +57,7 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
 
         holder.checkbox.setOnClickListener {
             item.isFavourite = !item.isFavourite
-            modifyItemState(item.id, item.isFavourite)
+            modifyItemState(item.id, item.isFavourite, "/" + item.path)
             Log.d("TEST", "Called Checked: " + position.toString())
         }
 
@@ -91,13 +91,15 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         }
     }
 
-    private fun modifyItemState(itemObjectId: String, isFavourite: Boolean) {
-        val value = ref.child("favourites").child(itemObjectId)
+    private fun modifyItemState(itemObjectId: String, isFavourite: Boolean, path: String = "") {
+        val value = ref.child("favourites/${path}").child(itemObjectId)
         value.child("favourite").setValue(isFavourite)
     }
 
-    fun onItemDelete(itemObjectId: String) {
-        val value = ref.child("favourites").child(itemObjectId)
+    fun onItemDelete(itemObjectId: String, path: String = "") {
+        Log.d("PROVA", path.toString())
+        Log.d("PROVA", itemObjectId.toString())
+        val value = ref.child("favourites/${path}").child(itemObjectId)
         value.removeValue()
     }
 

@@ -71,9 +71,7 @@ class GoogleSignInHelper(private val activity: Activity, private val launcher: A
         val credential = GoogleAuthProvider.getCredential(account.idToken , null)
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful) {
-                val intent: Intent = Intent(activity, MainActivity::class.java)
-                /*intent.putExtra("email", account.email)
-                intent.putExtra("name", account.displayName)*/
+                val intent = Intent(activity, MainActivity::class.java)
                 val sharedPref: SharedPreferences =
                     (activity.getSharedPreferences("user", Context.MODE_PRIVATE) ?: null) as SharedPreferences
                 sharedPref.edit {

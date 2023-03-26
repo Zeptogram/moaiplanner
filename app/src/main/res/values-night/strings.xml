@@ -77,8 +77,11 @@
     <string name="friends">Friends</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="pomodoro">Pomodoro</string>
-    <string name="welcome_info_text">Take Notes and manage your Tasks easily, while keeping all synced between your devices</string>
+    <string name="welcome_info_text">Take Markdown notes, while keeping them all synced between your devices if saved on Cloud</string>
     <string name="save_on_cloud">Save on Cloud</string>
+    <string name="notes">Notes</string>
+    <string name="pomodoro_info">Study and Focus while keeping track of your Time.</string>
+    <string name="todo_info">Manage your Tasks with a simple ToDo list automatically synced on Cloud.</string>
 
     <string-array name="pref_entries_dark_mode">
         <item>@string/pref_value_light</item>
