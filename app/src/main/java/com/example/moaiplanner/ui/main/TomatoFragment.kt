@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,7 @@ import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.TomatoViewModel
 import com.example.moaiplanner.service.MediaPlayerService
 import com.example.moaiplanner.service.MediaPlayerService.LocalBinder
+import com.example.moaiplanner.service.MoaiRadioService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,8 +49,11 @@ class TomatoFragment : Fragment() {
     var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss")
     private val mediaPlayer = MediaPlayer()
 
+    private var musicPlaying: Boolean = false
     private var player: MediaPlayerService? = null
     var serviceBound = false
+
+    private var radioPlaying: Boolean = false
 
     //Binding this Client to the AudioPlayer Service
     private val serviceConnection: ServiceConnection = object : ServiceConnection {
@@ -71,6 +76,7 @@ class TomatoFragment : Fragment() {
             playerIntent.putExtra("media", media)
             requireContext().startService(playerIntent)
             requireContext().bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+            Log.d("CIAO", "MSUICA")
         } else {
             //Service is active
             //Send media with BroadcastReceiver
@@ -192,6 +198,26 @@ class TomatoFragment : Fragment() {
             reset()
         }
 
+        binding.musicPlay.setOnClickListener {
+            if (!radioPlaying) {
+                requireContext().startForegroundService(Intent(requireContext(), MoaiRadioService::class.java))
+                radioPlaying = true
+                binding.musicPlay.setImageResource(R.drawable.ic_baseline_pause_24)
+            } else {
+                requireContext().stopService(Intent(requireContext(), MoaiRadioService::class.java))
+                radioPlaying = false
+                binding.musicPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+            }
+
+            /*
+            if (!musicPlaying)
+                playAudio("https://moai.eu.pythonanywhere.com/1")
+            else {
+                Log.d("CIAO", "CIAO")
+            }
+             */
+        }
+
         return binding.root
     }
 
@@ -205,7 +231,6 @@ class TomatoFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        playAudio("https://moai.eu.pythonanywhere.com/2")
 
         /*
         var response: Response? = null
