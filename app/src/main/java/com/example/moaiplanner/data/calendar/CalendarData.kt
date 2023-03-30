@@ -26,10 +26,4 @@ data class CalendarData(var data: Date, var isSelected: Boolean = false) {
             cal.time = data
             return cal[Calendar.YEAR].toString()
         }
-    /*val calendarNumber: String
-        get() {
-            val cal = Calendar.getInstance()
-            cal.time = data
-            return cal[Calendar.DAY_OF_MONTH].toString()
-        }*/
 }

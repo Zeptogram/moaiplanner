@@ -8,7 +8,7 @@
 >
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".ui.welcome.RegisterFragment"
     tools:layout="@layout/register_fragment">
 
@@ -23,10 +23,11 @@
 
         <TextView
             android:id="@+id/welcome_text"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Register into Moai"
-            android:layout_gravity="left"
+            android:text="@string/register_into_moai"
+            android:layout_gravity="start"
             android:textSize="40sp"
             android:layout_marginTop="40dp"
             android:layout_marginStart="24dp"
@@ -40,8 +41,9 @@
         <TextView
             android:id="@+id/welcome_text_small"
             android:layout_width="wrap_content"
+            android:layout_gravity="start"
             android:layout_height="wrap_content"
-            android:text="Welcome to Moai Planner!"
+            android:text="@string/welcome_to_moai_planner"
             android:textSize="16sp"
             android:textColor="?android:textColorSecondary"
             android:layout_marginStart="24dp"
@@ -62,7 +64,7 @@
             android:layout_marginTop="24sp"
             app:endIconMode="clear_text"
             app:startIconDrawable="@drawable/account"
-            android:textColorHint="?android:textColorSecondaryInverseNoDisable"
+            android:textColorHint="#78909C"
             app:boxBackgroundColor="?attr/colorSecondary"
             app:boxCornerRadiusTopEnd="15dp"
             app:boxCornerRadiusBottomEnd="15dp"
@@ -74,12 +76,12 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextUsername"
-                android:layout_width="match_parent"
-                android:padding="14dp"
-                android:hint="Username"
+                android:layout_width="365dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/username"
                 android:inputType="textPersonName"
-                />
+                android:padding="14dp" />
 
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -97,7 +99,7 @@
             android:layout_marginTop="24sp"
             app:endIconMode="clear_text"
             app:startIconDrawable="@drawable/baseline_email_24"
-            android:textColorHint="?android:textColorSecondaryInverseNoDisable"
+            android:textColorHint="#78909C"
             app:boxBackgroundColor="?attr/colorSecondary"
             app:boxCornerRadiusTopEnd="15dp"
             app:boxCornerRadiusBottomEnd="15dp"
@@ -109,9 +111,10 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextEmail"
-                android:layout_width="match_parent"
+                android:layout_width="365dp"
+                android:layout_gravity="center"
                 android:padding="14dp"
-                android:hint="Email"
+                android:hint="@string/email"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 />
@@ -128,7 +131,7 @@
             android:layout_marginTop="24sp"
             android:layout_marginEnd="24dp"
             app:startIconDrawable="@drawable/baseline_password_24"
-            android:textColorHint="?android:textColorSecondaryInverseNoDisable"
+            android:textColorHint="#78909C"
             app:boxBackgroundColor="?attr/colorSecondary"
             app:passwordToggleEnabled="true"
             app:boxCornerRadiusTopEnd="15dp"
@@ -142,9 +145,10 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextPassword"
-                android:layout_width="match_parent"
+                android:layout_width="365dp"
+                android:layout_gravity="center"
                 android:inputType="textPassword"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:padding="14dp"
                 android:layout_height="wrap_content" />
 
@@ -160,7 +164,7 @@
             android:layout_marginTop="24sp"
             android:layout_marginEnd="24dp"
             app:startIconDrawable="@drawable/baseline_password_24"
-            android:textColorHint="?android:textColorSecondaryInverseNoDisable"
+            android:textColorHint="#78909C"
             app:boxBackgroundColor="?attr/colorSecondary"
             app:passwordToggleEnabled="true"
             app:boxCornerRadiusTopEnd="15dp"
@@ -173,21 +177,24 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextConfirmPassword"
-                android:layout_width="match_parent"
+                android:layout_width="365dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/confirm_password"
                 android:inputType="textPassword"
-                android:hint="Confirm Password"
+                android:layout_gravity="center"
                 android:padding="14dp"
-                android:layout_height="wrap_content" />
+                android:textColorHint="#78909C" />
 
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/buttonSignUp"
-            android:layout_width="match_parent"
+            android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:padding="14dp"
             android:textSize="14sp"
+            android:layout_gravity="center"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:layout_marginTop="35dp"
@@ -195,13 +202,12 @@
             app:icon="@drawable/baseline_app_registration_24"
             app:iconGravity="textStart"
             app:iconTint="@null"
-            android:text="Register Now" />
+            android:text="@string/register_now" />
 
         <RelativeLayout
             android:id="@+id/relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginTop="10dp">
 
             <View
@@ -219,7 +225,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:text="OR"
+                android:text="@string/or"
                 android:textStyle="bold"
                 android:textColor="?android:textColorSecondary"
                 />
@@ -238,14 +244,15 @@
 
         <Button
             android:id="@+id/button_google_login"
-            android:layout_width="match_parent"
+            android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:padding="14dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="24dp"
-            android:text="Continue with Google"
+            android:text="@string/continue_with_google"
             android:textSize="14sp"
+            android:layout_gravity="center"
             app:backgroundTint="@color/white"
             app:icon="@drawable/googleg_standard_color_18"
             app:iconGravity="textStart"

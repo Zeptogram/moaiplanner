@@ -11,11 +11,11 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginTop="25dp"
-
         android:src="@drawable/todo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/app_name" />
 
     <TextView
         android:id="@+id/title"
@@ -79,7 +79,7 @@
         android:layout_marginTop="30dp"
 
         android:layout_marginEnd="50dp"
-        android:text="Next"
+        android:text="@string/next"
 
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

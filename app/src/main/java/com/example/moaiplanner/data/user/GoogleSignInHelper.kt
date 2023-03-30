@@ -1,29 +1,28 @@
+package com.example.moaiplanner.data.user
+
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.edit
 import com.example.moaiplanner.R
 import com.example.moaiplanner.ui.main.MainActivity
+import com.example.moaiplanner.util.Utils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class GoogleSignInHelper(private val activity: Activity, private val launcher: ActivityResultLauncher<Intent>, private val view: View) {
-    private lateinit var googleSignInClient: GoogleSignInClient
+    private var googleSignInClient: GoogleSignInClient
     private val firebaseAuth: FirebaseAuth = Firebase.auth
 
 
@@ -47,12 +46,7 @@ class GoogleSignInHelper(private val activity: Activity, private val launcher: A
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             handleResults(task)
         } else {
-            Snackbar.make(view,"Errore di Sign in", Snackbar.LENGTH_SHORT)
-                .setAction("OK") {
-                    // Responds to click on the action
-                }
-                .setActionTextColor(activity.getColor(R.color.primary))
-                .show()
+            Utils.showPopup(view, activity, activity.getString(R.string.sign_in_error))
         }
     }
 

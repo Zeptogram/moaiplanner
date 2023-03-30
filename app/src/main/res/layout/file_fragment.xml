@@ -20,33 +20,34 @@
 
         <LinearLayout
             android:id="@+id/folderLayout"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_gravity="start"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/button_showall"
                 style="?android:attr/button"
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="20dp"
                 android:enabled="false"
                 android:layout_weight="1"
-                android:text="Show All"
+                android:text="@string/show_all"
                 android:textStyle="bold" />
 
             <Button
                 android:id="@+id/button_favourites"
                 style="?android:attr/button"
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="20dp"
-                android:layout_weight="1"
-                android:text="Favourites"
+                android:layout_weight="2"
+                android:text="@string/favourites"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -77,7 +78,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:contentDescription="Add note or folder"
+            android:contentDescription="@string/add_note_or_folder"
             app:srcCompat="@drawable/baseline_add_24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -91,7 +92,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:contentDescription="Upload a note file"
+            android:contentDescription="@string/upload_a_note_file"
             app:srcCompat="@drawable/baseline_upload_file_24" />
 
     </RelativeLayout>

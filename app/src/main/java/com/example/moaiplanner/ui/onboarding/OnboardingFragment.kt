@@ -19,7 +19,7 @@ class OnboardingFragment : Fragment() {
 
         binding = OnboardingViewPagerBinding.inflate(inflater, container, false)
 
-        val fragmentList = arrayListOf<Fragment>(
+        val fragmentList = arrayListOf(
             OnboardingFirstScreen(),
             OnboardingSecondScreen(),
             OnboardingThirdScreen()

@@ -27,10 +27,11 @@
                 android:id="@+id/profilepic"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/bg"
                 android:contentDescription="@string/app_name"
                 android:scaleType="fitXY"
-                android:background="@drawable/bg"
-                android:src="@drawable/icon" />
+                android:src="@drawable/icon"
+                tools:ignore="ImageContrastCheck" />
 
             <!-- Contenuti della scheda qui -->
 
@@ -41,7 +42,7 @@
             android:id="@+id/textViewWelcome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Welcome to Moai Planner"
+            android:text="@string/welcome_to_moai_planner"
             android:layout_margin="24dp"
             android:textAlignment="center"
             android:textSize="42sp"
@@ -52,9 +53,10 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonEmail"
-            android:layout_width="match_parent"
+            android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:padding="12dp"
+            android:layout_gravity="center"
             android:textSize="14sp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
@@ -62,17 +64,18 @@
             app:iconGravity="textStart"
             app:iconTint="@null"
             app:iconSize="24dp"
-            android:text="Sign in with Email" />
+            android:text="@string/sign_in_with_email" />
 
         <Button
             android:id="@+id/button_google_login"
-            android:layout_width="match_parent"
+            android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:padding="14dp"
             android:layout_marginStart="24dp"
+            android:layout_gravity="center"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="24dp"
-            android:text="Sign in with Google"
+            android:text="@string/sign_in_with_google"
             android:textSize="14sp"
             app:backgroundTint="@color/white"
             app:icon="@drawable/googleg_standard_color_18"
@@ -87,7 +90,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="24dp"
-            android:text="Don't have an account? Sign up now!"
+            android:text="@string/don_t_have_an_account_sign_up_now"
             android:textAlignment="center"
             android:textStyle="bold"
             android:textColor="?android:textColorSecondary"

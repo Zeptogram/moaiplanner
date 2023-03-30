@@ -1,5 +1,6 @@
 package com.example.moaiplanner.ui.main
 
+import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -14,7 +15,6 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,8 +22,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.CalendarAdapter
 import com.example.moaiplanner.data.calendar.CalendarData
+import com.example.moaiplanner.data.todo.ToDoFetcher
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.TodoFragmentBinding
+import com.example.moaiplanner.util.NavigationHelper
 import com.example.moaiplanner.util.NetworkUtils
 import com.example.moaiplanner.util.ToDoItem
 import com.example.moaiplanner.util.ToDoItemListener
@@ -38,6 +40,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
+@Suppress("NAME_SHADOWING")
 class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItemListener{
 
     // Lista di elementi della to-do list
@@ -60,33 +63,14 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
     private var adapter = ToDoListAdapter(toDoList)
 
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate il layout del Fragment
         binding = TodoFragmentBinding.inflate(inflater, container, false)
-
-        toolbar = activity?.findViewById<Toolbar>(R.id.topAppBar)!!
-        toolbar.menu?.setGroupVisible(R.id.edit, false)
-        toolbar.menu?.setGroupVisible(R.id.sett, true)
-
-        toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    findNavController().navigate(R.id.optionsFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-                        }
-                    )
-                }
-            }
-            true
-        }
 
         auth = UserAuthentication(requireActivity().application)
         if (!auth.isUserAuthenticated()) {
@@ -96,7 +80,6 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         database = FirebaseDatabase.getInstance()
         todoListRef = database.getReference("users/" + auth.getCurrentUid().toString())
 
-        init()
         binding.monthYearPicker.setOnClickListener {
             displayDatePicker()
         }
@@ -104,30 +87,21 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         getDates()
         onSelect(CalendarData(Date(), true), (cal.get(Calendar.DAY_OF_MONTH) - 1))
 
-
-
-
-        //fetchToDoListFromFirebase()
-
-
         val icon = resources.getDrawable(R.drawable.baseline_delete_forever_24, null)
         val iconEdit = resources.getDrawable(R.drawable.ic_baseline_edit_note_24, null)
         val background = ColorDrawable(Color.RED)
 
         // Inizializza la RecyclerView
-        //adapter = ToDoListAdapter(toDoList)
         recyclerView = binding.recyclerView
         recyclerView!!.layoutManager = LinearLayoutManager(requireContext())
         recyclerView!!.adapter = adapter
         recyclerView!!.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-
 
         // Aggiungi un listener al bottone "Aggiungi" per aggiungere un nuovo elemento alla lista
         val addButton = binding.addButton
         addButton.setOnClickListener {
             showAddItemDialog()
         }
-
 
         // Aggiungi un item touch helper per eliminare gli elementi tramite lo swipe
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -150,12 +124,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
                 }
                 // Swipe verso sinistra
                 else {
-                    val id = toDoList.get(position).id
-
-                        /*toDoList.removeAt(position)
-                        adapter.notifyItemRemoved(position)
-                        adapter.notifyItemRangeChanged(position, toDoList.size)
-*/
+                    val id = toDoList[position].id
                     onItemDelete(id, position)
                 }
             }
@@ -173,10 +142,10 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
                 val backgroundCornerOffset = 20
 
                 if (dX > 0) { // Swipe to right
-                    val iconMargin = (itemView.height - iconEdit.getIntrinsicHeight()) / 2
-                    val iconTop = itemView.top + (itemView.height - iconEdit.getIntrinsicHeight()) / 2
-                    val iconBottom = iconTop + iconEdit.getIntrinsicHeight()
-                    val iconRight = itemView.left + iconMargin + iconEdit.getIntrinsicWidth()
+                    val iconMargin = (itemView.height - iconEdit.intrinsicHeight) / 2
+                    val iconTop = itemView.top + (itemView.height - iconEdit.intrinsicHeight) / 2
+                    val iconBottom = iconTop + iconEdit.intrinsicHeight
+                    val iconRight = itemView.left + iconMargin + iconEdit.intrinsicWidth
                     val iconLeft = itemView.left + iconMargin
                     iconEdit.setBounds(iconLeft, iconTop, iconRight, iconBottom)
                     background.color = resources.getColor(R.color.primary, null)
@@ -187,10 +156,10 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
                         itemView.bottom
                     )
                 } else if (dX < 0) { // Swipe to left
-                    val iconMargin = (itemView.height - icon.getIntrinsicHeight()) / 2
-                    val iconTop = itemView.top + (itemView.height - icon.getIntrinsicHeight()) / 2
-                    val iconBottom = iconTop + icon.getIntrinsicHeight()
-                    val iconLeft = itemView.right - iconMargin - icon.getIntrinsicWidth()
+                    val iconMargin = (itemView.height - icon.intrinsicHeight) / 2
+                    val iconTop = itemView.top + (itemView.height - icon.intrinsicHeight) / 2
+                    val iconBottom = iconTop + icon.intrinsicHeight
+                    val iconLeft = itemView.right - iconMargin - icon.intrinsicWidth
                     val iconRight = itemView.right - iconMargin
                     icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
                     background.color = Color.RED
@@ -219,28 +188,29 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         itemTouchHelper.attachToRecyclerView(recyclerView)
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), view)
-        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        NetworkUtils.notifyMissingNetwork(requireContext(), requireActivity())
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        toolbar = activity?.findViewById(R.id.topAppBar)!!
+        toolbar.menu?.setGroupVisible(R.id.edit, false)
+        toolbar.menu?.setGroupVisible(R.id.sett, true)
+
+        toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    NavigationHelper.navigateTo(view, R.id.optionsFragment)
+                }
+            }
+            true
+        }
+        init()
         // Mette la home come main
-        bottomNav.menu.getItem(2).isChecked = true;
+        bottomNav.menu.getItem(2).isChecked = true
 
     }
-
-
-
-
-
-    // Classe per rappresentare un elemento della to-do list
-
-
     // Adapter per la RecyclerView
-    private inner class ToDoListAdapter(private val items: List<ToDoItem>) : RecyclerView.Adapter<ToDoViewHolder>() {
-
-        private var todoListener: ToDoItemListener = this@ToDoListFragment
-
+    inner class ToDoListAdapter(private val items: List<ToDoItem>) : RecyclerView.Adapter<ToDoViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.todo_element, parent, false)
             return ToDoViewHolder(view)
@@ -252,18 +222,17 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
             holder.timeView.text = item.time
             holder.checkBox.setOnClickListener {
                 item.isDone = !item.isDone
-                todoListener.modifyItemState(item.id, item.isDone)
+                modifyItemState(item.id, item.isDone)
             }
         }
         override fun getItemCount(): Int = items.size
     }
 
     // ViewHolder per gli elementi della RecyclerView
-    private inner class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.textView)
         var timeView: TextView = itemView.findViewById(R.id.timeView)
         val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
-
     }
     private fun showAddItemDialog() {
         val layoutInflater = LayoutInflater.from(context)
@@ -273,9 +242,9 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         val editTimeItem = dialogView.findViewById<EditText>(R.id.timeItem)
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Aggiungi elemento")
+            .setTitle(getString(R.string.add_item))
             .setView(dialogView)
-            .setPositiveButton("Aggiungi") { dialog, which ->
+            .setPositiveButton(getString(R.string.add)) { _, _ ->
                 val text = editTextItem.text.toString()
                 val time = editTimeItem.text.toString()
                 if (text.isNotBlank() && time.isNotBlank()) {
@@ -285,18 +254,13 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
                     todoItem.id = dbItem.key.toString()
                     todoItem.userId = auth.getCurrentUid().toString()
                     dbItem.setValue(todoItem)
-
-                    /*toDoList.add(todoItem)
-                    adapter.notifyItemInserted(toDoList.lastIndex)*/
                 }
-                // Do something with the new item
             }
-            .setNegativeButton("Annulla", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .create()
 
         pickTimeListener(editTimeItem)
         dialog.show()
-
     }
 
     private fun showEditItemDialog(index: Int) {
@@ -304,54 +268,42 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
         val editTextItem = dialogView.findViewById<EditText>(R.id.textItem)
         val editTimeItem = dialogView.findViewById<EditText>(R.id.timeItem)
-
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Modifica l'elemento")
+            .setTitle(getString(R.string.edit_item))
             .setView(dialogView)
-            .setPositiveButton("Modifica") { dialog, which ->
+            .setPositiveButton(getString(R.string.edit)) { _, _ ->
                 val text = editTextItem.text.toString()
                 val time = editTimeItem.text.toString()
 
                 if (text.isNotBlank()) {
                     editItemState(toDoList[index].id, text, time, index)
-                    /*toDoList[index] = ToDoItem(text, time)
-                    adapter.notifyItemChanged(index)*/
                 }
                 else{
                     adapter.notifyItemChanged(index)
                 }
             }
-            .setNegativeButton("Annulla") { dialog, which ->
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                 adapter.notifyItemChanged(index)
             }
             .create()
-
-
         pickTimeListener(editTimeItem)
-
         dialog.show()
-
     }
-
-
     private fun init() {
         binding.apply {
-
             toolbar.title = sdf.format(cal.time).replaceFirstChar { it.uppercase() }
             calendarView.setHasFixedSize(true)
             calendarView.adapter = calendarAdapter
-
         }
     }
-
     private fun displayDatePicker() {
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
+                .setTitleText(getString(R.string.select_date))
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build()
 
-        datePicker.show(parentFragmentManager, "DatePicker");
+        datePicker.show(parentFragmentManager, "DatePicker")
         datePicker.addOnPositiveButtonClickListener {
 
         try {
@@ -359,15 +311,11 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
             cal.time = Date(it)
             getDates()
             onSelect(CalendarData(Date(it), true), (cal.get(Calendar.DAY_OF_MONTH) - 1))
-        } catch (e: ParseException) { }
+        } catch (_: ParseException) {
 
+            }
         }
-
     }
-
-
-    /*------------------------------ Get Dates of Month ------------------------------*/
-
     private fun getDates() {
 
         val dateList = ArrayList<CalendarData>() // For our Calendar Data Class
@@ -381,29 +329,24 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
             dateList.add(CalendarData(monthCalendar.time))
             monthCalendar.add(Calendar.DAY_OF_MONTH, 1)   // Increment Day By 1
         }
-
         calendarList.clear()
         calendarList.addAll(dateList)
         calendarAdapter.updateList(dateList)
 
     }
 
-
-
     override fun onSelect(calendarData: CalendarData, position: Int) {
-        binding.calendarView!!.scrollToPosition(position)
-
-        // You can get Selected date here....
+        binding.calendarView.scrollToPosition(position)
         calendarList.forEachIndexed { index, calendarModel ->
             calendarModel.isSelected = index == position
         }
         calendarAdapter.updateList(calendarList)
         currentDate = calendarData.calendarYear + "/" + calendarData.calendarMonth + "/" + calendarData.calendarDate
         manualUpdateUI = false
-        fetchToDoListFromFirebase()
+        val todo = ToDoFetcher()
+        todo.fetchToDoListFragmentFromFirebase(toDoList, currentDate, adapter, todoListRef)
 
     }
-
 
     private fun pickTimeListener(timeText: EditText){
 
@@ -428,39 +371,6 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
             picker.show(parentFragmentManager, "TimePicker")
 
         }
-    }
-
-    private fun fetchToDoListFromFirebase() {
-        val toDoListListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(!manualUpdateUI){
-                    toDoList.clear()
-                    val date = currentDate.split("/")
-                    val toDoListData = snapshot.child("todolist").child(date[0]).child(date[1]).child(date[2]).children
-                    for (item in toDoListData) {
-                        //Log.d("Item", item.toString())
-                        val toDoItem = item.getValue(ToDoItem::class.java)
-                        if (toDoItem != null) {
-                            if(toDoItem.id.isNotBlank()) {
-                                toDoList.add(toDoItem!!)
-                            }
-                        }
-                    }
-                    toDoList.sortBy { item ->
-                        val format = SimpleDateFormat("HH:mm")
-                        val date = format.parse(item.time)
-                        date.time / (60 * 1000)
-                    }
-                    adapter.notifyDataSetChanged()
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("ToDoListFragment", "loadToDoList:onCancelled", error.toException())
-            }
-
-        }
-        todoListRef.addValueEventListener(toDoListListener)
     }
 
     override fun modifyItemState(itemObjectId: String, isDone: Boolean) {

@@ -1,10 +1,10 @@
 package com.example.moaiplanner.ui.welcome
 
-import GoogleSignInHelper
 import android.os.Bundle
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.example.moaiplanner.data.user.GoogleSignInHelper
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.RegisterFragmentBinding
 import com.example.moaiplanner.util.NetworkUtils
@@ -32,7 +32,7 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), view, activity)
+        NetworkUtils.notifyMissingNetwork(requireContext(), activity)
 
         binding.buttonGoogleLogin.setOnClickListener {
             googleSignInHelper = GoogleSignInHelper(requireActivity(), signInLauncher, view)
@@ -40,7 +40,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.buttonSignUp.setOnClickListener {
-            firebase = UserAuthentication(requireActivity().application, view)
+            firebase = UserAuthentication(requireActivity().application, view, requireActivity())
             createAccount()
         }
     }

@@ -1,6 +1,5 @@
 package com.example.moaiplanner.ui.welcome
 
-import GoogleSignInHelper
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -9,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
+import com.example.moaiplanner.data.user.GoogleSignInHelper
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.SigninFragmentBinding
 import com.example.moaiplanner.util.NetworkUtils
@@ -39,7 +39,7 @@ class SigninFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), view, activity)
+        NetworkUtils.notifyMissingNetwork(requireContext(), activity)
 
         binding.buttonGoogleLogin.setOnClickListener {
             Log.d("USER", "Google Sign in Requested")
@@ -54,7 +54,7 @@ class SigninFragment : Fragment() {
 
         binding.buttonSignIn.setOnClickListener {
             Log.d("USER", "Sign in Requested")
-            firebase = UserAuthentication(requireActivity().application)
+            firebase = UserAuthentication(requireActivity().application, view, requireActivity())
             lifecycleScope.launch(Dispatchers.IO) {
                 val email = binding.editTextEmail.text.toString()
                 val password = binding.editTextPassword.text.toString()
@@ -68,15 +68,15 @@ class SigninFragment : Fragment() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_reset_password, null)
         val editEmail = dialogView.findViewById<EditText>(R.id.emailText)
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Inserire la Email")
+            .setTitle(getString(R.string.inserisci_la_email_associata_all_account))
             .setView(dialogView)
-            .setPositiveButton("Invia mail") { dialog, which ->
+            .setPositiveButton(getString(R.string.send_email)) { _, _ ->
                 val text = editEmail.text.toString()
                 if (text.isNotBlank()) {
                     firebase.resetPassword(text)
                 }
             }
-            .setNegativeButton("Annulla") { dialog, which ->
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
             }
             .create()
         dialog.show()

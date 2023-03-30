@@ -15,7 +15,7 @@ import androidx.preference.PreferenceManager
 import com.example.moaiplanner.R
 import com.example.moaiplanner.model.PREF_KEY_AUTOSAVE_URI
 import com.example.moaiplanner.ui.main.MainActivity
-import com.google.android.material.snackbar.Snackbar
+import com.example.moaiplanner.util.Utils
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -26,10 +26,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class UserAuthentication(app: Application, view: View? = null) {
+class UserAuthentication(app: Application, view: View? = null, activity: Activity? = null) {
     private var application: Application
     private var firebaseAuth: FirebaseAuth
     private var view: View?
+    private var activity: Activity?
 
     private companion object {
         private const val TAG = "GOOGLE_SIGN_IN_TAG"
@@ -39,6 +40,7 @@ class UserAuthentication(app: Application, view: View? = null) {
         this.application = app
         this.firebaseAuth = Firebase.auth
         this.view = view
+        this.activity = activity
     }
 
     fun createAccount(email: String, password: String, username: String) {
@@ -50,42 +52,26 @@ class UserAuthentication(app: Application, view: View? = null) {
                     setDisplayName(username)
                     firebaseAuth.currentUser?.sendEmailVerification()
                     view?.let {
-                        Snackbar.make(it,"Verification email sent", Snackbar.LENGTH_SHORT)
-                            .setAction("OK") {
-                                // Responds to click on the action
-                            }
-                            .setActionTextColor(application.getColor(R.color.primary))
-                            .show()
+                        activity?.let { it1 ->
+                            Utils.showPopup(it,
+                                it1, activity!!.getString(R.string.verification_sent))
+                        }
                     }
-                    //Toast.makeText(application, "Verification email sent", Toast.LENGTH_SHORT).show()
                     firebaseAuth.signOut()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     view?.let {
-                        Snackbar.make(it,"Authentication failed", Snackbar.LENGTH_SHORT)
-                            .setAction("OK") {
-                                // Responds to click on the action
-                            }
-                            .setActionTextColor(application.getColor(R.color.primary))
-                            .show()
+                        activity?.let { it1 ->
+                            Utils.showPopup(it,
+                                it1, activity!!.getString(R.string.authentication_failed))
+                        }
                     }
                 }
             }
     }
 
-    suspend fun signIn(email: String, password: String): Boolean {
-        return try {
-            firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            Log.d("USER", firebaseAuth.currentUser.toString())
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
     suspend fun signInAndSaveUser(email: String, password: String, activity: Activity?, view: View?) {
-
         try {
             val authResult = withContext(Dispatchers.IO) {
                 firebaseAuth.signInWithEmailAndPassword(email, password).await()
@@ -108,27 +94,20 @@ class UserAuthentication(app: Application, view: View? = null) {
             }
         } catch (e: Exception) {
             view?.let {
-                Snackbar.make(it,"Authentication failed", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    .setActionTextColor(application.getColor(R.color.primary))
-                    .show()
+                activity?.let { it1 ->
+                    Utils.showPopup(it,
+                        it1, activity.getString(R.string.authentication_failed))
+                }
             }
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             view?.let {
-                Snackbar.make(it,"Authentication failed", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    .setActionTextColor(application.getColor(R.color.primary))
-                    .show()
+                activity?.let { it1 ->
+                    Utils.showPopup(it,
+                        it1, activity.getString(R.string.authentication_failed))
+                }
             }
         }
     }
-
-
-
 
     fun signOut(context: Context) {
         var sharedPref: SharedPreferences = context.getSharedPreferences("user", Context.MODE_PRIVATE)
@@ -143,7 +122,6 @@ class UserAuthentication(app: Application, view: View? = null) {
         }
 
         firebaseAuth.signOut()
-
     }
 
     fun isUserAuthenticated(): Boolean {
@@ -156,18 +134,17 @@ class UserAuthentication(app: Application, view: View? = null) {
         return firebaseAuth.uid
     }
 
-    fun getEmail(): String? {
+    fun getEmail(): String {
         var email = ""
         firebaseAuth.currentUser?.let {
             email = it.email.toString()
         }
-        return email;
+        return email
     }
 
     fun setEmail(email: String, txt: TextView) {
         if(validateEmail(email) && isUserAuthenticated()) {
-            firebaseAuth.currentUser!!.updateEmail(email)
-                .addOnCompleteListener { task ->
+            firebaseAuth.currentUser!!.updateEmail(email).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "User email address updated.")
                         txt.text = email
@@ -178,16 +155,14 @@ class UserAuthentication(app: Application, view: View? = null) {
                                 }
                             }
                     }
-                }
+            }
         }
         else {
             view?.let {
-                Snackbar.make(it,"Utente non autenticato", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    .setActionTextColor(application.getColor(R.color.primary))
-                    .show()
+                activity?.let { it1 ->
+                    Utils.showPopup(it,
+                        it1, activity!!.getString(R.string.user_not_authenticated))
+                }
             }
         }
     }
@@ -210,34 +185,28 @@ class UserAuthentication(app: Application, view: View? = null) {
                                         if (updateTask.isSuccessful) {
                                             // la password è stata cambiata con successo
                                             view?.let {
-                                                Snackbar.make(it,"Password Aggiornata", Snackbar.LENGTH_SHORT)
-                                                    .setAction("OK") {
-                                                        // Responds to click on the action
-                                                    }
-                                                    .setActionTextColor(application.getColor(R.color.primary))
-                                                    .show()
+                                                activity?.let { it1 ->
+                                                    Utils.showPopup(it,
+                                                        it1, activity!!.getString(R.string.password_updated))
+                                                }
                                             }
                                         } else {
                                             // si è verificato un errore durante l'aggiornamento della password
                                             view?.let {
-                                                Snackbar.make(it,"Errore durante il cambiamento password", Snackbar.LENGTH_SHORT)
-                                                    .setAction("OK") {
-                                                        // Responds to click on the action
-                                                    }
-                                                    .setActionTextColor(application.getColor(R.color.primary))
-                                                    .show()
+                                                activity?.let { it1 ->
+                                                    Utils.showPopup(it,
+                                                        it1, activity!!.getString(R.string.error_password_update))
+                                                }
                                             }
                                         }
                                     }
                             } else {
                                 // la vecchia password non è corretta
                                 view?.let {
-                                    Snackbar.make(it,"Vecchia Password non corretta", Snackbar.LENGTH_SHORT)
-                                        .setAction("OK") {
-                                            // Responds to click on the action
-                                        }
-                                        .setActionTextColor(application.getColor(R.color.primary))
-                                        .show()
+                                    activity?.let { it1 ->
+                                        Utils.showPopup(it,
+                                            it1, activity!!.getString(R.string.old_password_not_correct))
+                                    }
                                 }
                             }
                         }
@@ -254,12 +223,10 @@ class UserAuthentication(app: Application, view: View? = null) {
                                 } else {
                                     // le credenziali non sono corrette
                                     view?.let {
-                                        Snackbar.make(it,"Vecchia Password non corretta", Snackbar.LENGTH_SHORT)
-                                            .setAction("OK") {
-                                                // Responds to click on the action
-                                            }
-                                            .setActionTextColor(application.getColor(R.color.primary))
-                                            .show()
+                                        activity?.let { it1 ->
+                                            Utils.showPopup(it,
+                                                it1, activity!!.getString(R.string.authentication_failed))
+                                        }
                                     }
                                 }
                             }
@@ -269,12 +236,10 @@ class UserAuthentication(app: Application, view: View? = null) {
         else {
             // weak password
             view?.let {
-                Snackbar.make(it,"Inserire una Password Sicura", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    .setActionTextColor(application.getColor(R.color.primary))
-                    .show()
+                activity?.let { it1 ->
+                    Utils.showPopup(it,
+                        it1, activity!!.getString(R.string.secure_pass))
+                }
             }
         }
     }
@@ -304,12 +269,12 @@ class UserAuthentication(app: Application, view: View? = null) {
             }
     }
 
-    fun getDisplayName(): String? {
+    fun getDisplayName(): String {
         var username = ""
         firebaseAuth.currentUser?.let {
             username = it.displayName.toString()
         }
-        return username;
+        return username
     }
 
 
@@ -329,12 +294,10 @@ class UserAuthentication(app: Application, view: View? = null) {
     private fun validateEmail(email: String): Boolean {
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             view?.let {
-                Snackbar.make(it,"Inserire una mail valida", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    .setActionTextColor(application.getColor(R.color.primary))
-                    .show()
+                activity?.let { it1 ->
+                    Utils.showPopup(it,
+                        it1, activity!!.getString(R.string.valid_email))
+                }
             }
             return false
         }
@@ -344,29 +307,26 @@ class UserAuthentication(app: Application, view: View? = null) {
     private fun validatePassword(password: String): Boolean {
         if (password.length < 6) {
             view?.let {
-                Snackbar.make(it,"Inserire una password valida", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    .setActionTextColor(application.getColor(R.color.primary))
-                    .show()
+                activity?.let { it1 ->
+                    Utils.showPopup(it,
+                        it1, activity!!.getString(R.string.secure_pass))
+                }
             }
             return false
         }
         val hasLowerCase = password.matches(Regex(".*[a-z].*"))
         val hasUpperCase = password.matches(Regex(".*[A-Z].*"))
         val hasDigit = password.matches(Regex(".*\\d.*"))
-        val hasSpecialChar = password.matches(Regex(".*[!@#\$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>\\/?].*"))
+        val hasSpecialChar = password.matches(Regex(".*[!@#\$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>?].*"))
         return hasLowerCase && hasUpperCase && hasDigit && hasSpecialChar
     }
 
     fun getProvider(): String {
         val user = Firebase.auth.currentUser
-        var providerId: String = ""
+        var providerId = ""
         user?.let {
             for (profile in it.providerData) {
                 providerId = profile.providerId
-
             }
         }
         return providerId
@@ -378,7 +338,6 @@ class UserAuthentication(app: Application, view: View? = null) {
         user?.let {
             for (profile in it.providerData) {
                 photo = profile.photoUrl
-
             }
         }
         return photo

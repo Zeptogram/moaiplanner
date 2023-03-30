@@ -7,7 +7,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".ui.main.TomatoFragment"
     tools:layout="@layout/tomato_fragment">
 
@@ -23,20 +23,22 @@
         app:layout_constraintEnd_toEndOf="@+id/timerBar"
         app:layout_constraintStart_toStartOf="@+id/timerBar"
         app:layout_constraintTop_toTopOf="@+id/timerBar"
-        app:layout_constraintVertical_bias="0.250" />
+        app:layout_constraintVertical_bias="0.250"
+        tools:ignore="VisualLintOverlap" />
 
     <TextView
         android:id="@+id/typeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Time to focus!"
+        android:text="@string/time_to_focus"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/timerBar"
         app:layout_constraintEnd_toEndOf="@+id/timerBar"
         app:layout_constraintStart_toStartOf="@+id/timerBar"
         app:layout_constraintTop_toBottomOf="@+id/timerLabel"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintVertical_bias="0"
+        tools:ignore="VisualLintOverlap" />
 
     <TextView
         android:id="@+id/roundsRemaining"
@@ -50,7 +52,8 @@
         app:layout_constraintEnd_toEndOf="@+id/timerBar"
         app:layout_constraintStart_toStartOf="@+id/timerBar"
         app:layout_constraintTop_toBottomOf="@+id/typeLabel"
-        app:layout_constraintVertical_bias="0.1">
+        app:layout_constraintVertical_bias="0.1"
+        tools:ignore="VisualLintOverlap">
 
     </TextView>
 
@@ -58,14 +61,15 @@
         android:id="@+id/roundsRemainingLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rounds"
+        android:text="@string/rounds"
         android:textAlignment="center"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/timerBar"
         app:layout_constraintEnd_toEndOf="@+id/timerBar"
         app:layout_constraintStart_toStartOf="@+id/timerBar"
         app:layout_constraintTop_toBottomOf="@+id/roundsRemaining"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="VisualLintOverlap">
 
     </TextView>
 
@@ -107,9 +111,9 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"
-
+            android:contentDescription="@string/tomato"
             app:srcCompat="@drawable/ic_baseline_stop_24"
-            tools:ignore="SpeakableTextPresentCheck" />
+            tools:ignore="SpeakableTextPresentCheck,DuplicateSpeakableTextCheck" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/play_pause"
@@ -119,8 +123,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"
-
-
+            android:contentDescription="@string/tomato"
             app:srcCompat="@drawable/ic_baseline_play_arrow_24"
             tools:ignore="SpeakableTextPresentCheck" />
 
@@ -131,6 +134,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="32dp"
+            android:contentDescription="@string/tomato"
             app:srcCompat="@drawable/ic_baseline_restart_alt_24"
             tools:ignore="SpeakableTextPresentCheck" />
 
@@ -144,7 +148,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginStart="20dp"
-        android:text="Current Settings"
+        android:text="@string/current_settings"
         android:textColor="?android:attr/textColorSecondary"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/infoSessione"
@@ -171,7 +175,7 @@
         android:layout_weight="0.5"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:text="Session Length " />
+        android:text="@string/session_length" />
 
     <TextView
         android:id="@+id/sessione"
@@ -181,7 +185,7 @@
         android:textAlignment="textEnd"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:text="Sessione di Lavoro" />
+        android:text="@string/sessione_di_lavoro" />
 
 
     </LinearLayout>
@@ -211,7 +215,7 @@
             android:textStyle="bold"
             android:layout_weight="0.5"
             android:textSize="18sp"
-            android:text="Break Length " />
+            android:text="@string/break_length" />
 
         <TextView
             android:id="@+id/pausa"
@@ -221,7 +225,7 @@
             android:textSize="18sp"
             android:layout_weight="0.5"
             android:textAlignment="textEnd"
-            android:text="Pausa" />
+            android:text="@string/pausa" />
 
 
     </LinearLayout>

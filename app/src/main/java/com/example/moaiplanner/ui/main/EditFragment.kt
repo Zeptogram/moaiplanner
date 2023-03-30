@@ -16,9 +16,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.example.moaiplanner.model.MarkdownViewModel
+import com.example.moaiplanner.util.Utils.Companion.hideKeyboard
+import com.example.moaiplanner.util.Utils.Companion.showKeyboard
 import com.example.moaiplanner.util.ViewPagerPage
-import com.example.moaiplanner.util.hideKeyboard
-import com.example.moaiplanner.util.showKeyboard
 import kotlinx.coroutines.*
 import kotlin.math.abs
 
@@ -66,9 +66,7 @@ class EditFragment : Fragment(), ViewPagerPage {
         var oldX = 0f
         var oldY = 0f
         markdownEditorScroller!!.setOnTouchListener { _, event ->
-            // The ScrollView's onClickListener doesn't seem to be called, so I've had to
-            // implement a sort of custom click listener that checks that the tap was both quick
-            // and didn't drag.
+
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
                     touchDown = System.currentTimeMillis()

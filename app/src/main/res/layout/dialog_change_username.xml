@@ -11,7 +11,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:hint="Inserisci il nuovo username"
+    android:hint="@string/inserisci_il_nuovo_username"
     app:boxCornerRadiusTopEnd="15dp"
     app:boxCornerRadiusBottomEnd="15dp"
     app:boxCornerRadiusBottomStart="15dp"

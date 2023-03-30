@@ -1,16 +1,15 @@
 package com.example.moaiplanner.ui.welcome
 
-import GoogleSignInHelper
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import com.example.moaiplanner.R
+import com.example.moaiplanner.data.user.GoogleSignInHelper
 import com.example.moaiplanner.databinding.WelcomeFragmentBinding
+import com.example.moaiplanner.util.NavigationHelper
 import com.example.moaiplanner.util.NetworkUtils
 
 class WelcomeFragment : Fragment() {
@@ -31,19 +30,12 @@ class WelcomeFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), view, activity)
+        NetworkUtils.notifyMissingNetwork(requireContext(), activity)
 
         binding.buttonEmail.setOnClickListener {
-            findNavController().navigate(R.id.signinFragment, null,
-                navOptions {
-                    anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
-                    }
-                }, null)
+            NavigationHelper.navigateTo(view, R.id.signinFragment)
         }
 
         binding.buttonGoogleLogin.setOnClickListener {
@@ -52,14 +44,7 @@ class WelcomeFragment : Fragment() {
         }
 
         binding.textViewSignUpNow.setOnClickListener {
-            findNavController().navigate(R.id.registerFragment, null,
-                navOptions {
-                    anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
-
-                    }
-                }, null)
+            NavigationHelper.navigateTo(view, R.id.registerFragment)
         }
     }
 }

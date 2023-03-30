@@ -33,6 +33,7 @@
             android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+
     </LinearLayout>
 
     <RelativeLayout
@@ -47,12 +48,17 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/month_year_picker"
             style="?attr/floatingActionButtonPrimaryStyle"
-            app:srcCompat="@drawable/baseline_edit_calendar_24"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_margin="16dp" />
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/common_signin_button_text"
+            app:srcCompat="@drawable/baseline_edit_calendar_24"
+            tools:ignore="DuplicateSpeakableTextCheck" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addButton"
@@ -62,7 +68,8 @@
             android:layout_height="wrap_content"
             android:layout_above="@id/month_year_picker"
             android:layout_alignParentEnd="true"
-            android:layout_margin="16dp" />
+            android:layout_margin="16dp"
+            android:contentDescription="@string/common_signin_button_text" />
 
     </RelativeLayout>
 

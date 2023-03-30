@@ -22,11 +22,11 @@ class SettingsRepository(context: Context) {
         val session = sharedPreferences.getString("session", "25")
         val pausa = sharedPreferences.getString("pausa", "5")
         val round = sharedPreferences.getString("round", "1")
-        var notifiche = sharedPreferences.getBoolean("notifications_enabled", true)
-        var lightMode = sharedPreferences.getBoolean("light_enabled", false)
+        val notifiche = sharedPreferences.getBoolean("notifications_enabled", true)
+        val lightMode = sharedPreferences.getBoolean("light_enabled", false)
 
 
-        return Quintuple(session ?: "25", pausa ?: "5", round?: "1", notifiche ?: true, lightMode ?: false)
+        return Quintuple(session ?: "25", pausa ?: "5", round?: "1", notifiche, lightMode)
     }
 }
 

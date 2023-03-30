@@ -9,10 +9,10 @@ class TomatoViewModel : ViewModel() {
     val rounds = MutableLiveData<Long>(-1)
     val maxRounds = MutableLiveData<Long>(-1)
     val timeMax = MutableLiveData<Long>(-1)
-    var paused = MutableLiveData<Boolean>(false)
-    var timeLabel = MutableLiveData<String>("")
+    var paused = MutableLiveData(false)
+    var timeLabel = MutableLiveData("")
     var timer = MutableLiveData<CountDownTimer>(null)
-    var pausa = MutableLiveData<Boolean>(false)
+    var pausa = MutableLiveData(false)
 
 
     fun updateTimer(duration: Long) {

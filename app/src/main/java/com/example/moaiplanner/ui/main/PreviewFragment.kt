@@ -1,7 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.moaiplanner.ui.main
 
 
-import android.content.Context
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
@@ -17,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.BuildConfig
 import com.example.moaiplanner.R
 import com.example.moaiplanner.model.MarkdownViewModel
-import com.example.moaiplanner.util.toHtml
+import com.example.moaiplanner.util.Utils.Companion.toHtml
 import kotlinx.coroutines.*
 
 class PreviewFragment : Fragment() {
@@ -51,16 +52,11 @@ class PreviewFragment : Fragment() {
             }
             val css = withContext(Dispatchers.IO) {
                 val context = context ?: return@withContext null
-                @Suppress("ConstantConditionIf")
-                if (!true) {
-                    context.getString(defaultCssId)
-                } else {
-                    PreferenceManager.getDefaultSharedPreferences(context)
-                        .getString(
-                            getString(R.string.pref_custom_css),
-                            getString(defaultCssId)
-                        )
-                }
+                PreferenceManager.getDefaultSharedPreferences(context)
+                    .getString(
+                        getString(R.string.pref_custom_css),
+                        getString(defaultCssId)
+                    )
             }
             style = String.format(FORMAT_CSS, css ?: "")
         }

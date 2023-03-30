@@ -2,36 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:orientation="vertical">
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:orientation="vertical">
 
         <TextView
             android:id="@+id/textDeletion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             android:layout_marginTop="10dp"
             android:textStyle="bold"
-            android:layout_weight="1"
-            android:text="Vuoi eliminare il seguente file o cartella?"
+            android:text="@string/vuoi_eliminare_il_seguente_file_o_cartella"
             android:textSize="18sp" />
 
         <TextView
             android:id="@+id/subtext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             android:layout_marginTop="2dp"
             android:textStyle="italic"
             android:textColor="?android:textColorSecondary"
-            android:text="N.B.: Eliminare una cartella eliminerà anche i file al suo interno."
+            android:text="@string/n_b_eliminare_una_cartella_eliminer_anche_i_file_al_suo_interno"
             android:textSize="12sp" />
-    </LinearLayout>
+
 </LinearLayout>

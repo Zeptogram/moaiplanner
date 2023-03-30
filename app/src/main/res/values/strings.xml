@@ -1,19 +1,20 @@
 <resources>
-    <string name="app_name">Moai Planner</string>
+    <string name="app_name" translatable="false">Moai Planner</string>
     <string name="settings">Settings</string>
-    <string name="account">Account</string>
+    <string name="account" translatable="false">Account</string>
     <string name="write">Write</string>
     <string name="calendar">Calendar</string>
-    <string name="home">Home</string>
+    <string name="home" translatable="false">Home</string>
     <string name="tomato">Tomato</string>
-    <string name="to_do">To Do</string>
+    <string name="to_do" translatable="false">To Do</string>
     <string name="amici">Amici</string>
+
     <string name="notifiche">Notifiche</string>
     <string name="sicurezza">Sicurezza</string>
     <string name="abilita_le_notifiche">Abilita le notifiche</string>
-    <string name="email">Email</string>
+    <string name="email" translatable="false">Email</string>
     <string name="cambia">Cambia</string>
-    <string name="password">Password</string>
+    <string name="password" translatable="false">Password</string>
     <string name="modifica_immagine">Modifica Immagine</string>
     <string name="log_out">Log Out</string>
     <string name="favourites">Favourites</string>
@@ -26,7 +27,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_preview">Preview</string>
 
-    <string name="markdown_here">Remember to Save Changes...</string>
+    <string name="markdown_here">Remember to Save Changes…</string>
     <string name="action_save">Save</string>
     <string name="action_share">Share</string>
     <string name="action_export">Export</string>
@@ -47,19 +48,19 @@
     <string name="action_open">Open</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_settings" translatable="false">Settings</string>
     <string name="action_lock_swipe">Lock Swiping</string>
     <string name="action_select">Select</string>
-    <string name="pref_key_error_reports_enabled">crashlytics.enable</string>
-    <string name="pref_custom_css">pref.custom_css</string>
+    <string name="pref_key_error_reports_enabled" translatable="false">crashlytics.enable</string>
+    <string name="pref_custom_css" translatable="false">pref.custom_css</string>
     <string name="pref_custom_css_default" translatable="false">pre {overflow:scroll; padding:15px; background: #F1F1F1;}</string>
     <string name="pref_custom_css_default_dark" translatable="false">body{background:
         #333333;color: #F1F1F1;}a{color:#7b91ff;}pre{background:#111111;}</string>
-    <string name="pref_key_dark_mode">darkMode</string>
+    <string name="pref_key_dark_mode" translatable="false">darkMode</string>
     <string name="title_dark_mode">Dark Mode</string>
-    <string name="pref_value_light">Light</string>
-    <string name="pref_value_dark">Dark</string>
-    <string name="pref_value_auto">Auto</string>
+    <string name="pref_value_light" translatable="false">Light</string>
+    <string name="pref_value_dark" translatable="false">Dark</string>
+    <string name="pref_value_auto" translatable="false">Auto</string>
     <string name="pref_key_dark_mode_light" translatable="false">light</string>
     <string name="pref_key_dark_mode_dark" translatable="false">dark</string>
     <string name="pref_key_dark_mode_auto" translatable="false">auto</string>
@@ -80,6 +81,59 @@
     <string name="notes">Notes</string>
     <string name="pomodoro_info">Study and Focus while keeping track of your Time.</string>
     <string name="todo_info">Manage your Tasks with a simple ToDo list automatically synced on Cloud.</string>
+    <string name="inserisci_un_nuovo_elemento">Inserisci un nuovo elemento</string>
+    <string name="inserisci_l_orario">Inserisci l\'orario</string>
+    <string name="note">Note</string>
+    <string name="folder">Folder</string>
+    <string name="name">Name</string>
+    <string name="inserisci_la_nuova_email">Inserisci la nuova email</string>
+    <string name="inserisci_la_vecchia_password">Inserisci la vecchia password</string>
+    <string name="inserisci_la_nuova_password">Inserisci la nuova password</string>
+    <string name="inserisci_il_nuovo_username">Inserisci il nuovo username</string>
+    <string name="vuoi_eliminare_il_seguente_file_o_cartella">Vuoi eliminare il seguente file o cartella?</string>
+    <string name="n_b_eliminare_una_cartella_eliminer_anche_i_file_al_suo_interno">N.B. Eliminare una cartella eliminerà anche i file al suo interno.</string>
+    <string name="inserisci_la_email_associata_all_account">Inserisci la email associata all\'account</string>
+    <string name="add_note_or_folder">Add note or folder</string>
+    <string name="upload_a_note_file">Upload a note file</string>
+    <string name="folder_name">Folder Name</string>
+    <string name="folder_files">Folder files</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="my_notes">My Notes</string>
+    <string name="you_have_completed_all_tasks">You have completed all Tasks!</string>
+    <string name="today_s_tasks">Today\'s Tasks</string>
+    <string name="file_name">File Name</string>
+    <string name="file_size">File size</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+    <string name="_25">25</string>
+    <string name="_5">5</string>
+    <string name="_1">1</string>
+    <string name="user">User</string>
+    <string name="minuti_pomodoro">Minuti Pomodoro</string>
+    <string name="minuti_pausa">Minuti Pausa</string>
+    <string name="numero_round">Numero Round</string>
+    <string name="username">Username</string>
+    <string name="register_into_moai">Register into Moai</string>
+    <string name="welcome_to_moai_planner">Welcome to Moai Planner!</string>
+    <string name="register_now">Register Now</string>
+    <string name="or">OR</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="log_into_moai">Log into Moai</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
+    <string name="log_in">Log in</string>
+    <string name="time">Time</string>
+    <string name="item">Item</string>
+    <string name="time_to_focus">Time to focus!</string>
+    <string name="rounds" translatable="false">Rounds</string>
+    <string name="current_settings">Current Settings</string>
+    <string name="session_length">Session Length</string>
+    <string name="sessione_di_lavoro">Sessione di Lavoro</string>
+    <string name="break_length">Break Length</string>
+    <string name="pausa">Pausa</string>
+    <string name="sign_in_with_email">Sign in with Email</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="don_t_have_an_account_sign_up_now">Don\'t have an account? Sign up now!</string>
     <string-array name="pref_entries_dark_mode">
         <item>@string/pref_value_light</item>
         <item>@string/pref_value_dark</item>
@@ -90,4 +144,45 @@
         <item>@string/pref_key_dark_mode_dark</item>
         <item>@string/pref_key_dark_mode_auto</item>
     </string-array>
+    <string name="cancel">Cancel</string>
+    <string name="delete_note_or_folder">Delete note or folder</string>
+    <string name="add">add</string>
+    <string name="delete">delete</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="note_upload_failed">Note upload failed</string>
+    <string name="note_uploaded_successfully">Note uploaded successfully</string>
+    <string name="file_fail_database">Failed loading file from database</string>
+    <string name="image_upload_failed">Image upload failed</string>
+    <string name="image_uploaded_successfully">Image uploaded successfully</string>
+    <string name="edit_username">Edit Username</string>
+    <string name="edit_email">Edit Email</string>
+    <string name="edit_password">Edit Password</string>
+    <string name="add_item">Add Item</string>
+    <string name="edit_item">Edit Item</string>
+    <string name="select_date">Select Date</string>
+    <string name="work">Work</string>
+    <string name="mins">%1$s mins</string>
+    <string name="round_div" translatable="false">%1$s/%2$s</string>
+    <string name="last_round_notification">Last round is over! Well Done!</string>
+    <string name="starting_session">Round is over! Starting now the session of %1$s minutes! Rounds remaining: %2$s</string>
+    <string name="time_break">Time to break! Starting %1$s minutes break!</string>
+    <string name="send_email">Send Email</string>
+    <string name="network_missing">Network Connection missing</string>
+    <string name="network_try">Connect to the Network and try again</string>
+    <string name="note_create">Note created</string>
+    <string name="folder_create">Folder created</string>
+    <string name="folder_error">Folder creation error</string>
+    <string name="note_error">Note creation error</string>
+    <string name="folder_delete">Folder deleted</string>
+    <string name="note_deleted">Note deleted</string>
+    <string name="delete_fail">Delete failed</string>
+    <string name="sign_in_error">Sign In Error</string>
+    <string name="authentication_failed">Authentication Failed</string>
+    <string name="verification_sent">Verification Email sent</string>
+    <string name="user_not_authenticated">User not Authenticated</string>
+    <string name="password_updated">Password Updated</string>
+    <string name="error_password_update">Error during Password Update</string>
+    <string name="old_password_not_correct">Old password not correct</string>
+    <string name="secure_pass">Insert a secure password</string>
+    <string name="valid_email">Insert a valid email</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.example.moaiplanner.model
 
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
@@ -9,7 +10,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.moaiplanner.ui.main.NoteFragment
-import com.example.moaiplanner.util.getName
+import com.example.moaiplanner.util.Utils.Companion.getName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 const val PREF_KEY_AUTOSAVE_URI = "autosave.uri"
 
-class MarkdownViewModel() : ViewModel() {
+class MarkdownViewModel : ViewModel() {
     val fileName = MutableLiveData("Untitled.md")
     var currentDir = MutableLiveData("Notes/")
     val markdownUpdates = MutableLiveData<String>()
@@ -75,16 +76,13 @@ class MarkdownViewModel() : ViewModel() {
         }
     }
 
+    @SuppressLint("Recycle")
     suspend fun save(
         context: Context,
         givenUri: Uri? = null,
         sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     ): Boolean = saveMutex.withLock {
-        val uri = givenUri?.let {
-            it
-        } ?: this.uri.value?.let {
-            it
-        } ?: run {
+        val uri = givenUri ?: this.uri.value ?: run {
             return@save false
         }
         return withContext(Dispatchers.IO) {

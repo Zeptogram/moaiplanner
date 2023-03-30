@@ -1,30 +1,24 @@
 package com.example.moaiplanner.ui.main
 
-import android.animation.ObjectAnimator
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
-import android.widget.ProgressBar
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
 import com.example.moaiplanner.databinding.TomatoFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.TomatoViewModel
+import com.example.moaiplanner.util.NavigationHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,14 +28,14 @@ class TomatoFragment : Fragment() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var binding: TomatoFragmentBinding
     private lateinit var pomodoroViewModel: TomatoViewModel
-    private lateinit var c: Context
+    private lateinit var contesto: Context
     private var minutesSession: Long = 5
     private var minutesBreak: Long = 1
     private var roundsRemaining: Long = -1
     private var pomodoroDuration: Long = -1
     private var max: Long = -1
     private var running: Boolean = false
-    var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss")
+    var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss", Locale.getDefault())
 
 
 
@@ -69,40 +63,15 @@ class TomatoFragment : Fragment() {
         if(roundsRemaining.toInt() == -1) {
             roundsRemaining = settingsViewModel.round.value?.toLong() ?: 1
             pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong() ?: 1
-            binding.roundsRemaining.text =  roundsRemaining.toString() + "/" + settingsViewModel.round.value.toString()
+            binding.roundsRemaining.text =  getString(R.string.round_div,  roundsRemaining.toString(), settingsViewModel.round.value.toString())
         }
 
         // osservazione sui valori delle impostazioni
         settingsViewModel.session.observe(viewLifecycleOwner) {
-            binding.sessione.text = settingsViewModel.session.value.toString() + " mins"
+            binding.sessione.text = getString(R.string.mins, settingsViewModel.session.value.toString())
         }
         settingsViewModel.pausa.observe(viewLifecycleOwner) {
-            binding.pausa.text = settingsViewModel.pausa.value.toString() + " mins"
-        }
-
-
-
-
-
-
-        val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
-        toolbar?.menu?.setGroupVisible(R.id.edit, false)
-        toolbar?.menu?.setGroupVisible(R.id.sett, true)
-
-        toolbar?.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    findNavController().navigate(R.id.optionsFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-                        }
-                    )
-                }
-            }
-            true
+            binding.pausa.text = getString(R.string.mins, settingsViewModel.pausa.value.toString())
         }
 
         updateRound()
@@ -145,9 +114,6 @@ class TomatoFragment : Fragment() {
             reset()
         }
 
-
-
-
         return binding.root
 
     }
@@ -155,16 +121,26 @@ class TomatoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
+        toolbar?.menu?.setGroupVisible(R.id.edit, false)
+        toolbar?.menu?.setGroupVisible(R.id.sett, true)
+        toolbar?.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    NavigationHelper.navigateTo(view, R.id.optionsFragment)
+                }
+            }
+            true
+        }
         // Mette la home come main
-        bottomNav.menu.getItem(3).isChecked = true;
+        bottomNav.menu.getItem(3).isChecked = true
     }
 
-    fun initTimer() {
-
+    private fun initTimer() {
 
         pomodoroViewModel.timer.value?.cancel()
-        c = requireActivity()
+        contesto = requireActivity()
         pomodoroDuration = pomodoroViewModel.timeRemaining.value!!
         pomodoroViewModel.updateTimer(pomodoroDuration)
         max = pomodoroViewModel.timeMax.value!!
@@ -173,12 +149,12 @@ class TomatoFragment : Fragment() {
             if(pomodoroViewModel.pausa.value == false) {
                 pomodoroDuration = minutesSession * 60 * 1000
                 pomodoroViewModel.pausa.value = true
-                binding.typeLabel.text = "Work"
+                binding.typeLabel.text = getString(R.string.work)
             }
             else {
                 pomodoroDuration = minutesBreak * 60 * 1000
                 pomodoroViewModel.pausa.value = false
-                binding.typeLabel.text = "Break"
+                binding.typeLabel.text = getString(R.string.pausa)
 
             }
             binding.timerBar.max = pomodoroDuration.toInt()
@@ -199,12 +175,12 @@ class TomatoFragment : Fragment() {
 
                 val date = Date(millisUntilFinished)
                 if(max >= 3600000) {
-                    simpleDateFormat = SimpleDateFormat("hh:mm:ss")
+                    simpleDateFormat = SimpleDateFormat("hh:mm:ss", Locale.getDefault())
                     binding.timerLabel.text = simpleDateFormat.format(date)
                     pomodoroViewModel.timeLabel.value = simpleDateFormat.format(date)
                 }
                 else if(max >= 60000) {
-                    simpleDateFormat= SimpleDateFormat("mm:ss")
+                    simpleDateFormat= SimpleDateFormat("mm:ss", Locale.getDefault())
                     binding.timerLabel.text = simpleDateFormat.format(date)
                     pomodoroViewModel.timeLabel.value = simpleDateFormat.format(date)
                 }
@@ -212,30 +188,26 @@ class TomatoFragment : Fragment() {
 
 
             override fun onFinish() {
-
                 stop(true)
                 if(settingsViewModel.notifiche.value == true) {
-                    val notificationManager =
-                        c.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    val notificationManager = contesto.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                     val notificationId = 1
                     val channelId = "pomodoro_channel"
                     val channelName = "Pomodoro Timer"
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val channel = NotificationChannel(
-                            channelId,
-                            channelName,
-                            NotificationManager.IMPORTANCE_HIGH
-                        )
-                        notificationManager.createNotificationChannel(channel)
-                    }
+                    val channel = NotificationChannel(
+                        channelId,
+                        channelName,
+                        NotificationManager.IMPORTANCE_HIGH
+                    )
+                    notificationManager.createNotificationChannel(channel)
                     val notification: Notification
                     // Se devo fare la pausa
                     if(pomodoroViewModel.pausa.value == true) {
-                        notification = NotificationCompat.Builder(c, channelId)
-                            .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                            .setContentTitle("Moai Planner")
-                            .setContentText("Tempo di pausa! Inizia la pausa di ${minutesBreak} minuti!")
+                        notification = NotificationCompat.Builder(contesto, channelId)
+                            .setSmallIcon(R.drawable.baseline_timer_24)
+                            .setContentTitle(getString(R.string.app_name))
+                            .setContentText(getString(R.string.time_break, minutesBreak.toString()))
                             .setAutoCancel(true)
                             .build()
                     }
@@ -243,18 +215,18 @@ class TomatoFragment : Fragment() {
                         roundsRemaining--
                         pomodoroViewModel.rounds.value = roundsRemaining
                         if(roundsRemaining <= 0){
-                            notification = NotificationCompat.Builder(c, channelId)
-                                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                                .setContentTitle("Moai Planner")
-                                .setContentText("Ultimo round terminato! Ben fatto!")
+                            notification = NotificationCompat.Builder(contesto, channelId)
+                                .setSmallIcon(R.drawable.baseline_timer_24)
+                                .setContentTitle(getString(R.string.app_name))
+                                .setContentText(getString(R.string.last_round_notification))
                                 .setAutoCancel(true)
                                 .build()
                         }
                         else {
-                            notification = NotificationCompat.Builder(c, channelId)
-                                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                                .setContentTitle("Moai Planner")
-                                .setContentText("Round terminato! Inizia la sessione di ${minutesSession} minuti! Round rimanenti: ${roundsRemaining}")
+                            notification = NotificationCompat.Builder(contesto, channelId)
+                                .setSmallIcon(R.drawable.baseline_timer_24)
+                                .setContentTitle(getString(R.string.app_name))
+                                .setContentText(getString(R.string.starting_session, minutesSession.toString(), roundsRemaining.toString()))
                                 .setAutoCancel(true)
                                 .build()
                         }
@@ -266,7 +238,7 @@ class TomatoFragment : Fragment() {
                     if(roundsRemaining < 0) {
                         pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
                         roundsRemaining = settingsViewModel.round.value?.toLong()!!
-                        binding.roundsRemaining.text = roundsRemaining.toString();
+                        binding.roundsRemaining.text = roundsRemaining.toString()
                     }
                 }
                 else
@@ -283,7 +255,7 @@ class TomatoFragment : Fragment() {
         else
             binding.timerBar.progress = 100
         initTimerLabel()
-        binding.typeLabel.text = "Time to focus!"
+        binding.typeLabel.text = getString(R.string.time_to_focus)
         binding.timerBar.max = 100
         max = 100
         running = false
@@ -302,7 +274,7 @@ class TomatoFragment : Fragment() {
 
     }
 
-    fun start() {
+    private fun start() {
         if(roundsRemaining <= 0)
             reset()
         initTimer()
@@ -312,7 +284,7 @@ class TomatoFragment : Fragment() {
         binding.playPause.setImageResource(R.drawable.ic_baseline_pause_24)
     }
 
-    fun pause(){
+    private fun pause(){
         binding.playPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
         pomodoroViewModel.timer.value?.cancel()
         running = false
@@ -329,7 +301,7 @@ class TomatoFragment : Fragment() {
         pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
         roundsRemaining = settingsViewModel.round.value?.toLong()!!
         pomodoroViewModel.maxRounds.value = settingsViewModel.round.value?.toLong()
-        binding.typeLabel.text = "Time to focus!"
+        binding.typeLabel.text = getString(R.string.time_to_focus)
         updateRound()
     }
 
@@ -338,10 +310,10 @@ class TomatoFragment : Fragment() {
         pomodoroViewModel.rounds.observe(viewLifecycleOwner) {
             // Reset Rounds
             if(roundsRemaining < 0)
-                binding.roundsRemaining.text = settingsViewModel.round.value.toString() + "/" + settingsViewModel.round.value.toString()
+                binding.roundsRemaining.text = getString(R.string.round_div, settingsViewModel.round.value.toString(), settingsViewModel.round.value.toString())
             // Aggiorno
             else
-                binding.roundsRemaining.text = pomodoroViewModel.rounds.value.toString() + "/" + settingsViewModel.round.value.toString()
+                binding.roundsRemaining.text = getString(R.string.round_div, pomodoroViewModel.rounds.value.toString(), settingsViewModel.round.value.toString())
         }
     }
 
@@ -350,12 +322,12 @@ class TomatoFragment : Fragment() {
         val startLabel = (settingsViewModel.session.value?.toInt()?.times(60) ?: 1) * 1000
         // Formato il tempo
         if(startLabel >= 3600000) {
-            simpleDateFormat= SimpleDateFormat("hh:mm:ss")
+            simpleDateFormat= SimpleDateFormat("hh:mm:ss", Locale.getDefault())
             binding.timerLabel.text = simpleDateFormat.format(startLabel)
 
         }
         else if(startLabel >= 60000) {
-            simpleDateFormat= SimpleDateFormat("mm:ss")
+            simpleDateFormat= SimpleDateFormat("mm:ss", Locale.getDefault())
             binding.timerLabel.text = simpleDateFormat.format(startLabel)
         }
     }

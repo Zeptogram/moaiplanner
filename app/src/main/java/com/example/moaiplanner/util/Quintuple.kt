@@ -13,5 +13,3 @@ data class Quintuple<out A, out B, out C, out D, out E>(
     override fun toString(): String = "($first, $second, $third, $fourth, $fifth)"
 }
 
-
-fun <T> Quintuple<T, T, T, T, T>.toList(): List<T> = listOf(first, second, third, fourth, fifth)

@@ -1,6 +1,6 @@
 package com.example.moaiplanner.data.notes
 
-import FolderViewAdapter
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
@@ -8,27 +8,28 @@ import android.view.View
 import android.widget.EditText
 import androidx.documentfile.provider.DocumentFile
 import com.example.moaiplanner.R
+import com.example.moaiplanner.adapter.FolderViewAdapter
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.util.FolderItem
-import com.example.moaiplanner.util.getFolderSize
-import com.example.moaiplanner.util.sizeCache
-import com.google.android.material.snackbar.Snackbar
+import com.example.moaiplanner.util.Utils
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.text.DecimalFormat
 
+@SuppressLint("NotifyDataSetChanged")
 class FolderManager(private val activity: Activity, private val view: View) {
 
 
@@ -41,96 +42,89 @@ class FolderManager(private val activity: Activity, private val view: View) {
     private var currentFolder = ""
 
 
-    fun getCollections(data: ArrayList<FolderItem>, adapter: FolderViewAdapter, folderName: String, shownFiles: ArrayList<FolderItem>, currentData: ArrayList<FolderItem>){
+    fun getCollections(
+        data: ArrayList<FolderItem>,
+        adapter: FolderViewAdapter,
+        folderName: String,
+        shownFiles: ArrayList<FolderItem>,
+        currentData: ArrayList<FolderItem>
+    ) {
         data.clear()
         shownFiles.clear()
-        adapter.notifyDataSetChanged()
         folderPath = "/${firebase.getCurrentUid()}/Notes/${currentFolder}"
         val folder = storageRef.child("${firebase.getCurrentUid()}/Notes/${folderName}")
         Log.d("collectionNotesRef", folder.toString())
         folder.listAll()
             .addOnSuccessListener { (items, prefixes) ->
                 prefixes.forEach { prefix ->
-
                     Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                    var fileItem = FolderItem(prefix.toString().split("/").last().replace("%20", " "), "", false, R.drawable.folder)
+                    val fileItem = FolderItem(
+                        prefix.toString().split("/").last().replace("%20", " "),
+                        "",
+                        false,
+                        R.drawable.folder
+                    )
                     fileItem.userId = firebase.getCurrentUid().toString()
                     fileItem.path = currentFolder.substringBeforeLast("/")
                     val value: FolderItem? = checkItemPresence(currentData, fileItem)
-                    if(value == null) {
-                        //var dbItem = favouritesRef.child("favourites/$currentFolder").push()
-                        //fileItem.id = dbItem.key.toString()
+                    if (value == null) {
                         data.add(fileItem)
                         getFolderSize(prefix) { bytes, files ->
                             val df = DecimalFormat("#,##0.##")
                             df.maximumFractionDigits = 2
-                            var kb = bytes.toDouble() / 1024
+                            val kb = bytes.toDouble() / 1024
                             val info = df.format(kb) + "KB - " + files.toString() + " Notes"
                             fileItem.folder_files = info
-                           // dbItem.setValue(fileItem)
                             adapter.notifyDataSetChanged()
                         }
                     } else {
                         data.add(value)
-                        adapter.notifyDataSetChanged()
-
                     }
-
-                    //data.add(fileItem)
-
-                    prefix.listAll()
                 }
-
                 items.forEach { item ->
                     Log.d("FIRESTORAGE-ITEM", item.toString())
-                    if (item.toString().split("/").last().contains("^[^.]*\$|.*\\.md\$".toRegex())){
-                        var fileItem = FolderItem(item.toString().split("/").last().replace("%20", " "), "", false, R.drawable.baseline_insert_drive_file_24)
+                    if (item.toString().split("/").last()
+                            .contains("^[^.]*\$|.*\\.md\$".toRegex())
+                    ) {
+                        val fileItem = FolderItem(
+                            item.toString().split("/").last().replace("%20", " "),
+                            "",
+                            false,
+                            R.drawable.baseline_insert_drive_file_24
+                        )
                         fileItem.userId = firebase.getCurrentUid().toString()
                         fileItem.path = currentFolder.substringBeforeLast("/")
                         Log.d("PRESENZA", checkItemPresence(currentData, fileItem).toString())
                         val value: FolderItem? = checkItemPresence(currentData, fileItem)
-                        if(value == null) {
-                            var dbItem = favouritesRef.child("favourites/$currentFolder").push()
+                        if (value == null) {
+                            val dbItem = favouritesRef.child("favourites/$currentFolder").push()
                             fileItem.id = dbItem.key.toString()
                             data.add(fileItem)
                             item.metadata.addOnSuccessListener {
                                 val df = DecimalFormat("#,##0.##")
                                 df.maximumFractionDigits = 2
-                                var kbytes: Double = it.sizeBytes.toDouble() / 1024
+                                val kbytes: Double = it.sizeBytes.toDouble() / 1024
                                 val size = df.format(kbytes) + "kB"
                                 fileItem.folder_files = size
                                 dbItem.setValue(fileItem)
                                 adapter.notifyDataSetChanged()
                             }
-                        }
-                        else {
+                        } else {
                             data.add(value)
-                            adapter.notifyDataSetChanged()
                         }
                     }
                 }
-            }
-            .addOnFailureListener {
-                Log.d("FIRESTORAGE-ERROR", "Error getting file list")
-                view?.let { it1 ->
-                    Snackbar.make(it1, "Error Getting Files", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                        .show()
-                }
-            }
-            .addOnSuccessListener {
                 shownFiles.clear()
                 shownFiles.addAll(data)
                 adapter.notifyDataSetChanged()
             }
+            .addOnFailureListener {
+                Log.d("FIRESTORAGE-ERROR", "Error getting file list")
+                Utils.showPopup(view, activity, activity.getString(R.string.file_load_error))
+            }
     }
 
-    fun getCurrentFolder(): String{
+    fun getCurrentFolder(): String {
         return currentFolder
     }
 
@@ -138,15 +132,15 @@ class FolderManager(private val activity: Activity, private val view: View) {
         currentFolder = folder
     }
 
-    fun getFolderPath(): String{
+    fun getFolderPath(): String {
         return folderPath
     }
 
-    fun getUserData(): UserAuthentication{
+    fun getUserData(): UserAuthentication {
         return firebase
     }
 
-    fun getStorageReference(): StorageReference{
+    private fun getStorageReference(): StorageReference {
         return storageRef
     }
 
@@ -154,79 +148,43 @@ class FolderManager(private val activity: Activity, private val view: View) {
     suspend fun createFile(fileName: EditText, isFolder: Boolean = false) {
         val noteDir: StorageReference
         var text = " "
-        if(!isFolder) {
+        if (!isFolder) {
             noteDir = getStorageReference().child("${getUserData().getCurrentUid()}/Notes/${getCurrentFolder()}${fileName.text}.md")
             text = "# Note created with Moai Planner"
             try {
                 noteDir.putBytes(text.toByteArray()).await()
                 Log.d("NOTE-CREATION", "Nota creata")
-                view.let {
-                    Snackbar.make(it, "Note created", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                        .show()
-                }
+                Utils.showPopup(view, activity, activity.getString(R.string.note_create))
+
             } catch (e: Exception) {
-                view.let {
-                    Snackbar.make(it, "Note error", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                        .show()
-                }
+                Utils.showPopup(view, activity, activity.getString(R.string.note_error))
             }
         } else {
             noteDir = getStorageReference().child("${getUserData().getCurrentUid()}/Notes/${getCurrentFolder()}${fileName.text}/temp.tmp")
             try {
                 noteDir.putBytes(text.toByteArray()).await()
                 Log.d("FOLDER-CREATION", "Folder creato")
-                view?.let {
-                    Snackbar.make(it, "Folder created", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                        .show()
-                }
+                Utils.showPopup(view, activity, activity.getString(R.string.folder_create))
             } catch (e: Exception) {
-                view.let {
-                    Snackbar.make(it, "Folder error", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                        .show()
-                }
+                Utils.showPopup(view, activity, activity.getString(R.string.folder_error))
             }
         }
     }
 
-    suspend fun uploadNote(data: Intent){
-        val uri = data?.data
+    @SuppressLint("Recycle")
+    suspend fun uploadNote(data: Intent) {
+        val uri = data.data
         Log.d("NOTE URI", uri.toString())
         var fileName = "null.md"
-        activity?.let {
-            if (uri != null) {
-                val document = DocumentFile.fromSingleUri(it, uri)
-                if (document != null) {
-                    fileName = document.name.toString()
-                }
+        if (uri != null) {
+            val document = DocumentFile.fromSingleUri(activity, uri)
+            if (document != null) {
+                fileName = document.name.toString()
             }
         }
         Log.d("NOTE URI", fileName)
         val stream = FileInputStream(uri?.let {
-            activity?.contentResolver?.openFileDescriptor(
+            activity.contentResolver?.openFileDescriptor(
                 it,
                 "r"
             )?.fileDescriptor ?: FileDescriptor()
@@ -234,31 +192,12 @@ class FolderManager(private val activity: Activity, private val view: View) {
         try {
             val noteDir = getStorageReference().child("${getUserData().getCurrentUid()}/Notes/${getCurrentFolder()}${fileName}")
             noteDir.putStream(stream).await()
-            // Register observers to listen for when the download is done or if it fails
-            view.let {
-                Snackbar.make(it, "Note uploaded successfully", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                    .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                    .show()
-            }
+            Utils.showPopup(view, activity, activity.getString(R.string.note_uploaded_successfully))
             withContext(Dispatchers.IO) {
                 stream.close()
             }
         } catch (e: Exception) {
-            view.let { it1 ->
-                Snackbar.make(it1, "Note upload failed", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                    .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                    .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                    .show()
-            }
+            Utils.showPopup(view, activity, activity.getString(R.string.note_upload_failed))
             withContext(Dispatchers.IO) {
                 stream.close()
             }
@@ -266,87 +205,71 @@ class FolderManager(private val activity: Activity, private val view: View) {
     }
 
 
-    suspend fun deleteNote(adapter: FolderViewAdapter, shownFiles: ArrayList<FolderItem>, files: ArrayList<FolderItem>, currentData: ArrayList<FolderItem>, position: Int): Boolean {
+    suspend fun deleteNote(
+        adapter: FolderViewAdapter,
+        shownFiles: ArrayList<FolderItem>,
+        currentData: ArrayList<FolderItem>,
+        position: Int
+    ): Boolean {
         val noteDir = getStorageReference().child(
             "${getUserData().getCurrentUid()}/Notes/${getCurrentFolder()}${
                 adapter.getFileName(position)
             }"
         )
         Log.d("NOTE-DIR", noteDir.toString())
-        try {
+        return try {
             val id = shownFiles[position].id
             adapter.onItemDelete(id)
             noteDir.delete().await()
             currentData.remove(shownFiles[position])
-            view.let { it1 ->
-                Snackbar.make(it1, "File deleted", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                    .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                    .show()
-            }
+            Utils.showPopup(view, activity, activity.getString(R.string.note_deleted))
+            true
 
-            return true;
-
-        } catch(e: Exception) {
-        view.let { it1 ->
-            Snackbar.make(it1, "Delete failed", Snackbar.LENGTH_SHORT)
-                .setAction("OK") {
-                    // Responds to click on the action
-                }
-                .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                .show()
-            }
-            return false
+        } catch (e: Exception) {
+            Utils.showPopup(view, activity, activity.getString(R.string.delete_fail))
+            false
         }
     }
 
-    suspend fun deleteDirectory(adapter: FolderViewAdapter, shownFiles: ArrayList<FolderItem>, files: ArrayList<FolderItem>, currentData: ArrayList<FolderItem>, position: Int): Boolean {
-        val noteDir = getStorageReference().child("${getUserData().getCurrentUid()}/Notes/${getCurrentFolder()}${adapter.getFileName(position)}")
+    suspend fun deleteDirectory(
+        adapter: FolderViewAdapter,
+        shownFiles: ArrayList<FolderItem>,
+        files: ArrayList<FolderItem>,
+        currentData: ArrayList<FolderItem>,
+        position: Int
+    ): Boolean {
+        val noteDir = getStorageReference().child(
+            "${getUserData().getCurrentUid()}/Notes/${getCurrentFolder()}${
+                adapter.getFileName(position)
+            }"
+        )
         Log.d("NOTE-DIR", noteDir.toString())
-        try {
+        return try {
             val result = noteDir.listAll().await()
             result.items.forEach { item ->
                 item.delete().await()
             }
             deleteFolder(result.prefixes, adapter, shownFiles, files, currentData)
-            view.let { it1 ->
-                Snackbar.make(it1, "Folder deleted", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                    .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                    .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                    .show()
-            }
-            return true
+            Utils.showPopup(view, activity, activity.getString(R.string.folder_delete))
+            true
 
-        } catch(e: java.lang.Exception) {
-            view.let { it1 ->
-                Snackbar.make(it1, "Delete failed", Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {
-                        // Responds to click on the action
-                    }
-                    //.setBackgroundTint(resources.getColor(R.color.pr))
-                    .setActionTextColor(activity.resources.getColor(R.color.primary, null))
-                    .setAnchorView(activity.findViewById(R.id.bottom_navigation))
-                    .show()
-            }
-            return false
+        } catch (e: java.lang.Exception) {
+            Utils.showPopup(view, activity, activity.getString(R.string.delete_fail))
+            false
         }
     }
 
 
-    private fun checkItemPresence(currentData: ArrayList<FolderItem>, item: FolderItem): FolderItem? {
-        for(i in currentData) {
-            if(i.folder_name == item.folder_name &&
+    private fun checkItemPresence(
+        currentData: ArrayList<FolderItem>,
+        item: FolderItem
+    ): FolderItem? {
+        for (i in currentData) {
+            if (i.folder_name == item.folder_name &&
                 i.path == item.path &&
                 i.icon == item.icon &&
-                i.userId == item.userId)
+                i.userId == item.userId
+            )
                 return i
         }
         return null
@@ -354,43 +277,45 @@ class FolderManager(private val activity: Activity, private val view: View) {
 
     fun updateFolderNotesCache(folder: String) {
         var path = folder
-        while(path != "/${firebase.getCurrentUid()}/Notes") {
+        while (path != "/${firebase.getCurrentUid()}/Notes") {
             path = path.substringBeforeLast("/")
-            sizeCache.remove(path)
+            Utils.sizeCache.remove(path)
         }
     }
 
 
-
-
-
-
     fun fetchFavouritesFromFirebase(currentData: ArrayList<FolderItem>) {
-         val favouritesListListener = object : ValueEventListener {
-             override fun onDataChange(snapshot: DataSnapshot) {
-                 currentData.clear()
-                 val favouritesData = snapshot.child("favourites/${currentFolder}").children
-                 for (item in favouritesData) {
-                     val folderItem = item.getValue(FolderItem::class.java)
-                     Log.d("PRESENZA", folderItem.toString())
-                     if (folderItem != null && folderItem.icon != R.drawable.folder) {
-                         if(folderItem.id.isNotBlank()) {
-                             currentData.add(folderItem)
-                         }
-                     }
-                 }
-                 Log.d("CURRENT", currentData.toString())
-             }
+        val favouritesListListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                currentData.clear()
+                val favouritesData = snapshot.child("favourites/${currentFolder}").children
+                for (item in favouritesData) {
+                    val folderItem = item.getValue(FolderItem::class.java)
+                    Log.d("PRESENZA", folderItem.toString())
+                    if (folderItem != null && folderItem.icon != R.drawable.folder) {
+                        if (folderItem.id.isNotBlank()) {
+                            currentData.add(folderItem)
+                        }
+                    }
+                }
+                Log.d("CURRENT", currentData.toString())
+            }
 
-             override fun onCancelled(error: DatabaseError) {
-                 Log.w("FileFragment", "loadFavouritesList:onCancelled", error.toException())
-             }
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("FileFragment", "loadFavouritesList:onCancelled", error.toException())
+            }
 
-         }
-         favouritesRef.addValueEventListener(favouritesListListener)
-     }
+        }
+        favouritesRef.addValueEventListener(favouritesListListener)
+    }
 
-    private suspend fun deleteFolder(prefixes: List<StorageReference>, adapter: FolderViewAdapter, shownFiles: ArrayList<FolderItem>, files: ArrayList<FolderItem>, currentData: ArrayList<FolderItem>) {
+    private suspend fun deleteFolder(
+        prefixes: List<StorageReference>,
+        adapter: FolderViewAdapter,
+        shownFiles: ArrayList<FolderItem>,
+        files: ArrayList<FolderItem>,
+        currentData: ArrayList<FolderItem>
+    ) {
         prefixes.forEach { prefix ->
             val result = prefix.listAll().await()
             result.items.forEach { item ->
@@ -400,5 +325,102 @@ class FolderManager(private val activity: Activity, private val view: View) {
         }
     }
 
+    fun loadHome(userDir: StorageReference, adapter: FolderViewAdapter, data: ArrayList<FolderItem>) {
+        userDir.listAll()
+            .addOnSuccessListener { (_, prefixes) ->
+                if (prefixes.isEmpty()) {
+                    val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/temp.tmp")
+                    val text = " "
+                    val uploadFile = noteDir.putBytes(text.toByteArray())
+                    uploadFile.addOnSuccessListener {
+                        Log.d("FOLDER-CREATION", "Folder creato")
+                        loadHome(userDir, adapter, data)
+                    }
+                } else {
+                    prefixes.forEach { prefix ->
+                        Log.d("FIRESTORAGE-PREFIX", prefix.toString())
+                        val fileItem = FolderItem(
+                            prefix.toString().split("/").last().replace("%20", " "),
+                            "",
+                            false,
+                            R.drawable.folder
+                        )
+                        getFolderSize(prefix) { bytes, files ->
+                            val df = DecimalFormat("#,##0.##")
+                            df.maximumFractionDigits = 2
+                            val kb = bytes.toDouble() / 1024
+                            val info = df.format(kb) + "KB - " + files.toString() + " Notes"
+                            fileItem.folder_files = info
+                            data.add(fileItem)
+                            adapter.notifyItemInserted(data.lastIndex)
+                        }
+                        prefix.listAll()
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Log.d("FIRESTORAGE-ERROR", "Error getting file list")
+                Utils.showPopup(view, activity, activity.getString(R.string.file_load_error))
+            }
+
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private suspend fun getTotalSize(folder: StorageReference): Pair<Long, Int> {
+        val folderPath = folder.path
+        if (Utils.sizeCache.containsKey(folderPath)  /*&& home.size != 3*/) {
+            // Se la cartella è già stata processata in precedenza, ritorniamo le dimensioni dalla cache
+            return Utils.sizeCache[folderPath]!!
+        }
+
+        var totalSize = 0L
+        var noteCount = 0
+        val (items, prefixes) = folder.listAll().await()
+        val fileTasks = items.map { it.metadata }
+        val metadatas = Tasks.whenAllSuccess<StorageMetadata>(fileTasks).await()
+        metadatas.forEach { metadata ->
+            if(metadata.name?.endsWith(".md") == true) {
+                totalSize += metadata.sizeBytes
+                noteCount++
+            }
+        }
+
+        // Creiamo un array di coroutine job per processare le sotto-cartelle in parallelo
+        val subFolderJobs = prefixes.map { prefix ->
+            GlobalScope.async { getTotalSize(prefix) }
+        }
+
+        // Attendo che tutte le sotto-cartelle siano state processate e sommo le dimensioni e i conteggi
+        val subFolderResults = subFolderJobs.awaitAll()
+        subFolderResults.forEach { (subTotalSize, subNoteCount) ->
+            totalSize += subTotalSize
+            noteCount += subNoteCount
+        }
+
+        // Salviamo le dimensioni nella cache
+        Utils.sizeCache[folderPath] = Pair(totalSize, noteCount)
+
+        return Pair(totalSize, noteCount)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun getFolderSize(
+        folder: StorageReference,
+        callback: (Long, Int) -> Unit
+    ) {
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                val totalSize = getTotalSize(folder).first
+                val fileCount = getTotalSize(folder).second
+                callback(totalSize, fileCount)
+            } catch (e: Exception) {
+                callback(-1, 0)
+            }
+        }
+    }
+
 
 }
+
+
+

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.moaiplanner.adapter
 
 import android.content.Context
@@ -28,7 +30,7 @@ class EditPagerAdapter(fm: FragmentManager, private val context: Context)
         return NUM_PAGES
     }
 
-    override fun getPageTitle(position: Int): CharSequence? {
+    override fun getPageTitle(position: Int): CharSequence {
         var stringId = 0
         when (position) {
             FRAGMENT_EDIT -> stringId = R.string.action_edit

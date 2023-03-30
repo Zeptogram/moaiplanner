@@ -1,10 +1,9 @@
 package com.example.moaiplanner.ui.main
 
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -20,24 +19,18 @@ import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.ui.welcome.WelcomeActivity
-import com.example.moaiplanner.util.disableNotifications
-import com.example.moaiplanner.util.enableLight
+import com.example.moaiplanner.util.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import com.google.firebase.storage.ktx.component1
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.FileDescriptor
 import java.io.FileInputStream
-import java.io.IOException
-import java.net.URL
 
 
+@Suppress("DEPRECATION")
 class OptionsFragment : Fragment() {
 
     private lateinit var settingsViewModel: SettingsViewModel
@@ -47,9 +40,6 @@ class OptionsFragment : Fragment() {
     private lateinit var storageRef: StorageReference
     private lateinit var avatar: StorageReference
     private lateinit var ref: StorageReference
-    fun newInstance(): OptionsFragment? {
-        return OptionsFragment()
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -67,7 +57,7 @@ class OptionsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)
         toolbar?.menu?.setGroupVisible(R.id.sett, false)
@@ -77,27 +67,15 @@ class OptionsFragment : Fragment() {
         if (savedInstanceState != null) {
             settingsViewModel.onRestoreInstanceState(savedInstanceState)
         }
-
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
         binding.viewModel = settingsViewModel
-
-
-
-
-
         return binding.root
-
-        // Inflate il layout per il fragment
-        //return inflater.inflate(R.layout.options_fragment, container, false)
     }
-
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        firebase = UserAuthentication(requireActivity().application, view)
+        firebase = UserAuthentication(requireActivity().application, view, requireActivity())
         storageRef = Firebase.storage.reference
         avatar = storageRef.child("${firebase.getCurrentUid()}/avatar.png")
         ref = storageRef.child("${firebase.getCurrentUid()}/")
@@ -108,43 +86,22 @@ class OptionsFragment : Fragment() {
             binding.buttonChangeName.isEnabled = false
         }
 
-        ref.listAll().addOnSuccessListener { (items) ->
-            items.forEach { item ->
-                Log.d("OPTIONS", item.toString())
-                if(item.toString().substringAfterLast("/") == "avatar.png") {
-                    downloadImage()
-                }
-            }
-            if(firebase.getProvider() == "google.com") {
-                var uri = firebase.getGoogleImage().toString()
-                Picasso.get()
-                    .load(uri)
-                    .priority(Picasso.Priority.HIGH)
-                    .into(binding.profilepic)
-            }
-        }
-        .addOnFailureListener {
-            Log.e("IMAGE", "Using default picture")
-        }
-
+        Utils.loadImage(ref, firebase, avatar, binding.profilepic)
         binding.usermail.text = firebase.getEmail()
         binding.username.text = firebase.getDisplayName()
 
 
         // imposta valore sessione quando viene modificato
         binding.durataPomodoro.addTextChangedListener {
-            //Log.d("SETTINGS", it.toString())
             if(it.toString().isBlank()) {
                 settingsViewModel.session.value = "5"
             }
-
-            else
+            else {
                 settingsViewModel.session.value = it.toString()
+            }
         }
 
-        // imposta valore break quando viene modificato
         binding.durataPausa.addTextChangedListener {
-            //Log.d("SETTINGS", it.toString())
             if(it.toString().isBlank()) {
                 settingsViewModel.pausa.value = "1"
             }
@@ -153,7 +110,6 @@ class OptionsFragment : Fragment() {
         }
 
         binding.numeroRound.addTextChangedListener {
-            //Log.d("SETTINGS", it.toString())
             if(it.toString().isBlank()) {
                 settingsViewModel.round.value = "1"
             }
@@ -163,15 +119,15 @@ class OptionsFragment : Fragment() {
 
         binding.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
             settingsViewModel.notifiche.value = isChecked
-            disableNotifications(isChecked, requireContext())
+            Utils.disableNotifications(isChecked, requireContext())
         }
 
         binding.themeSwitch.setOnCheckedChangeListener { _, isChecked ->
             settingsViewModel.lightMode.value = isChecked
-            enableLight(isChecked)
+            Utils.enableLight(isChecked)
         }
 
-        binding.editImage.setOnClickListener() {
+        binding.editImage.setOnClickListener {
             Intent(Intent.ACTION_GET_CONTENT).also {
                 it.type = "image/*"
                 startActivityForResult(it, 0)
@@ -190,7 +146,7 @@ class OptionsFragment : Fragment() {
             showEditPasswordDialog()
         }
 
-        binding.buttonLogout.setOnClickListener() {
+        binding.buttonLogout.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 firebase.signOut(requireContext())
             }.invokeOnCompletion {
@@ -204,40 +160,25 @@ class OptionsFragment : Fragment() {
     }
 
 
+    @SuppressLint("Recycle")
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 0) {
             val uri = data?.data
             Log.d("AVATAR URI", uri.toString())
             val stream = FileInputStream(uri?.let { context?.contentResolver?.openFileDescriptor(it, "r")?.fileDescriptor ?: FileDescriptor() })
-            // val file = Uri.fromFile(uri?.toFile() as File)
-
-            //val file = File(uri?.toFile())
             val uploadTask = avatar.putStream(stream)
 
             // Register observers to listen for when the download is done or if it fails
             uploadTask.addOnFailureListener {
                 view?.let { it1 ->
-                    Snackbar.make(it1, "Image upload failed", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                        .show()
+                    Utils.showPopup(it1, requireActivity(), getString(R.string.image_upload_failed))
                 }
                 stream.close()
-            }.addOnSuccessListener { taskSnapshot ->
+            }.addOnSuccessListener {
                 view?.let { it1 ->
-                    Snackbar.make(it1, "Imaged uploaded successfully", Snackbar.LENGTH_SHORT)
-                        .setAction("OK") {
-                            // Responds to click on the action
-                        }
-                        //.setBackgroundTint(resources.getColor(R.color.pr))
-                        .setActionTextColor(resources.getColor(R.color.primary, null))
-                        .setAnchorView(activity?.findViewById(R.id.bottom_navigation))
-                        .show()
+                    Utils.showPopup(it1, requireActivity(), getString(R.string.image_uploaded_successfully))
                 }
                 stream.close()
                 binding.profilepic.setImageURI(uri)
@@ -261,16 +202,16 @@ class OptionsFragment : Fragment() {
         val editUsername = dialogView.findViewById<EditText>(R.id.userText)
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Modifica l'Username")
+            .setTitle(getString(R.string.edit_username))
             .setView(dialogView)
-            .setPositiveButton("Modifica") { dialog, which ->
+            .setPositiveButton(getString(R.string.edit)) { _, _ ->
                 val text = editUsername.text.toString()
 
                 if (text.isNotBlank()) {
                     firebase.setDisplayName(text, binding.username)
                 }
             }
-            .setNegativeButton("Annulla") { dialog, which ->
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
             }
             .create()
 
@@ -284,16 +225,16 @@ class OptionsFragment : Fragment() {
         val editEmail = dialogView.findViewById<EditText>(R.id.emailText)
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Modifica la Email")
+            .setTitle(getString(R.string.edit_email))
             .setView(dialogView)
-            .setPositiveButton("Modifica") { dialog, which ->
+            .setPositiveButton(getString(R.string.edit)) { _, _ ->
                 val text = editEmail.text.toString()
 
                 if (text.isNotBlank()) {
                     firebase.setEmail(text, binding.username)
                 }
             }
-            .setNegativeButton("Annulla") { dialog, which ->
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
             }
             .create()
 
@@ -309,42 +250,22 @@ class OptionsFragment : Fragment() {
 
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Modifica la Password")
+            .setTitle(getString(R.string.edit_password))
             .setView(dialogView)
-            .setPositiveButton("Modifica") { dialog, which ->
+            .setPositiveButton(getString(R.string.edit)) { _, _ ->
                 val old = oldPass.text.toString()
-                var new = newPass.text.toString()
+                val new = newPass.text.toString()
 
                 if (old.isNotBlank() && new.isNotBlank()) {
                     firebase.setPassword(old, new)
                 }
             }
-            .setNegativeButton("Annulla") { dialog, which ->
-            }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .create()
 
         dialog.show()
 
     }
-
-    private fun downloadImage(){
-        avatar.downloadUrl.addOnSuccessListener { uri ->
-            Picasso.get()
-                .load(uri.toString())
-                .priority(Picasso.Priority.HIGH)
-                .into(binding.profilepic)
-        }.addOnFailureListener { exception ->
-            if (exception is StorageException &&
-                (exception as StorageException).errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
-                // File not found, handle appropriately
-                Log.e("IMAGE", "File not found in storage")
-            } else {
-                // Other storage exception, handle appropriately
-                Log.e("IMAGE", "StorageException: ${exception.message}")
-            }
-        }
-    }
-
 
 }
 

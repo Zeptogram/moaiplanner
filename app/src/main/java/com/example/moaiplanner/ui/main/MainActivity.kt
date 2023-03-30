@@ -3,17 +3,12 @@ package com.example.moaiplanner.ui.main
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
@@ -21,10 +16,9 @@ import com.example.moaiplanner.R
 import com.example.moaiplanner.data.repository.settings.SettingsRepository
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
-import com.example.moaiplanner.util.disableNotifications
-import com.example.moaiplanner.util.enableLight
+import com.example.moaiplanner.util.NavigationHelper
+import com.example.moaiplanner.util.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity() {
@@ -57,13 +51,10 @@ class MainActivity : AppCompatActivity() {
         ).build()
 
         toolbar.setupWithNavController(navController, appBarConfiguration)
-        bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav = findViewById(R.id.bottom_navigation)
         // Mette la home come main
-        bottomNav.menu.getItem(0).isChecked = true;
-        NavigationUI.setupWithNavController(bottomNav, navController);
-
-        //toolbar?.menu?.setGroupVisible(R.id.edit, false)
-        //toolbar?.menu?.setGroupVisible(R.id.sett, true)
+        bottomNav.menu.getItem(0).isChecked = true
+        NavigationUI.setupWithNavController(bottomNav, navController)
 
         settingsRepository = SettingsRepository(this)
         val factory = SettingsViewModelFactory(SettingsRepository(this))
@@ -71,54 +62,26 @@ class MainActivity : AppCompatActivity() {
 
         settingsViewModel.restoreSettings()
 
-        settingsViewModel.lightMode.value?.let { enableLight(it) }
-        settingsViewModel.notifiche.value?.let { disableNotifications(it, this) }
+        settingsViewModel.lightMode.value?.let { Utils.enableLight(it) }
+        settingsViewModel.notifiche.value?.let { Utils.disableNotifications(it, this) }
 
 
         bottomNav.setOnItemSelectedListener { item ->
             when(item.itemId) {
                 R.id.note -> {
-                    navHostFragment.findNavController().popBackStack()
-                    navHostFragment.findNavController().navigate(R.id.noteFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-                        }, null)
+                    NavigationHelper.navigateFromActivity(navHostFragment, R.id.noteFragment)
                     true
                 }
                 R.id.home -> {
-                    navHostFragment.findNavController().popBackStack()
-                    navHostFragment.findNavController().navigate(R.id.homeFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-                        })
+                    NavigationHelper.navigateFromActivity(navHostFragment, R.id.homeFragment)
                     true
                 }
                 R.id.tomato -> {
-                    navHostFragment.findNavController().popBackStack()
-                    navHostFragment.findNavController().navigate(R.id.tomatoFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-                        }, null)
+                    NavigationHelper.navigateFromActivity(navHostFragment, R.id.tomatoFragment)
                     true
                 }
                 R.id.todo -> {
-                    navHostFragment.findNavController().popBackStack()
-                    navHostFragment.findNavController().navigate(R.id.toDoListFragment, null,
-                        navOptions {
-                            anim {
-                                enter = android.R.anim.fade_in
-                                popEnter = android.R.anim.fade_in
-                            }
-                        }, null)
+                    NavigationHelper.navigateFromActivity(navHostFragment, R.id.toDoListFragment)
                     true
                 }
                 else -> false
@@ -128,8 +91,6 @@ class MainActivity : AppCompatActivity() {
 
         val m = toolbar.menu as MenuBuilder
         m.setOptionalIconsVisible(true)
-
-
 
     }
 

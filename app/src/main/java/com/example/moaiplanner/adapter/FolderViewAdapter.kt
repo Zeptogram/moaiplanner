@@ -1,5 +1,6 @@
+package com.example.moaiplanner.adapter
+
 import android.app.Application
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,40 +16,30 @@ import com.google.firebase.database.FirebaseDatabase
 
 class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adapter<FolderViewAdapter.ViewHolder>() {
 
-    private lateinit var mListener : onItemClickListener
+    private lateinit var mListener : OnItemClickListener
     private var auth = UserAuthentication(Application())
     private var database = FirebaseDatabase.getInstance()
     private var ref = database.getReference("users/" + auth.getCurrentUid().toString())
 
-
-    interface onItemClickListener {
+    interface OnItemClickListener {
         fun onItemClick(position: Int)
         fun onItemLongClick(position: Int)
 
     }
-
-
-    fun setOnItemClickListener(listener: onItemClickListener) {
+    fun setOnItemClickListener(listener: OnItemClickListener) {
         mListener = listener
     }
 
-
-    // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // inflates the card_view_design view
-        // that is used to hold list item
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.note_template, parent, false)
 
         return ViewHolder(view, mListener)
     }
 
-    // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val item = mList[position]
-        // sets the image to the imageview from our itemHolder class
-        // sets the text to the textview from our itemHolder class
         holder.textViewName.text = item.folder_name
         holder.textViewSize.text = item.folder_files
         holder.checkbox.isChecked = item.isFavourite
@@ -58,12 +49,9 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         holder.checkbox.setOnClickListener {
             item.isFavourite = !item.isFavourite
             modifyItemState(item.id, item.isFavourite, "/" + item.path)
-            Log.d("TEST", "Called Checked: " + position.toString())
         }
 
     }
-
-
     // return the number of the items in the list
     override fun getItemCount(): Int {
         return mList.size
@@ -73,7 +61,7 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
         return mList[position].folder_name
     }
     // Holds the views for adding it to image and text
-    class ViewHolder(ItemView: View, listener: onItemClickListener) : RecyclerView.ViewHolder(ItemView) {
+    class ViewHolder(ItemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(ItemView) {
         val textViewName: TextView = itemView.findViewById(R.id.fileName)
         val textViewSize: TextView = itemView.findViewById(R.id.fileSize)
         val checkbox: CheckBox = itemView.findViewById(R.id.star)
@@ -97,14 +85,8 @@ class FolderViewAdapter(private val mList: List<FolderItem>) : RecyclerView.Adap
     }
 
     fun onItemDelete(itemObjectId: String, path: String = "") {
-        Log.d("PROVA", path.toString())
-        Log.d("PROVA", itemObjectId.toString())
         val value = ref.child("favourites/${path}").child(itemObjectId)
         value.removeValue()
     }
-
-
-
-
 
 }

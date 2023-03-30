@@ -10,18 +10,10 @@
         android:label="@string/settings"
         tools:layout="@layout/options_fragment"/>
     <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.moaiplanner.ui.welcome.RegisterFragment"
-        android:label="Test"
-        tools:layout="@layout/register_fragment" />
-    <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.moaiplanner.ui.main.HomeFragment"
         android:label="@string/app_name"
         tools:layout="@layout/home_fragment" >
-        <action
-            android:id="@+id/action_homeFragment_to_friendFragment"
-            app:destination="@id/friendFragment" />
         <action
             android:id="@+id/action_homeFragment_to_fileFragment"
             app:destination="@id/fileFragment" />
@@ -46,13 +38,8 @@
         android:name="com.example.moaiplanner.ui.main.ToDoListFragment"
         android:label="To Do" />
     <fragment
-        android:id="@+id/friendFragment"
-        android:name="com.example.moaiplanner.ui.main.FriendFragment"
-        android:label=""
-        tools:layout="@layout/friend_fragment" />
-    <fragment
         android:id="@+id/fileFragment"
         android:name="com.example.moaiplanner.ui.main.FileFragment"
-        android:label="My Notes"
+        android:label="@string/my_notes"
         tools:layout="@layout/file_fragment" />
 </navigation>

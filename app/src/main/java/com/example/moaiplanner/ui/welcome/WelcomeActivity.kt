@@ -1,7 +1,6 @@
 package com.example.moaiplanner.ui.welcome
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -9,8 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.moaiplanner.R
@@ -18,9 +15,8 @@ import com.example.moaiplanner.data.repository.settings.SettingsRepository
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.ui.main.MainActivity
-import com.example.moaiplanner.util.disableNotifications
-import com.example.moaiplanner.util.enableLight
-
+import com.example.moaiplanner.util.NavigationHelper
+import com.example.moaiplanner.util.Utils
 class WelcomeActivity : AppCompatActivity() {
     private lateinit var navHostFragment : NavHostFragment
     private lateinit var settingsViewModel: SettingsViewModel
@@ -44,23 +40,14 @@ class WelcomeActivity : AppCompatActivity() {
         val logged = sharedPref.getBoolean("auth", false)
 
         settingsViewModel.restoreSettings()
-        settingsViewModel.lightMode.value?.let { enableLight(it) }
-        settingsViewModel.notifiche.value?.let { disableNotifications(it, this) }
+        settingsViewModel.lightMode.value?.let { Utils.enableLight(it) }
+        settingsViewModel.notifiche.value?.let { Utils.disableNotifications(it, this) }
 
         if(logged) {
             Log.d("WELCOME-A", "User logged")
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            NavigationHelper.changeActivity(this, MainActivity::class.java)
         } else if(!onBoardingFinished()) {
-            navController.popBackStack()
-            navHostFragment.findNavController().navigate(R.id.viewPagerFragment, null,
-                navOptions {
-                    anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
-                    }
-                }, null)
+            NavigationHelper.navigateFromActivity(navHostFragment, R.id.viewPagerFragment)
         }
 
     }

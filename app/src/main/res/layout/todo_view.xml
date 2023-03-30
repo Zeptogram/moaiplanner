@@ -25,11 +25,11 @@
         <LinearLayout
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            >
+            android:baselineAligned="false"
+            tools:ignore="UselessParent">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -37,7 +37,6 @@
                 android:orientation="vertical"
                 android:layout_gravity="center"
                 android:layout_weight="0.8">
-
 
                 <TextView
                     android:id="@+id/textView"
@@ -47,7 +46,7 @@
                     android:textSize="18sp"
 
                     android:layout_height="wrap_content"
-                    android:text="TODO"
+                    android:text="@string/item"
                     />
 
                 <TextView
@@ -55,28 +54,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.Material3.MaterialTimePicker.Title"
-                    android:text="Time"
+                    android:text="@string/time"
                     android:textColor="?android:textColorSecondaryNoDisable" />
-
-
-                <!-- TextView per visualizzare il testo dell'elemento -->
-
-
-
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:orientation="horizontal">
                 <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/checkBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-
-            </LinearLayout>
         </LinearLayout>
 
 
