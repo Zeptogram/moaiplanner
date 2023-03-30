@@ -101,14 +101,11 @@ class MarkdownViewModel : ViewModel() {
                 this@MarkdownViewModel.fileName.postValue(fileName)
                 this@MarkdownViewModel.uri.postValue(uri)
                 isDirty.set(false)
-                //timber.i("Saved file $fileName to uri $uri")
-                //timber.i("Persisting autosave uri in shared prefs: $uri")
                 sharedPrefs.edit()
                     .putString(PREF_KEY_AUTOSAVE_URI, uri.toString())
                     .apply()
                 true
             } catch (e: Exception) {
-                //timber.e(e, "Failed to save file at uri: $uri")
                 false
             }
         }
@@ -116,36 +113,25 @@ class MarkdownViewModel : ViewModel() {
 
     suspend fun autosave(context: Context, sharedPrefs: SharedPreferences) {
         if (saveMutex.isLocked) {
-            //timber.i("Ignoring autosave since manual save is already in progress")
             return
         }
         val isAutoSaveEnabled = sharedPrefs.getBoolean(NoteFragment.KEY_AUTOSAVE, true)
-        //timber.d("Autosave called. isEnabled? $isAutoSaveEnabled")
         if (!isDirty.get() || !isAutoSaveEnabled) {
-            //timber.i("Ignoring call to autosave. Contents haven't changed or autosave not enabled")
             return
         }
 
-        if (save(context)) {
-            //timber.i("Autosave with cached uri succeeded: ${uri.value}")
-        } else {
-            // The user has left the app, with autosave enabled, and we don't already have a
-            // Uri for them or for some reason we were unable to save to the original Uri. In
-            // this case, we need to just save to internal file storage so that we can recover
+        if (!save(context)) {
             val fileUri = Uri.fromFile(File(context.filesDir, fileName.value ?: "Untitled.md"))
-            // timber.i("No cached uri for autosave, saving to $fileUri instead")
             save(context, fileUri)
         }
     }
 
     fun reset(untitledFileName: String, sharedPrefs: SharedPreferences) {
-        // timber.i("Resetting view model to default state")
         fileName.postValue(untitledFileName)
         uri.postValue(null)
         markdownUpdates.postValue("")
         editorActions.postValue(EditorAction.Load(""))
         isDirty.set(false)
-        //timber.i("Removing autosave uri from shared prefs")
         sharedPrefs.edit {
             remove(PREF_KEY_AUTOSAVE_URI)
         }

@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -20,6 +19,7 @@ import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.EditPagerAdapter
+import com.example.moaiplanner.data.notes.FolderManager
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.DisableableViewPager
@@ -62,6 +62,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val toolbar = activity?.findViewById<Toolbar>(R.id.topAppBar)
+        val fm = FolderManager(requireActivity(), requireView())
 
         toolbar?.menu?.setGroupVisible(R.id.edit, true)
         toolbar?.menu?.setGroupVisible(R.id.sett, false)
@@ -111,22 +112,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                         markdownViewModel.autosave(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
                         markdownViewModel.saveDir(requireContext())
                     }.invokeOnCompletion {
-                        var folder = "/${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}"
-                        var noteDir = storageRef.child("${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}/${markdownViewModel.fileName.value}")
-                        if(!noteDir.toString().contains("Notes")) {
-                            folder = "/${firebase.getCurrentUid()}/Notes"
-                            noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/${markdownViewModel.fileName.value}")
-                        }
-                        val uri : Uri = markdownViewModel.uri.value.toString().toUri()
-                        val uploadTask = noteDir.putFile(uri)
-                        uploadTask.addOnFailureListener {
-                            Utils.showPopup(view, requireActivity(), getString(R.string.note_upload_failed))
-                            Log.d("Note", "Failed")
-                        }.addOnSuccessListener { _ ->
-                            updateFolderNotesCache(folder)
-                            Utils.showPopup(view, requireActivity(), getString(R.string.note_uploaded_successfully))
-                            Log.d("Note", "Successful")
-                        }
+                        fm.saveOnFirebase(noteDir, markdownViewModel)
                     }
                     true
                 }
@@ -151,7 +137,6 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
                     true
                 }
                 R.id.action_lock_swipe -> {
-                    //Timber.d("Lock swiping clicked")
                     it.isChecked = !it.isChecked
                     pager!!.setSwipeLocked(it.isChecked)
                     true
@@ -250,7 +235,6 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
             return
         }
         val context = context ?: run {
-            //Timber.w("Context is null, unable to show prompt for save or discard")
             return
         }
         MaterialAlertDialogBuilder(context)
@@ -308,13 +292,7 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         const val KEY_AUTOSAVE = "autosave"
     }
 
-    private fun updateFolderNotesCache(folder: String) {
-        var path = folder
-        while(path != "/${firebase.getCurrentUid()}") {
-            Utils.sizeCache.remove(path)
-            path = path.substringBeforeLast("/")
-        }
-    }
+
 
 
 

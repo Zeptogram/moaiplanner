@@ -3,13 +3,16 @@ package com.example.moaiplanner.data.notes
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import com.example.moaiplanner.R
 import com.example.moaiplanner.adapter.FolderViewAdapter
 import com.example.moaiplanner.data.user.UserAuthentication
+import com.example.moaiplanner.model.MarkdownViewModel
 import com.example.moaiplanner.util.FolderItem
 import com.example.moaiplanner.util.Utils
 import com.google.android.gms.tasks.Tasks
@@ -277,9 +280,9 @@ class FolderManager(private val activity: Activity, private val view: View) {
 
     fun updateFolderNotesCache(folder: String) {
         var path = folder
-        while (path != "/${firebase.getCurrentUid()}/Notes") {
-            path = path.substringBeforeLast("/")
+        while(path != "/${firebase.getCurrentUid()}") {
             Utils.sizeCache.remove(path)
+            path = path.substringBeforeLast("/")
         }
     }
 
@@ -416,6 +419,25 @@ class FolderManager(private val activity: Activity, private val view: View) {
             } catch (e: Exception) {
                 callback(-1, 0)
             }
+        }
+    }
+
+    fun saveOnFirebase(noteDir: String, markdownViewModel: MarkdownViewModel){
+        var folder = "/${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}"
+        var dir = storageRef.child("${firebase.getCurrentUid()}/${noteDir.substringBeforeLast("/")}/${markdownViewModel.fileName.value}")
+        if(!dir.toString().contains("Notes")) {
+            folder = "/${firebase.getCurrentUid()}/Notes"
+            dir = storageRef.child("${firebase.getCurrentUid()}/Notes/${markdownViewModel.fileName.value}")
+        }
+        val uri : Uri = markdownViewModel.uri.value.toString().toUri()
+        val uploadTask = dir.putFile(uri)
+        uploadTask.addOnFailureListener {
+            Utils.showPopup(view, activity, activity.getString(R.string.note_upload_failed))
+            Log.d("Note", "Failed")
+        }.addOnSuccessListener {
+            updateFolderNotesCache(folder)
+            Utils.showPopup(view, activity, activity.getString(R.string.note_uploaded_successfully))
+            Log.d("Note", "Successful")
         }
     }
 
