@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 <!-- Base application theme. -->
 <style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
     <!-- Customize your dark theme here. -->
@@ -25,6 +25,8 @@
     <!-- Snackbar -->
     <item name="colorSurfaceInverse">@color/night_background</item>
     <item name="colorOnSurfaceInverse">@color/white</item>
+    <item name="colorError">@color/night_background</item>
+
 
 
 

@@ -171,4 +171,6 @@
     <string name="old_password_not_correct">Old password not correct</string>
     <string name="secure_pass">Insert a secure password</string>
     <string name="valid_email">Insert a valid email</string>
+    <string name="listen_to_the_radio">Listen to the radio</string>
+    <string name="moai_radio">Moai Radio</string>
 </resources>

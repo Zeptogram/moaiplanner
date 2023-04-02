@@ -1,9 +1,12 @@
 package com.example.moaiplanner.ui.main
 
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
@@ -18,12 +21,15 @@ import com.example.moaiplanner.databinding.TomatoFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.model.TomatoViewModel
+import com.example.moaiplanner.service.MoaiRadioService
 import com.example.moaiplanner.util.NavigationHelper
+import com.example.moaiplanner.util.NetworkUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
 
 
+@Suppress("DEPRECATION")
 class TomatoFragment : Fragment() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var binding: TomatoFragmentBinding
@@ -36,6 +42,16 @@ class TomatoFragment : Fragment() {
     private var max: Long = -1
     private var running: Boolean = false
     var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss", Locale.getDefault())
+
+    private var radioPlaying: Boolean = false
+
+    override fun onResume() {
+        super.onResume()
+        radioPlaying = isServiceRunning("com.example.moaiplanner.service.MoaiRadioService")
+        if (radioPlaying) {
+            binding.musicPlay.setImageResource(R.drawable.ic_baseline_stop_24)
+        }
+    }
 
 
 
@@ -118,6 +134,21 @@ class TomatoFragment : Fragment() {
 
     }
 
+    private fun isServiceRunning(serviceName: String): Boolean {
+        var serviceRunning = false
+        val am = context?.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        val l = am.getRunningServices(50)
+        val i: Iterator<ActivityManager.RunningServiceInfo> = l.iterator()
+        while (i.hasNext()) {
+            val runningServiceInfo = i
+                .next()
+            if (runningServiceInfo.service.className == serviceName) {
+                serviceRunning = true
+            }
+        }
+        return serviceRunning
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -132,6 +163,31 @@ class TomatoFragment : Fragment() {
                 }
             }
             true
+        }
+
+        binding.musicPlay.setOnClickListener {
+            NetworkUtils.notifyMissingNetwork(requireContext(), requireView(), requireActivity())
+            if(NetworkUtils.isNetworkAvailable(requireContext())) {
+                if (!radioPlaying) {
+                    requireContext().startForegroundService(
+                        Intent(
+                            requireContext(),
+                            MoaiRadioService::class.java
+                        )
+                    )
+                    radioPlaying = true
+                    binding.musicPlay.setImageResource(R.drawable.ic_baseline_stop_24)
+                } else {
+                    requireContext().stopService(
+                        Intent(
+                            requireContext(),
+                            MoaiRadioService::class.java
+                        )
+                    )
+                    radioPlaying = false
+                    binding.musicPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                }
+            }
         }
         // Mette la home come main
         bottomNav.menu.getItem(3).isChecked = true

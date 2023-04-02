@@ -133,7 +133,7 @@
     <string name="starting_session">Round is over! Starting now the session of %1$s minutes! Rounds remaining: %2$s</string>
     <string name="time_break">Time to break! Starting %1$s minutes break!</string>
     <string name="send_email">Send Email</string>
-    <string name="network_missing">Network Connection missing</string>
+    <string name="network_missing">Network Connection Missing</string>
     <string name="network_try">Connect to the Network and try again</string>
     <string name="note_create">Note created</string>
     <string name="folder_create">Folder created</string>
@@ -151,4 +151,6 @@
     <string name="old_password_not_correct">Old password not correct</string>
     <string name="secure_pass">Insert a secure password</string>
     <string name="valid_email">Insert a valid email</string>
+    <string name="listen_to_the_radio">Listen to the Radio</string>
+    <string name="moai_radio">Moai Radio</string>
 </resources>

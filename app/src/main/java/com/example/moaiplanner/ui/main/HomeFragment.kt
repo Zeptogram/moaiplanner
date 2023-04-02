@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), requireActivity())
+        NetworkUtils.notifyMissingNetwork(requireContext(), requireView(), requireActivity())
         val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         val toolbar = activity?.findViewById<androidx.appcompat.widget.Toolbar>(R.id.topAppBar)
         toolbar?.menu?.setGroupVisible(R.id.edit, false)

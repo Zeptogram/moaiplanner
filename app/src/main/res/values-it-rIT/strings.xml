@@ -132,8 +132,8 @@
     <string name="starting_session">Round terminato! Inizia la sessione di %1$s minuti! Round rimanenti: %2$s</string>
     <string name="time_break">Tempo di pausa! Inizia la pausa di %1$s minuti!</string>
     <string name="send_email">Invia Email</string>
-    <string name="network_missing">Connessione di rete assente</string>
-    <string name="network_try">Connettiti alla rete e riprova</string>
+    <string name="network_missing">Connessione di Rete Assente</string>
+    <string name="network_try">Connettiti alla Rete e riprova</string>
     <string name="note_create">Nota creata</string>
     <string name="folder_create">Cartella Creata</string>
     <string name="folder_error">Errore di creazione della Cartella</string>
@@ -151,4 +151,6 @@
     <string name="old_password_not_correct">La vecchia password non è corretta</string>
     <string name="secure_pass">Inserire una password sicura</string>
     <string name="valid_email">Inserire una email valida</string>
+    <string name="moai_radio">Moai Radio</string>
+    <string name="listen_to_the_radio">Ascolta la Radio</string>
 </resources>

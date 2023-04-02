@@ -55,7 +55,7 @@ class FileFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         fm =  FolderManager(requireActivity(), requireView())
 
-        NetworkUtils.notifyMissingNetwork(requireContext(), requireActivity())
+        NetworkUtils.notifyMissingNetwork(requireContext(), requireView(), requireActivity())
         val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         // Mette la home come main
         bottomNav.menu.getItem(0).isChecked = true

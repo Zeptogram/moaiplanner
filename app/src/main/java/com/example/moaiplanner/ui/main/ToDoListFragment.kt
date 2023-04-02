@@ -190,7 +190,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), requireActivity())
+        NetworkUtils.notifyMissingNetwork(requireContext(), requireView(), requireActivity())
         val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         toolbar = activity?.findViewById(R.id.topAppBar)!!
         toolbar.menu?.setGroupVisible(R.id.edit, false)

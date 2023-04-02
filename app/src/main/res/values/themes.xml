@@ -21,6 +21,7 @@
     <item name="colorOnPrimaryContainer">@color/white</item>
     <item name="android:statusBarColor">@color/night_background</item>
     <item name="android:fontFamily"> @font/avenirbold </item>
+    <item name="colorError">@color/night_background</item>
 
     <!-- Snackbar -->
     <item name="colorOnSurfaceInverse">@color/black</item>

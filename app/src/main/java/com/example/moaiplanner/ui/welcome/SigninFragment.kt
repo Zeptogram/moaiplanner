@@ -39,7 +39,7 @@ class SigninFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), activity)
+        NetworkUtils.notifyMissingNetwork(requireContext(), requireActivity())
 
         binding.buttonGoogleLogin.setOnClickListener {
             Log.d("USER", "Google Sign in Requested")

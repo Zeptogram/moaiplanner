@@ -32,7 +32,7 @@ class WelcomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        NetworkUtils.notifyMissingNetwork(requireContext(), activity)
+        NetworkUtils.notifyMissingNetwork(requireContext(), requireActivity())
 
         binding.buttonEmail.setOnClickListener {
             NavigationHelper.navigateTo(view, R.id.signinFragment)
