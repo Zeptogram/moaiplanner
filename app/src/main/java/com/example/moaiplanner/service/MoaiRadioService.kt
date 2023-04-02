@@ -1,12 +1,7 @@
 package com.example.moaiplanner.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
 import android.app.NotificationManager.IMPORTANCE_HIGH
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_MUTABLE
-import android.app.Service
-import android.content.ComponentName
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
@@ -46,6 +41,9 @@ class MoaiRadioService : Service(), OnPreparedListener {
     private var numSong = 2
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
+    private var notificationManager : NotificationManager? = null
+    private var notification : Notification? = null
+    //private var init = false
 
     data class Song(
         val artist: String,
@@ -62,21 +60,21 @@ class MoaiRadioService : Service(), OnPreparedListener {
     override fun onCreate() {
         super.onCreate()
 
-        playlistRadio = IntArray(numSong, { it + 1 })
+        playlistRadio = IntArray(numSong) { it + 1 }
         playlistRadio?.shuffle()
 
         mediaSession = MediaSessionCompat(applicationContext, "MediaSessionDebug")
         mediaController = mediaSession!!.controller
 
-        val mediaButtonReceiver = ComponentName(applicationContext, MediaButtonReceiver::class.java)
-        mediaSession?.setMediaButtonReceiver(PendingIntent.getBroadcast(applicationContext, 0, Intent(Intent.ACTION_MEDIA_BUTTON).setComponent(mediaButtonReceiver), FLAG_MUTABLE))
+        //val mediaButtonReceiver = ComponentName(applicationContext, MediaButtonReceiver::class.java)
+        //mediaSession?.setMediaButtonReceiver(PendingIntent.getBroadcast(applicationContext, 0, Intent(Intent.ACTION_MEDIA_BUTTON).setComponent(mediaButtonReceiver), FLAG_MUTABLE))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notificationManager : NotificationManager = applicationContext.getSystemService(
+        notificationManager = applicationContext.getSystemService(
             NOTIFICATION_SERVICE
         ) as NotificationManager
-        notificationManager.createNotificationChannel(NotificationChannel("moairadio", "Moai Radio", IMPORTANCE_HIGH))
+        notificationManager!!.createNotificationChannel(NotificationChannel("moairadio", "Moai Radio", IMPORTANCE_HIGH))
 
         val albumCover = BitmapFactory.decodeResource(
             applicationContext.resources,
@@ -113,7 +111,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
             }
         ).build()
 
-        val notification = NotificationCompat.Builder(applicationContext, "moairadio")
+        notification = NotificationCompat.Builder(applicationContext, "moairadio")
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
                 .setMediaSession(mediaSession!!.sessionToken))
             .setContentTitle("Moai Radio")
@@ -142,10 +140,10 @@ class MoaiRadioService : Service(), OnPreparedListener {
 
         updateMetadata()
         mediaSession!!.setPlaybackState(playbackState)
-        MediaButtonReceiver.handleIntent(mediaSession, intent)
+        //MediaButtonReceiver.handleIntent(mediaSession, intent)
 
         val ONGOING_NOTIFICATION_ID = 1
-        notificationManager.notify(ONGOING_NOTIFICATION_ID, notification)
+        notificationManager!!.notify(ONGOING_NOTIFICATION_ID, notification)
 
         startForeground(ONGOING_NOTIFICATION_ID, notification)
 
@@ -182,9 +180,9 @@ class MoaiRadioService : Service(), OnPreparedListener {
                     } else {
                         currentSongId--
                     }
+                    updateMetadata()
                     mediaPlayer.setDataSource("https://moai.eu.pythonanywhere.com/".plus(playlistRadio?.get(currentSongId).toString())) // METTERE RANDOM
                     mediaPlayer.prepareAsync()
-                    updateMetadata()
                 }
 
                 override fun onSeekTo(pos: Long) {
@@ -205,9 +203,9 @@ class MoaiRadioService : Service(), OnPreparedListener {
         mediaPlayer.reset()
         updatePlaybackState(PlaybackState.STATE_STOPPED)
         currentSongId = (currentSongId + 1) % numSong
+        updateMetadata()
         mediaPlayer.setDataSource("https://moai.eu.pythonanywhere.com/".plus(playlistRadio?.get(currentSongId).toString()))
         mediaPlayer.prepareAsync()
-        updateMetadata()
     }
 
     private fun updatePlaybackState(state: Int) {
@@ -222,7 +220,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
         mediaSession?.setPlaybackState(stateBuilder.build())
     }
 
-    fun updateMetadata() {
+    private fun updateMetadata() {
         var info : Song? = null
         var response : Response? = null
         scope.launch {
@@ -245,21 +243,22 @@ class MoaiRadioService : Service(), OnPreparedListener {
         }.invokeOnCompletion {
             info = Gson().fromJson(response?.body?.string(), Song::class.java)
 
-            val metadataBuilder = MediaMetadataCompat.Builder().apply {
-                info?.let { it ->
-                    putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, it.name)
-                    putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, it.artist)
-                    putString(MediaMetadataCompat.METADATA_KEY_TITLE, it.name)
-                    putString(MediaMetadataCompat.METADATA_KEY_ARTIST, it.artist)
-                }
-                info?.duration?.let { it ->
-                    putLong(MediaMetadataCompat.METADATA_KEY_DURATION,
-                        it
-                    )
-                }
+            val metadataBuilder = MediaMetadataCompat.Builder()
+                .putText(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, info!!.name)
+                .putText(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, info!!.artist)
+                .putText(MediaMetadataCompat.METADATA_KEY_TITLE, info!!.name)
+                .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, info!!.artist)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, info!!.duration)
+                .build()
+
+            scope.launch {
+                mediaSession?.setMetadata(metadataBuilder)
             }
-            mediaSession?.setMetadata(metadataBuilder.build())
+            info?.name?.let { it1 -> Log.d("METADATA", it1) }
         }
+
+        val ONGOING_NOTIFICATION_ID = 1
+        notificationManager!!.notify(ONGOING_NOTIFICATION_ID, notification)
     }
 
     override fun onDestroy() {

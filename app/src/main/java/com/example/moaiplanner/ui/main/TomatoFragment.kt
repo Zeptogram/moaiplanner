@@ -1,10 +1,12 @@
 package com.example.moaiplanner.ui.main
 
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
 import android.content.ServiceConnection
 import android.media.MediaPlayer
@@ -47,60 +49,15 @@ class TomatoFragment : Fragment() {
     private var max: Long = -1
     private var running: Boolean = false
     var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss")
-    private val mediaPlayer = MediaPlayer()
-
-    private var musicPlaying: Boolean = false
-    private var player: MediaPlayerService? = null
-    var serviceBound = false
 
     private var radioPlaying: Boolean = false
 
-    //Binding this Client to the AudioPlayer Service
-    private val serviceConnection: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as LocalBinder
-            player = binder.service
-            serviceBound = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName) {
-            serviceBound = false
-        }
-    }
-
-    private fun playAudio(media: String) {
-        //Check is service is active
-        if (!serviceBound) {
-            val playerIntent = Intent(requireContext(), MediaPlayerService::class.java)
-            playerIntent.putExtra("media", media)
-            requireContext().startService(playerIntent)
-            requireContext().bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-            Log.d("CIAO", "MSUICA")
-        } else {
-            //Service is active
-            //Send media with BroadcastReceiver
-        }
-    }
-
-    override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        savedInstanceState.putBoolean("ServiceState", serviceBound)
-        super.onSaveInstanceState(savedInstanceState)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        if (savedInstanceState != null) {
-            serviceBound = savedInstanceState.getBoolean("ServiceState")
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (serviceBound) {
-            requireContext().unbindService(serviceConnection)
-            //service is active
-            player!!.stopSelf()
+    override fun onResume() {
+        super.onResume()
+        radioPlaying = isServiceRunning("com.example.moaiplanner.service.MoaiRadioService")
+        Log.d("CIAO", radioPlaying.toString())
+        if (radioPlaying) {
+            binding.musicPlay.setImageResource(R.drawable.ic_baseline_stop_24)
         }
     }
 
@@ -108,7 +65,6 @@ class TomatoFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = TomatoFragmentBinding.inflate(inflater, container, false)
         // ViewModels
         val factory = SettingsViewModelFactory(SettingsRepository(requireActivity()))
@@ -202,23 +158,33 @@ class TomatoFragment : Fragment() {
             if (!radioPlaying) {
                 requireContext().startForegroundService(Intent(requireContext(), MoaiRadioService::class.java))
                 radioPlaying = true
-                binding.musicPlay.setImageResource(R.drawable.ic_baseline_pause_24)
+                binding.musicPlay.setImageResource(R.drawable.ic_baseline_stop_24)
             } else {
                 requireContext().stopService(Intent(requireContext(), MoaiRadioService::class.java))
                 radioPlaying = false
                 binding.musicPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24)
             }
-
-            /*
-            if (!musicPlaying)
-                playAudio("https://moai.eu.pythonanywhere.com/1")
-            else {
-                Log.d("CIAO", "CIAO")
-            }
-             */
         }
 
         return binding.root
+    }
+
+    private fun isServiceRunning(serviceName: String): Boolean {
+        var serviceRunning = false
+        val am = context?.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        val l = am.getRunningServices(50)
+        val i: Iterator<ActivityManager.RunningServiceInfo> = l.iterator()
+        while (i.hasNext()) {
+            val runningServiceInfo = i
+                .next()
+            if (runningServiceInfo.service.className == serviceName) {
+                serviceRunning = true
+                if (runningServiceInfo.foreground) {
+                    //service run in foreground
+                }
+            }
+        }
+        return serviceRunning
     }
 
 
@@ -231,41 +197,6 @@ class TomatoFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-
-        /*
-        var response: Response? = null
-        Log.d("API", "CIAO")
-        lifecycleScope.launch(Dispatchers.IO) {
-            Log.d("API", "CIAO2")
-            val client = OkHttpClient()
-            val request = Request.Builder()
-                .url("https://moai.eu.pythonanywhere.com/1")
-                .get()
-                .build()
-            response = client.newCall(request).execute()
-            Log.d("API", "CIAO3")
-        }.invokeOnCompletion {
-            val rawData = response!!.body?.bytes()
-            if (rawData != null) {
-                Log.d("API", rawData.size.toString())
-            }
-            if (rawData != null) {
-                //playByteArray(rawData)
-                val Mytemp = File.createTempFile("TCL", "mp3", activity?.cacheDir)
-                Mytemp.deleteOnExit()
-                val fos = FileOutputStream(Mytemp)
-                fos.write(rawData)
-                fos.close()
-                val MyFile = FileInputStream(Mytemp)
-                lifecycleScope.launch(Dispatchers.IO) {
-                    mediaPlayer.setDataSource(Mytemp.path)
-                    mediaPlayer.prepare()
-                }.invokeOnCompletion {
-                    mediaPlayer.start()
-                }
-            }
-        }
-         */
     }
 
     override fun onStop() {
@@ -274,29 +205,7 @@ class TomatoFragment : Fragment() {
         //mediaPlayer.release()
     }
 
-    /*
-    private fun playByteArray(mp3SoundByteArray: ByteArray) {
-        try {
-            val Mytemp = File.createTempFile("TCL", "mp3", activity?.cacheDir)
-            Mytemp.deleteOnExit()
-            val fos = FileOutputStream(Mytemp)
-            fos.write(mp3SoundByteArray)
-            fos.close()
-            val mediaPlayer = MediaPlayer()
-            val MyFile = FileInputStream(Mytemp)
-            mediaPlayer.setDataSource(Mytemp.path)
-            mediaPlayer.prepare()
-            mediaPlayer.start()
-        } catch (ex: IOException) {
-            val s = ex.toString()
-            ex.printStackTrace()
-        }
-    }
-     */
-
     fun initTimer() {
-
-
         pomodoroViewModel.timer.value?.cancel()
         c = requireActivity()
         pomodoroDuration = pomodoroViewModel.timeRemaining.value!!
@@ -343,7 +252,6 @@ class TomatoFragment : Fragment() {
                     pomodoroViewModel.timeLabel.value = simpleDateFormat.format(date)
                 }
             }
-
 
             override fun onFinish() {
 

@@ -14,7 +14,6 @@ class TomatoViewModel : ViewModel() {
     var timer = MutableLiveData<CountDownTimer>(null)
     var pausa = MutableLiveData<Boolean>(false)
 
-
     fun updateTimer(duration: Long) {
         timeRemaining.value = duration
     }
