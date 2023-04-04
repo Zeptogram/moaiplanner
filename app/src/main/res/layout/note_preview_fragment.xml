@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.moaiplanner.ui.main.PreviewFragment">
+    tools:context="com.moai.planner.ui.main.PreviewFragment">
 
     <WebView
         android:layout_width="match_parent"

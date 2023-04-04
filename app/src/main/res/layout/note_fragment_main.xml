@@ -6,14 +6,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/drawerLayout"
-        tools:context="com.example.moaiplanner.ui.main.NoteFragment">
+        tools:context="com.moai.planner.ui.main.NoteFragment">
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/coord"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.example.moaiplanner.util.DisableableViewPager
+            <com.moai.planner.util.DisableableViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

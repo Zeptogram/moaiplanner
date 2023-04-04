@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.moaiplanner'
+    namespace 'com.moai.planner'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.moaiplanner"
+        applicationId "com.moai.planner"
         minSdk 26
         targetSdk 33
         versionCode 1

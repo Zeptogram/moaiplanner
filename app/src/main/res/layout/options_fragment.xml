@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.moaiplanner.model.SettingsViewModel" />
+            type="com.moai.planner.model.SettingsViewModel" />
     </data>
 
 <ScrollView

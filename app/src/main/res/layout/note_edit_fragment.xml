@@ -3,7 +3,7 @@
     android:id="@+id/markdown_edit_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.moaiplanner.ui.main.EditFragment">
+    tools:context="com.moai.planner.ui.main.EditFragment">
 
     <EditText
 
