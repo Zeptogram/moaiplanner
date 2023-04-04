@@ -2,9 +2,11 @@
 
 ## Features:
 
-- Pianificazione del lavoro e impegni (es. Università, ToDoList, Note).
-- Funzionalità per aiutare a concentrarsi (es. Metodo pomodoro etc).
+- Pianificazione del lavoro e impegni (es. ToDoList, Note).
+- Gestione dei file con cartelle e possibilità di importazione, esportazione, condivisione.
+- Funzionalità per aiutare a concentrarsi e studiare (Metodo Pomodoro, Musica Lofi).
 - Possibilità di mantenere note e impegni sincrozzati sul cloud attraverso un sistema di account.
+- Accesso tramite Firebase e Google
 
 ## Membri:
 
