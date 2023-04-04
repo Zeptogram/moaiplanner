@@ -181,7 +181,6 @@ class MoaiRadioService : Service(), OnPreparedListener {
                     } else {
                         currentSongId--
                     }
-                    updateMetadata()
                     mediaPlayer.setDataSource("https://moai.eu.pythonanywhere.com/".plus(playlistRadio?.get(currentSongId).toString())) // METTERE RANDOM
                     mediaPlayer.prepareAsync()
                 }
@@ -266,25 +265,6 @@ class MoaiRadioService : Service(), OnPreparedListener {
     override fun onPrepared(mp: MediaPlayer?) {
         mediaPlayer.start()
         updatePlaybackState(PlaybackState.STATE_PLAYING)
-        // Set the playback state of the MediaSessionCompat
-        val playbackState = PlaybackStateCompat.Builder()
-            .setActions(
-                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
-                        or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-                        or PlaybackStateCompat.ACTION_SEEK_TO
-            )
-            .setState(
-                PlaybackStateCompat.STATE_PLAYING,
-                mediaPlayer.currentPosition.toLong(),
-                1.0f
-            )
-            .build()
-
-
-        mediaSession!!.setPlaybackState(playbackState)
-
-
         updateMetadata()
     }
 }
