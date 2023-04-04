@@ -26,4 +26,4 @@
 - Markdown [Done]
 - Autenticazione e salvataggio dati su firebase [Done]
 - Pomodoro [Done]
-- Notes [Done]
+- File Manager [Done]
