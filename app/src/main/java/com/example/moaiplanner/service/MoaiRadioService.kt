@@ -127,8 +127,8 @@ class MoaiRadioService : Service(), OnPreparedListener {
 
         notification = NotificationCompat.Builder(applicationContext, "moairadio")
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSession!!.sessionToken))
-            .setContentTitle("Moai Radio")
-            .setContentText("Listen closely")
+            .setContentTitle(getString(R.string.moai_radio))
+            .setContentText(getString(R.string.listen_closely))
             .setSmallIcon(R.drawable.icon)
             .setLargeIcon(albumCover)
             .addAction(prevAction)
@@ -202,7 +202,6 @@ class MoaiRadioService : Service(), OnPreparedListener {
         mediaPlayer.reset()
         updatePlaybackState(PlaybackState.STATE_STOPPED)
         currentSongId = (currentSongId + 1) % numSong
-        updateMetadata()
         mediaPlayer.setDataSource("https://moai.eu.pythonanywhere.com/".plus(playlistRadio?.get(currentSongId).toString()))
         mediaPlayer.prepareAsync()
     }

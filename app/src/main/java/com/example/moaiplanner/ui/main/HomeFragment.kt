@@ -7,7 +7,6 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moaiplanner.R
@@ -17,6 +16,7 @@ import com.example.moaiplanner.data.notes.FolderManager
 import com.example.moaiplanner.data.todo.ToDoFetcher
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.HomeFragmentBinding
+import com.example.moaiplanner.ui.welcome.WelcomeActivity
 import com.example.moaiplanner.util.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.*
@@ -90,7 +90,7 @@ class HomeFragment : Fragment() {
         super.onStart()
         firebase = UserAuthentication(requireActivity().application)
         if (!firebase.isUserAuthenticated()) {
-            findNavController().navigate(R.id.welcomeActivity)
+            NavigationHelper.changeActivity(requireActivity(), WelcomeActivity::class.java)
         }
         val recyclerview = activity?.findViewById<RecyclerView>(R.id.recyclerview)
         val todoview = activity?.findViewById<RecyclerView>(R.id.todoList)

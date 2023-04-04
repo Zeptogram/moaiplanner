@@ -153,4 +153,5 @@
     <string name="valid_email">Inserire una email valida</string>
     <string name="moai_radio">Moai Radio</string>
     <string name="listen_to_the_radio">Ascolta la Radio</string>
+    <string name="listen_closely">Ascolta e concentrati</string>
 </resources>

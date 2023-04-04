@@ -19,6 +19,8 @@ import com.example.moaiplanner.databinding.OptionsFragmentBinding
 import com.example.moaiplanner.model.SettingsViewModel
 import com.example.moaiplanner.model.SettingsViewModelFactory
 import com.example.moaiplanner.ui.welcome.WelcomeActivity
+import com.example.moaiplanner.util.NavigationHelper
+import com.example.moaiplanner.util.NetworkUtils
 import com.example.moaiplanner.util.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.ktx.Firebase
@@ -76,14 +78,22 @@ class OptionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         firebase = UserAuthentication(requireActivity().application, view, requireActivity())
+        if (!firebase.isUserAuthenticated()) {
+            NavigationHelper.changeActivity(requireActivity(), WelcomeActivity::class.java)
+        }
         storageRef = Firebase.storage.reference
         avatar = storageRef.child("${firebase.getCurrentUid()}/avatar.png")
         ref = storageRef.child("${firebase.getCurrentUid()}/")
 
-        if(firebase.getProvider() == "google.com") {
+        val network = NetworkUtils.isNetworkAvailable(requireContext())
+
+        if(firebase.getProvider() == "google.com" || !network)
+        {
             binding.buttonChangePass.isEnabled = false
             binding.buttonChangeEmail.isEnabled = false
             binding.buttonChangeName.isEnabled = false
+            if(!network)
+                binding.buttonLogout.isEnabled = false
         }
 
         Utils.loadImage(ref, firebase, avatar, binding.profilepic)

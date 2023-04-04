@@ -14,7 +14,6 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +24,7 @@ import com.example.moaiplanner.data.calendar.CalendarData
 import com.example.moaiplanner.data.todo.ToDoFetcher
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.databinding.TodoFragmentBinding
+import com.example.moaiplanner.ui.welcome.WelcomeActivity
 import com.example.moaiplanner.util.NavigationHelper
 import com.example.moaiplanner.util.NetworkUtils
 import com.example.moaiplanner.util.ToDoItem
@@ -74,7 +74,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
 
         auth = UserAuthentication(requireActivity().application)
         if (!auth.isUserAuthenticated()) {
-            findNavController().navigate(R.id.welcomeActivity)
+            NavigationHelper.changeActivity(requireActivity(), WelcomeActivity::class.java)
         }
 
         database = FirebaseDatabase.getInstance()

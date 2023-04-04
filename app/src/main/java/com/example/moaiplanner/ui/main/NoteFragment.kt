@@ -22,7 +22,9 @@ import com.example.moaiplanner.adapter.EditPagerAdapter
 import com.example.moaiplanner.data.notes.FolderManager
 import com.example.moaiplanner.data.user.UserAuthentication
 import com.example.moaiplanner.model.MarkdownViewModel
+import com.example.moaiplanner.ui.welcome.WelcomeActivity
 import com.example.moaiplanner.util.DisableableViewPager
+import com.example.moaiplanner.util.NavigationHelper
 import com.example.moaiplanner.util.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -79,6 +81,9 @@ class NoteFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallba
         tabLayout?.setupWithViewPager(pager)
 
         firebase = UserAuthentication(requireActivity().application)
+        if (!firebase.isUserAuthenticated()) {
+            NavigationHelper.changeActivity(requireActivity(), WelcomeActivity::class.java)
+        }
         storage = Firebase.storage
         storageRef = storage.reference
         userDir = storageRef.child("${firebase.getCurrentUid()}")

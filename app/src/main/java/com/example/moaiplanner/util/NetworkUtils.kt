@@ -28,9 +28,12 @@ object NetworkUtils {
                     .setTitle(activity.getString(R.string.network_missing))
                     .setMessage(activity.getString(R.string.network_try))
                     .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
-                        NavigationHelper.navigateToAndPop(view, R.id.noteFragment)
+                        //
                     }
                     .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setOnDismissListener {
+                        NavigationHelper.navigateToAndPop(view, R.id.noteFragment)
+                    }
                     .create()
                     .show()
             }
@@ -46,9 +49,12 @@ object NetworkUtils {
                     .setTitle(activity.getString(R.string.network_missing))
                     .setMessage(activity.getString(R.string.network_try))
                     .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
-                        activity.finish()
+                        //
                     }
                     .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setOnDismissListener {
+                        activity.finish()
+                    }
                     .create()
                     .show()
             }
