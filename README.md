@@ -17,6 +17,7 @@
 # Link utili
 - [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
 - [Firebase Authentication](https://firebase.google.com/docs/auth/android/start?authuser=1#kotlin+ktx_2)
+- [Material 3](https://m3.material.io/)
 
 # Current TO-DO
 - TO-DO List [Done]
