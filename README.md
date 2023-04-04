@@ -2,9 +2,9 @@
 
 ## Features:
 
-- Pianificazione del lavoro e impegni (es. Università, ToDoList, Sessioni di studio, Calendario lezioni).
+- Pianificazione del lavoro e impegni (es. Università, ToDoList, Note).
 - Funzionalità per aiutare a concentrarsi (es. Metodo pomodoro etc).
-- Possibilità di organizzarsi con altri utenti attraverso un sistema di account.
+- Possibilità di mantenere note e impegni sincrozzati sul cloud attraverso un sistema di account.
 
 ## Membri:
 
@@ -20,7 +20,7 @@
 
 # Current TO-DO
 - TO-DO List [Done]
-- Markdown [90%]
+- Markdown [Done]
 - Autenticazione e salvataggio dati su firebase [Done]
 - Pomodoro [Done]
 - Notes [Done]
