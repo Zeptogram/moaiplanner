@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <group android:id="@+id/sett">
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/settings"
+            app:showAsAction="ifRoom"
+            android:title="@string/app_name" />
+    </group>
+    <group android:id="@+id/edit">
+        <item
+            android:id="@+id/action_share"
+            android:icon="@drawable/ic_baseline_share_24"
+            android:title="@string/action_share"
+            app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/action_new"
+            android:title="@string/action_new"
+            android:icon="@drawable/ic_baseline_note_add_24"
+            android:alphabeticShortcut="N"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_load"
+            android:title="@string/action_open"
+            android:icon="@drawable/ic_baseline_file_open_24"
+            android:alphabeticShortcut="O"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_save"
+            android:icon="@drawable/ic_baseline_save_24"
+            android:alphabeticShortcut="S"
+            android:title="@string/action_save" />
+        <item
+            android:id="@+id/action_save_as"
+            android:title="@string/action_save_as"
+            android:icon="@drawable/ic_baseline_save_as_24"
+            tools:ignore="UnusedAttribute" />
+        <item
+            android:id="@+id/action_save_firebase"
+            android:icon="@drawable/baseline_cloud_upload_24"
+            android:alphabeticShortcut="S"
+            android:title="@string/save_on_cloud" />
+        <item
+            android:id="@+id/action_lock_swipe"
+            android:checkable="true"
+            android:title="@string/action_lock_swipe"
+            app:showAsAction="never" />
+    </group>
+
+</menu>

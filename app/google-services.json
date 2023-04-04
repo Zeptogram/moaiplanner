@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "50394403115",
+    "firebase_url": "https://moai-planner-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "moai-planner",
     "storage_bucket": "moai-planner.appspot.com"
   },
@@ -13,6 +14,51 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "50394403115-vl26fosqrisjhg7k94dup8o4ejc8anf8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.moaiplanner",
+            "certificate_hash": "16d1c55cca6c5fc38f07ab046dbbdf3e3ffddcd8"
+          }
+        },
+        {
+          "client_id": "50394403115-k98o4pct0grf3dveb47a4ncl4gauuifd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyqxuas7E2ZGO1msouh4qQ13tQ_vJiOwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "50394403115-k98o4pct0grf3dveb47a4ncl4gauuifd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50394403115:android:0fba2fb21de8689a48b56e",
+        "android_client_info": {
+          "package_name": "com.moai.planner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "50394403115-oh8dokfokr6j5msr7da0tf8d5a0h3hc1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.moai.planner",
+            "certificate_hash": "16d1c55cca6c5fc38f07ab046dbbdf3e3ffddcd8"
+          }
+        },
         {
           "client_id": "50394403115-k98o4pct0grf3dveb47a4ncl4gauuifd.apps.googleusercontent.com",
           "client_type": 3

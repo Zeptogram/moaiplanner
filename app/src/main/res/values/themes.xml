@@ -1,13 +1,47 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorSecondary">@color/white</item>
-        <item name="colorOnSecondary">@color/gray</item>
-        <item name="colorSecondaryVariant">@color/gray</item>
-        <item name="android:colorBackground">@color/white</item>
+<resources>
+<!-- Base application theme. -->
+<style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Customize your light theme here. -->
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryVariant">@color/primary</item>
+    <item name="colorSecondary">@color/white</item>
+    <item name="android:colorBackground">@color/white</item>
+    <item name="colorOnSecondary">@color/light_background_variant</item>
+    <item name="colorSecondaryVariant">@color/light_background_variant</item>
+    <item name="android:textColor">@color/gray</item>
+    <item name="android:textColorPrimary">@color/black</item>
+    <item name="android:textColorSecondary">@color/gray</item>
+    <item name="android:textColorSecondaryInverse">@color/light_gray</item>
+    <item name="android:textColorSecondaryNoDisable">@color/gray</item>
+    <item name="colorOutline">@color/light_background_variant</item>
+    <item name="colorSurfaceVariant">@color/light_background_variant</item>
+    <item name="colorSecondaryContainer">@color/light_background_variant</item>
+    <item name="popupMenuBackground">@color/white</item>
+    <item name="colorPrimaryContainer">@color/primary</item>
+    <item name="colorOnPrimaryContainer">@color/white</item>
+    <item name="android:statusBarColor">@color/night_background</item>
+    <item name="android:fontFamily"> @font/avenirbold </item>
+    <item name="colorError">@color/night_background</item>
+
+    <!-- Snackbar -->
+    <item name="colorOnSurfaceInverse">@color/black</item>
+    <item name="colorSurfaceInverse">@color/light_background_variant</item>
+</style>
+
+<style name="Theme.MoaiPlanner" parent="Base.Theme.MoaiPlanner" />
+<style name="Theme.MoaiPlanner.NoActionBar">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+</style>
+<style name="Theme.MoaiPlanner.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+<style name="Theme.MoaiPlanner.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="roundedImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
     </style>
 
-    <style name="Theme.MoaiPlanner" parent="Base.Theme.MoaiPlanner" />
+
+
+
 </resources>

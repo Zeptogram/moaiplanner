@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    namespace 'com.example.moaiplanner'
+    namespace 'com.moai.planner'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.moaiplanner"
-        minSdk 24
+        applicationId "com.moai.planner"
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -31,20 +31,56 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    dataBinding {
+        enabled = true
+    }
+    buildFeatures {
+        viewBinding = true
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+
+    packagingOptions {
+        exclude 'kotlin/reflect/reflect.kotlin_builtins'
+        exclude 'kotlin/internal/internal.kotlin_builtins'
+        exclude 'kotlin/kotlin.kotlin_builtins'
+        exclude 'kotlin/coroutines/coroutines.kotlin_builtins'
+        exclude 'kotlin/ranges/ranges.kotlin_builtins'
+        exclude 'kotlin/collections/collections.kotlin_builtins'
+        exclude 'kotlin/annotation/annotation.kotlin_builtins'
+    }
+
 }
 
 dependencies {
-
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.8.0-alpha03'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'com.google.android.material:material:1.9.0-beta01'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
-    implementation 'com.google.firebase:firebase-auth:21.1.0'
+    implementation 'com.google.firebase:firebase-auth:21.2.0'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
-    implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.2.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.commonsware.cwac:anddown:0.4.0'
+    implementation 'com.wbrawner.plausible:plausible-android:0.1.0-SNAPSHOT'
+    implementation 'eu.crydee:syllable-counter:4.0.2'
+    implementation platform('com.google.firebase:firebase-bom:31.2.0')
+    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'androidx.fragment:fragment-ktx:1.5.6'
+    implementation 'com.squareup.picasso:picasso:2.8'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    implementation 'com.firebaseui:firebase-ui-storage:7.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    implementation 'com.google.firebase:firebase-database-ktx'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'androidx.core:core:1.9.0'
+    implementation 'androidx.media:media:1.6.0'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10', changing: true
 }

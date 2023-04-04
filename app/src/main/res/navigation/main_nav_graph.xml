@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/optionsFragment"
+        android:name="com.moai.planner.ui.main.OptionsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/options_fragment"/>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.moai.planner.ui.main.HomeFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/home_fragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_fileFragment"
+            app:destination="@id/fileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/tomatoFragment"
+        android:name="com.moai.planner.ui.main.TomatoFragment"
+        android:label="Pomodoro"
+        tools:layout="@layout/tomato_fragment" />
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="com.moai.planner.ui.main.NoteFragment"
+        android:label="Untitled.md" />
+    <include app:graph="@navigation/welcome_nav_graph" />
+    <activity
+        android:id="@+id/welcomeActivity"
+        android:name="com.moai.planner.ui.welcome.WelcomeActivity"
+        android:label="activity_welcome"
+        tools:layout="@layout/activity_welcome" />
+    <fragment
+        android:id="@+id/toDoListFragment"
+        android:name="com.moai.planner.ui.main.ToDoListFragment"
+        android:label="To Do" />
+    <fragment
+        android:id="@+id/fileFragment"
+        android:name="com.moai.planner.ui.main.FileFragment"
+        android:label="@string/my_notes"
+        tools:layout="@layout/file_fragment" />
+</navigation>

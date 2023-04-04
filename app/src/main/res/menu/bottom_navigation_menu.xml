@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/home"
+        android:enabled="true"
+        android:icon="@drawable/home"
+        android:title="@string/home"/>
+    <item
+        android:id="@+id/note"
+        android:enabled="true"
+        android:icon="@drawable/create"
+        android:title="@string/write"/>
+    <item
+        android:id="@+id/todo"
+        android:enabled="true"
+        android:icon="@drawable/do_list"
+        android:title="@string/to_do" />
+    <item
+        android:id="@+id/tomato"
+        android:enabled="true"
+        android:icon="@drawable/tomato"
+        android:title="@string/pomodoro"/>
+</menu>

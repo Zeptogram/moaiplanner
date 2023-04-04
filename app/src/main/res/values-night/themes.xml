@@ -1,11 +1,38 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorSecondary">@color/gray</item>
-        <item name="colorOnSecondary">@color/gray</item>
-        <item name="colorSecondaryVariant">@color/light_gray</item>
-        <item name="android:colorBackground">@color/night_background</item>
-    </style>
+<resources>
+<!-- Base application theme. -->
+<style name="Base.Theme.MoaiPlanner" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Customize your dark theme here. -->
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorOnPrimary">@color/white</item>
+    <item name="colorSecondary">@color/gray</item>
+    <item name="android:colorBackground">@color/night_background</item>
+    <item name="colorOnSecondary">@color/gray</item>
+    <item name="colorSecondaryVariant">@color/light_gray</item>
+    <item name="android:textColor">@color/white</item>
+    <item name="android:textColorPrimary">@color/white</item>
+    <item name="android:textColorSecondary">@color/light_gray</item>
+    <item name="android:textColorSecondaryInverse">@color/gray</item>
+    <item name="colorOutline">@color/gray</item>
+    <item name="colorOnSurfaceVariant">@color/light_gray</item>
+    <item name="colorSecondaryContainer">@color/gray</item>
+    <item name="colorOnSecondaryContainer">@color/white</item>
+    <item name="popupMenuBackground">@color/night_background</item>
+    <item name="colorAccent">@color/primary</item>
+    <item name="colorPrimaryContainer">@color/primary</item>
+    <item name="colorOnPrimaryContainer">@color/white</item>
+    <item name="android:statusBarColor">@color/night_background</item>
+    <item name="android:fontFamily"> @font/avenirbold </item>
+    <!-- Snackbar -->
+    <item name="colorSurfaceInverse">@color/night_background</item>
+    <item name="colorOnSurfaceInverse">@color/white</item>
+    <item name="colorError">@color/night_background</item>
+
+
+
+
+
+</style>
+
+
+
 </resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textDeletion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="@string/vuoi_eliminare_il_seguente_file_o_cartella"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/subtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="2dp"
+            android:textStyle="italic"
+            android:textColor="?android:textColorSecondary"
+            android:text="@string/n_b_eliminare_una_cartella_eliminer_anche_i_file_al_suo_interno"
+            android:textSize="12sp" />
+
+</LinearLayout>
