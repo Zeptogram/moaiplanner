@@ -20,7 +20,6 @@ import com.moai.planner.util.NavigationHelper
 import com.moai.planner.util.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var navHostFragment : NavHostFragment
@@ -34,15 +33,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.topAppBar)
 
-
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-
         navController = navHostFragment.navController
-        //navController.popBackStack(R.id.welcomeFragment, true)
 
         // Leva la freccia per il back
         val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(

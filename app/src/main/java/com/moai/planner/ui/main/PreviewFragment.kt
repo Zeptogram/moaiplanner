@@ -1,8 +1,7 @@
 @file:Suppress("DEPRECATION")
 
 package com.moai.planner.ui.main
-
-
+import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
@@ -21,10 +20,16 @@ import com.moai.planner.model.MarkdownViewModel
 import com.moai.planner.util.Utils.Companion.toHtml
 import kotlinx.coroutines.*
 
+
 class PreviewFragment : Fragment() {
     private val viewModel: MarkdownViewModel by viewModels({ requireParentFragment() })
     private var markdownPreview: WebView? = null
+
     private var style: String = ""
+    private var mathjax =
+        "<script> MathJax = { tex: { displayMath: [['\$\$','\$\$'], ['\\\\[', '\\\\]']], processEscapes: true, processEnvironments: true }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } };  </script>" +
+        "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>" +
+        "<script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js\"></script>"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,8 +43,11 @@ class PreviewFragment : Fragment() {
         return inflater.inflate(R.layout.note_preview_fragment, container, false)
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         markdownPreview = view.findViewById(R.id.markdown_view)
+        markdownPreview?.settings?.domStorageEnabled = true
+        markdownPreview?.settings?.javaScriptEnabled = true
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         lifecycleScope.launch {
             val isNightMode = AppCompatDelegate.getDefaultNightMode() ==
@@ -63,12 +71,13 @@ class PreviewFragment : Fragment() {
     }
 
     private fun updateWebContent(markdown: String) {
+
         markdownPreview?.post {
             lifecycleScope.launch {
-                markdownPreview?.loadDataWithBaseURL(null,
-                    style + markdown.toHtml(),
+                markdownPreview?.loadDataWithBaseURL("http://localhost",
+                    style + markdown.toHtml() + mathjax,
                     "text/html",
-                    "UTF-8", null
+                    "UTF-8", null,
                 )
             }
         }

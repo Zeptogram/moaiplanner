@@ -123,8 +123,8 @@
     <string name="sessione_di_lavoro">Sessione di Lavoro</string>
     <string name="break_length">Break Length</string>
     <string name="pausa">Pausa</string>
-    <string name="sign_in_with_email">Sign in with Email</string>
-    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_in_with_email">Log in with Email</string>
+    <string name="sign_in_with_google">Log in with Google</string>
     <string name="don_t_have_an_account_sign_up_now">Don\'t have an account? Sign up now!</string>
     <string name="listen_to_the_radio">Listen to the radio</string>
     <string name="moai_radio">Moai Radio</string>

@@ -109,8 +109,8 @@
     <string name="sessione_di_lavoro">Work Session</string>
     <string name="break_length">Break Length</string>
     <string name="pausa">Break</string>
-    <string name="sign_in_with_email">Sign in with Email</string>
-    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_in_with_email">Log in with Email</string>
+    <string name="sign_in_with_google">Log in with Google</string>
     <string name="don_t_have_an_account_sign_up_now">Don\'t have an account? Sign up now!</string>
     <string name="cancel">Cancel</string>
     <string name="delete_note_or_folder">Delete note or folder</string>

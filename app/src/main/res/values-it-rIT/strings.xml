@@ -109,8 +109,8 @@
     <string name="sessione_di_lavoro">Sessione di Lavoro</string>
     <string name="break_length">Lunghezza Pausa</string>
     <string name="pausa">Pausa</string>
-    <string name="sign_in_with_email">Registrati con Email</string>
-    <string name="sign_in_with_google">Registrati con Google</string>
+    <string name="sign_in_with_email">Entra con Email</string>
+    <string name="sign_in_with_google">Entra con Google</string>
     <string name="don_t_have_an_account_sign_up_now">Non hai un account? Registrati ora!</string>
     <string name="cancel">Annulla</string>
     <string name="delete_note_or_folder">Cancella nota o cartella</string>
