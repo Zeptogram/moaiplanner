@@ -2,9 +2,11 @@
 
 ## Features:
 
-- Pianificazione del lavoro e impegni (es. Università, ToDoList, Sessioni di studio, Calendario lezioni).
-- Funzionalità per aiutare a concentrarsi (es. Metodo pomodoro etc).
-- Possibilità di organizzarsi con altri utenti attraverso un sistema di account.
+- Pianificazione del lavoro e impegni (es. ToDoList, Note).
+- Gestione dei file con cartelle e possibilità di importazione, esportazione, condivisione.
+- Funzionalità per aiutare a concentrarsi e studiare (Metodo Pomodoro, Musica Lofi).
+- Possibilità di mantenere note e impegni sincrozzati sul cloud attraverso un sistema di account.
+- Accesso tramite Firebase e Google
 
 ## Membri:
 
@@ -17,10 +19,11 @@
 # Link utili
 - [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
 - [Firebase Authentication](https://firebase.google.com/docs/auth/android/start?authuser=1#kotlin+ktx_2)
+- [Material 3](https://m3.material.io/)
 
 # Current TO-DO
 - TO-DO List [Done]
-- Markdown [90%]
+- Markdown [Done]
 - Autenticazione e salvataggio dati su firebase [Done]
 - Pomodoro [Done]
-- Notes [Done]
+- File Manager [Done]
