@@ -3,7 +3,7 @@
     <string name="settings">Settings</string>
     <string name="write">Write</string>
     <string name="calendar">Calendar</string>
-    <string name="tomato">Tomato</string>
+    <string name="tomato">Pomodoro</string>
     <string name="amici">Friends</string>
     <string name="notifiche">Notifications</string>
     <string name="sicurezza">Security</string>
@@ -54,7 +54,7 @@
     <string name="sigin">Sign In</string>
     <string name="signup">Sign Up</string>
     <string name="forgot_password">Forgot Password?</string>
-    <string name="pomodoro">Tomato</string>
+    <string name="pomodoro">Pomodoro</string>
     <string name="welcome_info_text">Take Markdown notes, while keeping them all synced between your devices if saved on Cloud</string>
     <string name="save_on_cloud">Save on Cloud</string>
     <string name="notes">Notes</string>
@@ -88,7 +88,7 @@
     <string name="_5">5</string>
     <string name="_1">1</string>
     <string name="user">User</string>
-    <string name="minuti_pomodoro">Tomato Minutes</string>
+    <string name="minuti_pomodoro">Pomodoro Minutes</string>
     <string name="minuti_pausa">Break Minutes</string>
     <string name="numero_round">Round Number</string>
     <string name="username">Username</string>
