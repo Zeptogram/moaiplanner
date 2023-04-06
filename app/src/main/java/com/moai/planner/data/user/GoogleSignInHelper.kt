@@ -42,7 +42,7 @@ class GoogleSignInHelper(private val activity: Activity, private val launcher: A
     }
 
     fun handleActivityResult(resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_FIRST_USER) {
+        if (resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             handleResults(task)
         } else {
