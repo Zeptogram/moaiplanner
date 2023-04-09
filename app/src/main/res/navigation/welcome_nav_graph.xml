@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/signinFragment"
         android:name="com.moai.planner.ui.welcome.SigninFragment"
-        android:label="@string/sigin"
+        android:label="@string/log_in"
         tools:layout="@layout/signin_fragment" >
         <action
             android:id="@+id/action_signinFragment_to_mainActivity"
@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.moai.planner.ui.welcome.RegisterFragment"
-        android:label="@string/signup"
+        android:label="@string/register_now"
         tools:layout="@layout/register_fragment" >
         <action
             android:id="@+id/action_registerFragment_to_welcomeFragment"
