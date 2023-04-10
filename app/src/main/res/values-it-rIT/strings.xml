@@ -55,7 +55,7 @@
     <string name="signup">Accedi</string>
     <string name="forgot_password">Password Dimenticata?</string>
     <string name="pomodoro">Pomodoro</string>
-    <string name="welcome_info_text">Prendi note in Mardown e mantienile sincronizzate su tutti i tuoi dispositivi con l\'opzione di salvataggio su Cloud.</string>
+    <string name="welcome_info_text">Prendi note in Markdown e mantienile sincronizzate su tutti i tuoi dispositivi con l\'opzione di salvataggio su Cloud.</string>
     <string name="save_on_cloud">Salva su Cloud</string>
     <string name="notes">Note</string>
     <string name="pomodoro_info">Studia e Concentrati mentre tieni traccia del tuo tempo.</string>
