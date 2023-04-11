@@ -47,7 +47,7 @@ class TomatoFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        radioPlaying = isServiceRunning("com.example.moaiplanner.service.MoaiRadioService")
+        radioPlaying = isServiceRunning(getString(R.string.service_name))
         if (radioPlaying) {
             binding.musicPlay.setImageResource(R.drawable.ic_baseline_stop_24)
         }

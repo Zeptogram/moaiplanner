@@ -174,4 +174,5 @@
     <string name="listen_to_the_radio">Listen to the radio</string>
     <string name="moai_radio">Moai Radio</string>
     <string name="listen_closely">Listen closely and focus</string>
+    <string name="service_name" translatable="false">com.moai.planner.service.MoaiRadioService</string>
 </resources>
