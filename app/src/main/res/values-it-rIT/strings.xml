@@ -149,7 +149,7 @@
     <string name="password_updated">Password Aggiornata</string>
     <string name="error_password_update">Errore durante l\'aggiornamento della Password</string>
     <string name="old_password_not_correct">La vecchia password non è corretta</string>
-    <string name="secure_pass">Inserire una password sicura</string>
+    <string name="secure_pass">Inserire una password sicura/ Password non corrispondenti</string>
     <string name="valid_email">Inserire una email valida</string>
     <string name="moai_radio">Moai Radio</string>
     <string name="listen_to_the_radio">Ascolta la Radio</string>

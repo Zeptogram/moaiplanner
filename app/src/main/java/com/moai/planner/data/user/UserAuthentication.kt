@@ -318,6 +318,14 @@ class UserAuthentication(app: Application, view: View? = null, activity: Activit
         val hasUpperCase = password.matches(Regex(".*[A-Z].*"))
         val hasDigit = password.matches(Regex(".*\\d.*"))
         val hasSpecialChar = password.matches(Regex(".*[!@#\$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>?].*"))
+        if(!(hasLowerCase && hasUpperCase && hasDigit && hasSpecialChar)){
+            view?.let {
+                activity?.let { it1 ->
+                    Utils.showPopup(it,
+                        it1, activity!!.getString(R.string.secure_pass))
+                }
+            }
+        }
         return hasLowerCase && hasUpperCase && hasDigit && hasSpecialChar
     }
 
