@@ -51,14 +51,7 @@ class MainActivity : AppCompatActivity() {
         bottomNav.menu.getItem(0).isChecked = true
         NavigationUI.setupWithNavController(bottomNav, navController)
 
-        settingsRepository = SettingsRepository(this)
-        val factory = SettingsViewModelFactory(SettingsRepository(this))
-        settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
 
-        settingsViewModel.restoreSettings()
-
-        settingsViewModel.lightMode.value?.let { Utils.enableLight(it) }
-        settingsViewModel.notifiche.value?.let { Utils.disableNotifications(it, this) }
 
 
         bottomNav.setOnItemSelectedListener { item ->

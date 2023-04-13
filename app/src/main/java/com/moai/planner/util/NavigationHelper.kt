@@ -7,6 +7,7 @@ import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
+import com.moai.planner.R
 
 class NavigationHelper {
 
@@ -16,8 +17,10 @@ class NavigationHelper {
             findNavController(view).navigate(fragment, null,
                 navOptions {
                     anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
+                        enter = androidx.appcompat.R.anim.abc_fade_in
+                        popEnter = androidx.appcompat.R.anim.abc_fade_in
+                        exit =  androidx.appcompat.R.anim.abc_fade_out
+                        popExit = androidx.appcompat.R.anim.abc_fade_out
                     }
                 }, null
             )
@@ -27,8 +30,11 @@ class NavigationHelper {
             findNavController(view).navigate(fragment, null,
                 navOptions {
                     anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
+                        enter = androidx.appcompat.R.anim.abc_fade_in
+                        popEnter = androidx.appcompat.R.anim.abc_fade_in
+                        exit =  androidx.appcompat.R.anim.abc_fade_out
+                        popExit = androidx.appcompat.R.anim.abc_fade_out
+
                     }
                 }, null
             )
@@ -39,8 +45,10 @@ class NavigationHelper {
             navHostFragment.findNavController().navigate(fragment, null,
                 navOptions {
                     anim {
-                        enter = android.R.anim.fade_in
-                        popEnter = android.R.anim.fade_in
+                        enter = androidx.appcompat.R.anim.abc_fade_in
+                        popEnter = androidx.appcompat.R.anim.abc_fade_in
+                        exit =  androidx.appcompat.R.anim.abc_fade_out
+                        popExit = androidx.appcompat.R.anim.abc_fade_out
                     }
                 }, null
             )
