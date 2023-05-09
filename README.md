@@ -1,7 +1,10 @@
 # Moai Planner: Applicazione mobile per la produttività.
 
-## Membri:
+## Gruppo e Membri:
+__Nome Gruppo:__ 
+- Airdroppers
 
+__Membri:__
 - Gargiulo Elio 869184 (Referente)
 - Rigato Stefano 869441
 - Mocellin Andrea 869218
