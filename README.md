@@ -1,11 +1,5 @@
 # Moai Planner: Applicazione mobile per la produttività.
 
-## Features:
-
-- Pianificazione del lavoro e impegni (es. Università, ToDoList, Sessioni di studio, Calendario lezioni).
-- Funzionalità per aiutare a concentrarsi (es. Metodo pomodoro etc).
-- Possibilità di organizzarsi con altri utenti attraverso un sistema di account.
-
 ## Membri:
 
 - Gargiulo Elio 869184 (Referente)
@@ -14,13 +8,24 @@
 - Lamanna Francesco 869052
 - Isavo Benavides Milla Nicolle 875386  
 
+## Features:
+
+- Pianificazione del lavoro e impegni (es. ToDoList, Pomodoro Timer).
+- Funzionalità per aiutare a concentrarsi (es. Metodo pomodoro, Musica).
+- Scrittura di note e appunti in formato markdown. 
+- Possibilità di organizzare le note attraverso un File Manager su Cloud (Aggiunta, Cancellazione di note e cartelle).
+- Sistema di account per mantenere tutto sincronizzato su diversi dispositivi e accesso con Google.
+
 # Link utili
 - [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
 - [Firebase Authentication](https://firebase.google.com/docs/auth/android/start?authuser=1#kotlin+ktx_2)
+- [Material3](https://m3.material.io/)
+- [Documentazione Kotlin](https://kotlinlang.org/docs/home.html)
+- [Documentazione Android](https://developer.android.com/docs?hl=it)
 
 # Current TO-DO
 - TO-DO List [Done]
-- Markdown [90%]
-- Autenticazione e salvataggio dati su firebase [Done]
-- Pomodoro [Done]
-- Notes [Done]
+- Notes in Markdown [Done]
+- Autenticazione e salvataggio dati su firebase (Account) [Done]
+- Pomodoro e Musica Lofi [Done]
+- File Manager [Done]
