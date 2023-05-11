@@ -15,8 +15,8 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media.session.MediaButtonReceiver
-import com.moai.planner.R
 import com.google.gson.Gson
+import com.moai.planner.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,6 +25,7 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import java.util.concurrent.CountDownLatch
 
 
 class MoaiRadioService : Service(), OnPreparedListener {
@@ -37,7 +38,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
     private var currentSongId : Int = 0
     private var mediaSession : MediaSessionCompat? = null
     private var playlistRadio : IntArray? = null
-    private var numSong = 2
+    private var numSong = 1
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
     private var notificationManager : NotificationManager? = null
@@ -60,13 +61,9 @@ class MoaiRadioService : Service(), OnPreparedListener {
     override fun onCreate() {
         super.onCreate()
 
-        playlistRadio = IntArray(numSong) { it + 1 }
-        playlistRadio?.shuffle()
         mediaSession = MediaSessionCompat(applicationContext, "MediaSessionDebug")
-    }
 
-    @SuppressLint("UnspecifiedImmutableFlag")
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val countDownLatch = CountDownLatch(1)
         scope.launch {
             val client = OkHttpClient()
 
@@ -83,8 +80,18 @@ class MoaiRadioService : Service(), OnPreparedListener {
 
             val response = client.newCall(requesthttp).execute()
             numSong = response.body?.string()?.trim()?.toInt()!!
+        }.invokeOnCompletion {
+            countDownLatch.countDown()
         }
 
+        countDownLatch.await()
+
+        playlistRadio = IntArray(numSong) { it + 1 }
+        playlistRadio?.shuffle()
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         notificationManager = applicationContext.getSystemService(
             NOTIFICATION_SERVICE
         ) as NotificationManager
@@ -135,8 +142,6 @@ class MoaiRadioService : Service(), OnPreparedListener {
             .addAction(playPauseAction)
             .addAction(nextAction)
             .build()
-
-
 
         startForeground(notificationId, notification)
 
@@ -236,7 +241,6 @@ class MoaiRadioService : Service(), OnPreparedListener {
                 .build()
 
             response = client.newCall(requesthttp).execute()
-
         }.invokeOnCompletion {
             info = Gson().fromJson(response?.body?.string(), Song::class.java)
 
@@ -259,7 +263,6 @@ class MoaiRadioService : Service(), OnPreparedListener {
         mediaPlayer.stop()
         mediaPlayer.release()
     }
-
 
     override fun onPrepared(mp: MediaPlayer?) {
         mediaPlayer.start()
