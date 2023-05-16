@@ -12,7 +12,6 @@ import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media.session.MediaButtonReceiver
 import com.google.gson.Gson
@@ -86,7 +85,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
 
         countDownLatch.await()
 
-        playlistRadio = IntArray(numSong) { it + 1 }
+        playlistRadio = IntArray(numSong) { it * 1 }
         playlistRadio?.shuffle()
     }
 
@@ -186,7 +185,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
                     } else {
                         currentSongId--
                     }
-                    mediaPlayer.setDataSource("https://moai.eu.pythonanywhere.com/".plus(playlistRadio?.get(currentSongId).toString())) // METTERE RANDOM
+                    mediaPlayer.setDataSource("https://moai.eu.pythonanywhere.com/".plus(playlistRadio?.get(currentSongId).toString()))
                     mediaPlayer.prepareAsync()
                 }
 
@@ -253,7 +252,6 @@ class MoaiRadioService : Service(), OnPreparedListener {
                 .build()
 
             mediaSession?.setMetadata(metadataBuilder)
-            info?.name?.let { it1 -> Log.d("METADATA", it1) }
 
             notificationManager!!.notify(notificationId, notification)
         }
