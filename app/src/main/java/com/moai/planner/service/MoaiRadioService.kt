@@ -43,7 +43,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
     private var notificationManager : NotificationManager? = null
     private var notification : Notification? = null
     private var info : Song? = null
-    private val notificationId = 1
+    private val notificationId = 2
 
     data class Song(
         val artist: String,
