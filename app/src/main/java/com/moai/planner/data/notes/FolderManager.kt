@@ -35,7 +35,6 @@ import java.text.DecimalFormat
 @SuppressLint("NotifyDataSetChanged")
 class FolderManager(private val activity: Activity, private val view: View) {
 
-
     private var firebase = UserAuthentication(activity.application)
     private var storage = Firebase.storage
     private var storageRef = storage.reference
@@ -43,7 +42,6 @@ class FolderManager(private val activity: Activity, private val view: View) {
     private var favouritesRef = realtimeDb.getReference("users/" + firebase.getCurrentUid().toString())
     private lateinit var folderPath: String
     private var currentFolder = ""
-
 
     fun getCollections(
         data: ArrayList<FolderItem>,
@@ -109,11 +107,21 @@ class FolderManager(private val activity: Activity, private val view: View) {
                                 val kbytes: Double = it.sizeBytes.toDouble() / 1024
                                 val size = df.format(kbytes) + "kB"
                                 fileItem.folder_files = size
+                                Log.d("VAMO", size)
                                 dbItem.setValue(fileItem)
                                 adapter.notifyDataSetChanged()
                             }
                         } else {
                             data.add(value)
+                            item.metadata.addOnSuccessListener {
+                                val df = DecimalFormat("#,##0.##")
+                                df.maximumFractionDigits = 2
+                                val kbytes: Double = it.sizeBytes.toDouble() / 1024
+                                val size = df.format(kbytes) + "kB"
+                                value.folder_files = size
+                                adapter.notifyDataSetChanged()
+                            }
+
                         }
                     }
                 }
@@ -146,7 +154,6 @@ class FolderManager(private val activity: Activity, private val view: View) {
     private fun getStorageReference(): StorageReference {
         return storageRef
     }
-
 
     suspend fun createFile(fileName: EditText, isFolder: Boolean = false) {
         val noteDir: StorageReference
@@ -207,7 +214,6 @@ class FolderManager(private val activity: Activity, private val view: View) {
         }
     }
 
-
     suspend fun deleteNote(
         adapter: FolderViewAdapter,
         shownFiles: ArrayList<FolderItem>,
@@ -255,13 +261,11 @@ class FolderManager(private val activity: Activity, private val view: View) {
             deleteFolder(result.prefixes, adapter, shownFiles, files, currentData)
             Utils.showPopup(view, activity, activity.getString(R.string.folder_delete))
             true
-
         } catch (e: java.lang.Exception) {
             Utils.showPopup(view, activity, activity.getString(R.string.delete_fail))
             false
         }
     }
-
 
     private fun checkItemPresence(
         currentData: ArrayList<FolderItem>,
@@ -285,7 +289,6 @@ class FolderManager(private val activity: Activity, private val view: View) {
             path = path.substringBeforeLast("/")
         }
     }
-
 
     fun fetchFavouritesFromFirebase(currentData: ArrayList<FolderItem>) {
         val favouritesListListener = object : ValueEventListener {
@@ -329,43 +332,41 @@ class FolderManager(private val activity: Activity, private val view: View) {
     }
 
     fun loadHome(userDir: StorageReference, adapter: FolderViewAdapter, data: ArrayList<FolderItem>) {
-        userDir.listAll()
-            .addOnSuccessListener { (_, prefixes) ->
-                if (prefixes.isEmpty()) {
-                    val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/temp.tmp")
-                    val text = " "
-                    val uploadFile = noteDir.putBytes(text.toByteArray())
-                    uploadFile.addOnSuccessListener {
-                        Log.d("FOLDER-CREATION", "Folder creato")
-                        loadHome(userDir, adapter, data)
+        userDir.listAll().addOnSuccessListener { (_, prefixes) ->
+            if (prefixes.isEmpty()) {
+                val noteDir = storageRef.child("${firebase.getCurrentUid()}/Notes/temp.tmp")
+                val text = " "
+                val uploadFile = noteDir.putBytes(text.toByteArray())
+                uploadFile.addOnSuccessListener {
+                    Log.d("FOLDER-CREATION", "Folder creato")
+                    loadHome(userDir, adapter, data)
+                }
+            } else {
+                prefixes.forEach { prefix ->
+                    Log.d("FIRESTORAGE-PREFIX", prefix.toString())
+                    val fileItem = FolderItem(
+                        prefix.toString().split("/").last().replace("%20", " "),
+                        "",
+                        false,
+                        R.drawable.folder
+                    )
+                    getFolderSize(prefix) { bytes, files ->
+                        val df = DecimalFormat("#,##0.##")
+                        df.maximumFractionDigits = 2
+                        val kb = bytes.toDouble() / 1024
+                        val info = df.format(kb) + "KB - " + files.toString() + " Notes"
+                        fileItem.folder_files = info
+                        data.add(fileItem)
+                        adapter.notifyItemInserted(data.lastIndex)
                     }
-                } else {
-                    prefixes.forEach { prefix ->
-                        Log.d("FIRESTORAGE-PREFIX", prefix.toString())
-                        val fileItem = FolderItem(
-                            prefix.toString().split("/").last().replace("%20", " "),
-                            "",
-                            false,
-                            R.drawable.folder
-                        )
-                        getFolderSize(prefix) { bytes, files ->
-                            val df = DecimalFormat("#,##0.##")
-                            df.maximumFractionDigits = 2
-                            val kb = bytes.toDouble() / 1024
-                            val info = df.format(kb) + "KB - " + files.toString() + " Notes"
-                            fileItem.folder_files = info
-                            data.add(fileItem)
-                            adapter.notifyItemInserted(data.lastIndex)
-                        }
-                        prefix.listAll()
-                    }
+                    prefix.listAll()
                 }
             }
-            .addOnFailureListener {
-                Log.d("FIRESTORAGE-ERROR", "Error getting file list")
-                Utils.showPopup(view, activity, activity.getString(R.string.file_load_error))
-            }
-
+        }
+        .addOnFailureListener {
+            Log.d("FIRESTORAGE-ERROR", "Error getting file list")
+            Utils.showPopup(view, activity, activity.getString(R.string.file_load_error))
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -440,9 +441,4 @@ class FolderManager(private val activity: Activity, private val view: View) {
             Log.d("Note", "Successful")
         }
     }
-
-
 }
-
-
-

@@ -39,7 +39,6 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 @Suppress("NAME_SHADOWING")
 class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItemListener{
 
@@ -57,11 +56,9 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
     private lateinit var currentDate: String
     private var recyclerView: RecyclerView? = null
     private var manualUpdateUI: Boolean = false
-    //private var todoListener: ToDoItemListener = context as ToDoItemListener
 
     // Adapter per la RecyclerView
     private var adapter = ToDoListAdapter(toDoList)
-
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreateView(
@@ -188,6 +185,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         itemTouchHelper.attachToRecyclerView(recyclerView)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         NetworkUtils.notifyMissingNetwork(requireContext(), requireView(), requireActivity())
@@ -207,8 +205,8 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         init()
         // Mette la home come main
         bottomNav.menu.getItem(2).isChecked = true
-
     }
+
     // Adapter per la RecyclerView
     inner class ToDoListAdapter(private val items: List<ToDoItem>) : RecyclerView.Adapter<ToDoViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
@@ -234,6 +232,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         var timeView: TextView = itemView.findViewById(R.id.timeView)
         val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
     }
+
     private fun showAddItemDialog() {
         val layoutInflater = LayoutInflater.from(context)
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
@@ -289,6 +288,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         pickTimeListener(editTimeItem)
         dialog.show()
     }
+
     private fun init() {
         binding.apply {
             toolbar.title = sdf.format(cal.time).replaceFirstChar { it.uppercase() }
@@ -296,6 +296,7 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
             calendarView.adapter = calendarAdapter
         }
     }
+
     private fun displayDatePicker() {
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
@@ -306,16 +307,17 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         datePicker.show(parentFragmentManager, "DatePicker")
         datePicker.addOnPositiveButtonClickListener {
 
-        try {
-            toolbar.title = sdf.format(it)
-            cal.time = Date(it)
-            getDates()
-            onSelect(CalendarData(Date(it), true), (cal.get(Calendar.DAY_OF_MONTH) - 1))
-        } catch (_: ParseException) {
+            try {
+                toolbar.title = sdf.format(it).replaceFirstChar { it.uppercase() }
+                cal.time = Date(it)
+                getDates()
+                onSelect(CalendarData(Date(it), true), (cal.get(Calendar.DAY_OF_MONTH) - 1))
+            } catch (_: ParseException) {
 
             }
         }
     }
+
     private fun getDates() {
 
         val dateList = ArrayList<CalendarData>() // For our Calendar Data Class
@@ -399,6 +401,4 @@ class ToDoListFragment : Fragment(), CalendarAdapter.CalendarInterface, ToDoItem
         ref.child("time").setValue(time)
         adapter.notifyItemChanged(position)
     }
-
-
 }

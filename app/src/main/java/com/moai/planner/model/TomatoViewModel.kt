@@ -12,8 +12,8 @@ class TomatoViewModel : ViewModel() {
     var paused = MutableLiveData(false)
     var timeLabel = MutableLiveData("")
     var timer = MutableLiveData<CountDownTimer>(null)
+    var info = MutableLiveData<String>("")
     var pausa = MutableLiveData(false)
-
 
     fun updateTimer(duration: Long) {
         timeRemaining.value = duration
@@ -25,5 +25,6 @@ class TomatoViewModel : ViewModel() {
         maxRounds.value = -1
         paused.value = false
         timer.value?.cancel()
+        info.value = ""
     }
 }

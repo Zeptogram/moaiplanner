@@ -179,7 +179,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
                     super.onSkipToPrevious()
                     mediaPlayer.stop()
                     mediaPlayer.reset()
-                    updatePlaybackState(PlaybackState.STATE_STOPPED)
+                    //updatePlaybackState(PlaybackState.STATE_STOPPED)
                     if (currentSongId == 0) {
                         currentSongId = numSong - 1
                     } else {
@@ -204,7 +204,7 @@ class MoaiRadioService : Service(), OnPreparedListener {
     private fun skipSong() {
         mediaPlayer.stop()
         mediaPlayer.reset()
-        updatePlaybackState(PlaybackState.STATE_STOPPED)
+        //updatePlaybackState(PlaybackState.STATE_STOPPED)
         currentSongId = (currentSongId + 1) % numSong
         mediaPlayer.setDataSource("https://moai.eu.pythonanywhere.com/".plus(playlistRadio?.get(currentSongId).toString()))
         mediaPlayer.prepareAsync()

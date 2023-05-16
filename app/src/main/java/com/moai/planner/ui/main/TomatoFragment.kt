@@ -28,7 +28,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 @Suppress("DEPRECATION")
 class TomatoFragment : Fragment() {
     private lateinit var settingsViewModel: SettingsViewModel
@@ -47,19 +46,17 @@ class TomatoFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        radioPlaying = isServiceRunning(getString(R.string.service_name))
+        radioPlaying = isServiceRunning(contesto.getString(R.string.service_name))
         if (radioPlaying) {
             binding.musicPlay.setImageResource(R.drawable.ic_baseline_stop_24)
         }
     }
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        contesto = requireActivity()
         binding = TomatoFragmentBinding.inflate(inflater, container, false)
         // ViewModels
         val factory = SettingsViewModelFactory(SettingsRepository(requireActivity()))
@@ -73,21 +70,26 @@ class TomatoFragment : Fragment() {
         else if(pomodoroViewModel.maxRounds.value?.toInt() != settingsViewModel.round.value?.toInt())
             reset()
 
+        if(pomodoroViewModel.info.value == "")
+            binding.typeLabel.text = contesto.getString(R.string.time_to_focus)
+        else
+            binding.typeLabel.text = pomodoroViewModel.info.value
+
         minutesSession = settingsViewModel.session.value?.toLong() ?: 5
         minutesBreak = settingsViewModel.pausa.value?.toLong() ?: 1
         roundsRemaining = pomodoroViewModel.rounds.value!!
         if(roundsRemaining.toInt() == -1) {
             roundsRemaining = settingsViewModel.round.value?.toLong() ?: 1
             pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong() ?: 1
-            binding.roundsRemaining.text =  getString(R.string.round_div,  roundsRemaining.toString(), settingsViewModel.round.value.toString())
+            binding.roundsRemaining.text =  contesto.getString(R.string.round_div,  roundsRemaining.toString(), settingsViewModel.round.value.toString())
         }
 
         // osservazione sui valori delle impostazioni
         settingsViewModel.session.observe(viewLifecycleOwner) {
-            binding.sessione.text = getString(R.string.mins, settingsViewModel.session.value.toString())
+            binding.sessione.text = contesto.getString(R.string.mins, settingsViewModel.session.value.toString())
         }
         settingsViewModel.pausa.observe(viewLifecycleOwner) {
-            binding.pausa.text = getString(R.string.mins, settingsViewModel.pausa.value.toString())
+            binding.pausa.text = contesto.getString(R.string.mins, settingsViewModel.pausa.value.toString())
         }
 
         updateRound()
@@ -108,8 +110,7 @@ class TomatoFragment : Fragment() {
                 binding.playPause.setImageResource(R.drawable.ic_baseline_pause_24)
 
             }
-        }
-        else {
+        } else {
             initTimerLabel()
         }
 
@@ -131,7 +132,6 @@ class TomatoFragment : Fragment() {
         }
 
         return binding.root
-
     }
 
     private fun isServiceRunning(serviceName: String): Boolean {
@@ -148,7 +148,6 @@ class TomatoFragment : Fragment() {
         }
         return serviceRunning
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -194,9 +193,7 @@ class TomatoFragment : Fragment() {
     }
 
     private fun initTimer() {
-
         pomodoroViewModel.timer.value?.cancel()
-        contesto = requireActivity()
         pomodoroDuration = pomodoroViewModel.timeRemaining.value!!
         pomodoroViewModel.updateTimer(pomodoroDuration)
         max = pomodoroViewModel.timeMax.value!!
@@ -205,12 +202,14 @@ class TomatoFragment : Fragment() {
             if(pomodoroViewModel.pausa.value == false) {
                 pomodoroDuration = minutesSession * 60 * 1000
                 pomodoroViewModel.pausa.value = true
-                binding.typeLabel.text = getString(R.string.work)
+                pomodoroViewModel.info.value = contesto.getString(R.string.work)
+                binding.typeLabel.text = pomodoroViewModel.info.value
             }
             else {
                 pomodoroDuration = minutesBreak * 60 * 1000
                 pomodoroViewModel.pausa.value = false
-                binding.typeLabel.text = getString(R.string.pausa)
+                pomodoroViewModel.info.value = contesto.getString(R.string.pausa)
+                binding.typeLabel.text = pomodoroViewModel.info.value
 
             }
             binding.timerBar.max = pomodoroDuration.toInt()
@@ -242,7 +241,6 @@ class TomatoFragment : Fragment() {
                 }
             }
 
-
             override fun onFinish() {
                 stop(true)
                 if(settingsViewModel.notifiche.value == true) {
@@ -262,27 +260,26 @@ class TomatoFragment : Fragment() {
                     if(pomodoroViewModel.pausa.value == true) {
                         notification = NotificationCompat.Builder(contesto, channelId)
                             .setSmallIcon(R.drawable.baseline_timer_24)
-                            .setContentTitle(getString(R.string.app_name))
-                            .setContentText(getString(R.string.time_break, minutesBreak.toString()))
+                            .setContentTitle(contesto.getString(R.string.app_name))
+                            .setContentText(contesto.getString(R.string.time_break, minutesBreak.toString()))
                             .setAutoCancel(true)
                             .build()
-                    }
-                    else{
+                    } else{
                         roundsRemaining--
                         pomodoroViewModel.rounds.value = roundsRemaining
                         if(roundsRemaining <= 0){
                             notification = NotificationCompat.Builder(contesto, channelId)
                                 .setSmallIcon(R.drawable.baseline_timer_24)
-                                .setContentTitle(getString(R.string.app_name))
-                                .setContentText(getString(R.string.last_round_notification))
+                                .setContentTitle(contesto.getString(R.string.app_name))
+                                .setContentText(contesto.getString(R.string.last_round_notification))
                                 .setAutoCancel(true)
                                 .build()
                         }
                         else {
                             notification = NotificationCompat.Builder(contesto, channelId)
                                 .setSmallIcon(R.drawable.baseline_timer_24)
-                                .setContentTitle(getString(R.string.app_name))
-                                .setContentText(getString(R.string.starting_session, minutesSession.toString(), roundsRemaining.toString()))
+                                .setContentTitle(contesto.getString(R.string.app_name))
+                                .setContentText(contesto.getString(R.string.starting_session, minutesSession.toString(), roundsRemaining.toString()))
                                 .setAutoCancel(true)
                                 .build()
                         }
@@ -299,7 +296,6 @@ class TomatoFragment : Fragment() {
                 }
                 else
                     restart()
-
             }
         }
     }
@@ -311,7 +307,7 @@ class TomatoFragment : Fragment() {
         else
             binding.timerBar.progress = 100
         initTimerLabel()
-        binding.typeLabel.text = getString(R.string.time_to_focus)
+        binding.typeLabel.text = contesto.getString(R.string.time_to_focus)
         binding.timerBar.max = 100
         max = 100
         running = false
@@ -326,8 +322,6 @@ class TomatoFragment : Fragment() {
             pomodoroViewModel.rounds.value = roundsRemaining
             updateRound()
         }
-
-
     }
 
     private fun start() {
@@ -357,7 +351,6 @@ class TomatoFragment : Fragment() {
         pomodoroViewModel.rounds.value = settingsViewModel.round.value?.toLong()
         roundsRemaining = settingsViewModel.round.value?.toLong()!!
         pomodoroViewModel.maxRounds.value = settingsViewModel.round.value?.toLong()
-        binding.typeLabel.text = getString(R.string.time_to_focus)
         updateRound()
     }
 
@@ -366,10 +359,10 @@ class TomatoFragment : Fragment() {
         pomodoroViewModel.rounds.observe(viewLifecycleOwner) {
             // Reset Rounds
             if(roundsRemaining < 0)
-                binding.roundsRemaining.text = getString(R.string.round_div, settingsViewModel.round.value.toString(), settingsViewModel.round.value.toString())
+                binding.roundsRemaining.text = contesto.getString(R.string.round_div, settingsViewModel.round.value.toString(), settingsViewModel.round.value.toString())
             // Aggiorno
             else
-                binding.roundsRemaining.text = getString(R.string.round_div, pomodoroViewModel.rounds.value.toString(), settingsViewModel.round.value.toString())
+                binding.roundsRemaining.text = contesto.getString(R.string.round_div, pomodoroViewModel.rounds.value.toString(), settingsViewModel.round.value.toString())
         }
     }
 
@@ -388,5 +381,3 @@ class TomatoFragment : Fragment() {
         }
     }
 }
-
-
