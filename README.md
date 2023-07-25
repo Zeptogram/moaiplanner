@@ -3,6 +3,11 @@
   <img src="screenshots/01%20-%20app_icon.png">
 </p>
 
+## Screenshots
+
+- [Screenshots](screenshots)
+
+
 
 ## Gruppo e Membri:
 __Nome Gruppo:__ 
