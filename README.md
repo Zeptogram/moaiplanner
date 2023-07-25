@@ -1,7 +1,14 @@
 # Moai Planner: Applicazione mobile per la produttività.
 
-[![Download Documentation](https://img.shields.io/badge/Download%20Docs-pdf-lime.svg)](https://github.com/Zeptogram/moaiplanner/releases/download/moaidocs/Moai.Planner.-.Documentazione.-.Gruppo.Airdroppers.pdf
+[![Download Documentation](https://img.shields.io/badge/Download%20Docs-PDF-lime.svg)](https://github.com/Zeptogram/moaiplanner/releases/download/moaidocs/Moai.Planner.-.Documentazione.-.Gruppo.Airdroppers.pdf
 )
+[![Kotlin](https://img.shields.io/badge/Kotlin-purple.svg)](https://kotlinlang.org/docs/home.html)
+[![Firebase](https://img.shields.io/badge/Firebase-orange.svg)](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
+[![Android](https://img.shields.io/badge/Android-green.svg)](https://developer.android.com/docs?hl=it)
+[![Android](https://img.shields.io/badge/Material3-red.svg)](https://m3.material.io/)
+
+
+
 
 <p align="center">
   <img src="screenshots/01%20-%20app_icon.png">
