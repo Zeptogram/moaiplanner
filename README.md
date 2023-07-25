@@ -7,18 +7,6 @@
   <img src="features.png">
 </p>
 
-
-## Gruppo e Membri:
-__Nome Gruppo:__ 
-- Airdroppers
-
-__Membri:__
-- Gargiulo Elio 869184 (Referente)
-- Rigato Stefano 869441
-- Mocellin Andrea 869218
-- Lamanna Francesco 869052
-- Isavo Benavides Milla Nicolle 875386  
-
 ## Features:
 
 - Pianificazione del lavoro e impegni (es. ToDoList, Pomodoro Timer).
@@ -31,6 +19,17 @@ __Membri:__
 - [Docs](Moai%20Planner%20-%20Documentazione%20-%20Gruppo%20Airdroppers.pdf)
 - [Presentazione](Moai%20Planner%20-%20Presentazione%20-%20Gruppo%20Airdroppers.pdf)
 - [Screenshots](screeshots)
+
+## Gruppo e Autori:
+__Nome Gruppo:__ 
+- Airdroppers
+
+__Autori:__
+- Gargiulo Elio 869184 (Referente)
+- Rigato Stefano 869441
+- Mocellin Andrea 869218
+- Lamanna Francesco 869052
+- Isavo Benavides Milla Nicolle 875386  
 
 ## Link utili
 - [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
