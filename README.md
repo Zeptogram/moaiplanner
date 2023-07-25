@@ -28,7 +28,7 @@
 ## Documentazione e Presentazione
 - [Docs](Moai%20Planner%20-%20Documentazione%20-%20Gruppo%20Airdroppers.pdf)
 - [Presentazione](Moai%20Planner%20-%20Presentazione%20-%20Gruppo%20Airdroppers.pdf)
-- [Screenshots](screeshots)
+- [Screenshots](screenshots)
 
 ## Gruppo e Autori:
 __Nome Gruppo:__ 
