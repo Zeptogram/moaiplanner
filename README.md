@@ -23,6 +23,10 @@ __Membri:__
 - Possibilità di organizzare le note attraverso un File Manager su Cloud (Aggiunta, Cancellazione di note e cartelle).
 - Sistema di account per mantenere tutto sincronizzato su diversi dispositivi e accesso con Google.
 
+## Documentazione e Presentazione
+- [Docs](Moai%20Planner%20-%20Documentazione%20-%20Gruppo%20Airdroppers.pdf)
+- [Presentazione](Moai%20Planner%20-%20Presentazione%20-%20Gruppo%20Airdroppers.pdf)
+
 ## Link utili
 - [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
 - [Firebase Authentication](https://firebase.google.com/docs/auth/android/start?authuser=1#kotlin+ktx_2)
