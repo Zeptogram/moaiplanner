@@ -3,10 +3,9 @@
   <img src="screenshots/01%20-%20app_icon.png">
 </p>
 
-## Screenshots
-
-- [Screenshots](screenshots)
-
+<p align="center">
+  <img src="features.png">
+</p>
 
 
 ## Gruppo e Membri:
@@ -31,6 +30,7 @@ __Membri:__
 ## Documentazione e Presentazione
 - [Docs](Moai%20Planner%20-%20Documentazione%20-%20Gruppo%20Airdroppers.pdf)
 - [Presentazione](Moai%20Planner%20-%20Presentazione%20-%20Gruppo%20Airdroppers.pdf)
+- [Screenshots](screeshots)
 
 ## Link utili
 - [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
