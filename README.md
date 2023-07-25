@@ -1,12 +1,11 @@
 # Moai Planner: Applicazione mobile per la produttività.
 
-[![Download Documentation](https://img.shields.io/badge/Download%20Docs-PDF-lime.svg)](https://github.com/Zeptogram/moaiplanner/releases/download/moaidocs/Moai.Planner.-.Documentazione.-.Gruppo.Airdroppers.pdf
+[![Download Documentation](https://img.shields.io/badge/Download%20Docs-PDF-lime.svg?style=for-the-badge)](https://github.com/Zeptogram/moaiplanner/releases/download/moaidocs/Moai.Planner.-.Documentazione.-.Gruppo.Airdroppers.pdf
 )
-[![Kotlin](https://img.shields.io/static/v1?style=flat&message=Kotlin&color=7F52FF&logo=Kotlin&logoColor=FFFFFF&label=)](https://kotlinlang.org/docs/home.html)
-[![Firebase](https://img.shields.io/static/v1?style=flat&message=Firebase&color=222222&logo=Firebase&logoColor=FFCA28&label=)](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
-[![Android](https://img.shields.io/static/v1?style=flat&message=Android&color=222222&logo=Android&logoColor=3DDC84&label=)](https://developer.android.com/docs?hl=it)
-[![Material Design](https://img.shields.io/static/v1?style=fflat&message=Material+Design&color=757575&logo=Material+Design&logoColor=FFFFFF&label=)](https://m3.material.io/)
-
+[![Kotlin](https://img.shields.io/static/v1?style=for-the-badge&message=Kotlin&color=7F52FF&logo=Kotlin&logoColor=FFFFFF&label=)](https://kotlinlang.org/docs/home.html)
+[![Firebase](https://img.shields.io/static/v1?style=for-the-badge&message=Firebase&color=222222&logo=Firebase&logoColor=FFCA28&label=)](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
+[![Android](https://img.shields.io/static/v1?style=for-the-badge&message=Android&color=222222&logo=Android&logoColor=3DDC84&label=)](https://developer.android.com/docs?hl=it)
+[![Material Design](https://img.shields.io/static/v1?style=for-the-badge&message=Material+Design&color=757575&logo=Material+Design&logoColor=FFFFFF&label=)](https://m3.material.io/)
 
 
 
