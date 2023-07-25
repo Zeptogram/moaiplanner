@@ -1,5 +1,5 @@
 package com.moai.planner.ui.main
-
+// Check https://github.com/wbrawner/SimpleMarkdown for Similar Class
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
