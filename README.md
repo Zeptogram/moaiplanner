@@ -1,6 +1,7 @@
 # Moai Planner: Applicazione mobile per la produttività.
-
-![Icon](screenshots/01%20-%20app_icon.png)
+<p align="center">
+  <img width="460" height="300" src="screenshots/01%20-%20app_icon.png">
+</p>
 
 
 ## Gruppo e Membri:
