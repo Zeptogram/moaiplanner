@@ -2,10 +2,10 @@
 
 [![Download Documentation](https://img.shields.io/badge/Download%20Docs-PDF-lime.svg)](https://github.com/Zeptogram/moaiplanner/releases/download/moaidocs/Moai.Planner.-.Documentazione.-.Gruppo.Airdroppers.pdf
 )
-[![Kotlin](https://img.shields.io/badge/Kotlin-purple.svg)](https://kotlinlang.org/docs/home.html)
-[![Firebase](https://img.shields.io/badge/Firebase-orange.svg)](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
-[![Android](https://img.shields.io/badge/Android-green.svg)](https://developer.android.com/docs?hl=it)
-[![Android](https://img.shields.io/badge/Material3-red.svg)](https://m3.material.io/)
+[![Kotlin](https://img.shields.io/static/v1?style=flat&message=Kotlin&color=7F52FF&logo=Kotlin&logoColor=FFFFFF&label=)](https://kotlinlang.org/docs/home.html)
+[![Firebase](https://img.shields.io/static/v1?style=flat&message=Firebase&color=222222&logo=Firebase&logoColor=FFCA28&label=)](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
+[![Android](https://img.shields.io/static/v1?style=flat&message=Android&color=222222&logo=Android&logoColor=3DDC84&label=)](https://developer.android.com/docs?hl=it)
+[![Material Design](https://img.shields.io/static/v1?style=fflat&message=Material+Design&color=757575&logo=Material+Design&logoColor=FFFFFF&label=)](https://m3.material.io/)
 
 
 
@@ -42,9 +42,3 @@ __Autori:__
 - Lamanna Francesco 869052
 - Isavo Benavides Milla Nicolle 875386  
 
-## Link utili
-- [Firebase](https://firebase.google.com/docs/reference/kotlin/packages?authuser=1)
-- [Firebase Authentication](https://firebase.google.com/docs/auth/android/start?authuser=1#kotlin+ktx_2)
-- [Material3](https://m3.material.io/)
-- [Documentazione Kotlin](https://kotlinlang.org/docs/home.html)
-- [Documentazione Android](https://developer.android.com/docs?hl=it)
