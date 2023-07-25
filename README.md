@@ -1,4 +1,8 @@
 # Moai Planner: Applicazione mobile per la produttività.
+
+[![Download Documentation](https://img.shields.io/badge/Download%20Docs-pdf-lime.svg)](https://github.com/Zeptogram/moaiplanner/releases/download/moaidocs/Moai.Planner.-.Documentazione.-.Gruppo.Airdroppers.pdf
+)
+
 <p align="center">
   <img src="screenshots/01%20-%20app_icon.png">
 </p>
