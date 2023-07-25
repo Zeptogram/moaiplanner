@@ -1,5 +1,8 @@
 # Moai Planner: Applicazione mobile per la produttività.
 
+![Icon](screenshots/01%20-%20app_icon.png)
+
+
 ## Gruppo e Membri:
 __Nome Gruppo:__ 
 - Airdroppers
